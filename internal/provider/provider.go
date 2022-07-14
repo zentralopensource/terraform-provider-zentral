@@ -41,7 +41,7 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 	var baseURL string
 	if data.BaseURL.Unknown {
 		resp.Diagnostics.AddWarning(
-			"Unable to create client",
+			"Zentral provider configuration error",
 			"Cannot use unknown value as base URL",
 		)
 		return
@@ -55,7 +55,7 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 
 	if baseURL == "" {
 		resp.Diagnostics.AddError(
-			"Unable to find base URL",
+			"Zentral provider configuration error",
 			"Base URL cannot be an empty string",
 		)
 		return
@@ -65,7 +65,7 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 	var token string
 	if data.Token.Unknown {
 		resp.Diagnostics.AddWarning(
-			"Unable to create client",
+			"Zentral provider configuration error",
 			"Cannot use unknown value as token",
 		)
 		return
@@ -79,7 +79,7 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 
 	if token == "" {
 		resp.Diagnostics.AddError(
-			"Unable to find token",
+			"Zentral provider configuration error",
 			"Token cannot be an empty string",
 		)
 		return
