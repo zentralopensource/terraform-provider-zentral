@@ -11,9 +11,16 @@ func TestAccMetaBusinessUnitDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Read testing
+			// Read by ID testing
 			{
-				Config: testAccMetaBusinessUnitDataSourceConfig,
+				Config: testAccMetaBusinessUnitDataSourceByIDConfig,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.zentral_meta_business_unit.test", "name", "default"),
+				),
+			},
+			// Read by name testing
+			{
+				Config: testAccMetaBusinessUnitDataSourceByNameConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.zentral_meta_business_unit.test", "id", "1"),
 				),
@@ -22,7 +29,13 @@ func TestAccMetaBusinessUnitDataSource(t *testing.T) {
 	})
 }
 
-const testAccMetaBusinessUnitDataSourceConfig = `
+const testAccMetaBusinessUnitDataSourceByIDConfig = `
+data "zentral_meta_business_unit" "test" {
+  id = 1
+}
+`
+
+const testAccMetaBusinessUnitDataSourceByNameConfig = `
 data "zentral_meta_business_unit" "test" {
   name = "default"
 }
