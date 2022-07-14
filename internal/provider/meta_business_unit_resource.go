@@ -21,21 +21,24 @@ type metaBusinessUnitResourceType struct{}
 
 func (t metaBusinessUnitResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
+		Description:         "Meta business unit",
 		MarkdownDescription: "Meta business unit",
 
 		Attributes: map[string]tfsdk.Attribute{
 			"name": {
+				Description:         "Name of the meta business unit",
 				MarkdownDescription: "Name of the meta business unit",
-				Required:            true,
 				Type:                types.StringType,
+				Required:            true,
 			},
 			"id": {
-				Computed:            true,
+				Description:         "ID of the meta business unit",
 				MarkdownDescription: "ID of the meta business unit",
+				Type:                types.Int64Type,
+				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
 					tfsdk.UseStateForUnknown(),
 				},
-				Type: types.Int64Type,
 			},
 		},
 	}, nil
@@ -49,17 +52,12 @@ func (t metaBusinessUnitResourceType) NewResource(ctx context.Context, in tfsdk.
 	}, diags
 }
 
-type metaBusinessUnitResourceData struct {
-	Name types.String `tfsdk:"name"`
-	Id   types.Int64  `tfsdk:"id"`
-}
-
 type metaBusinessUnitResource struct {
 	provider provider
 }
 
 func (r metaBusinessUnitResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
-	var data metaBusinessUnitResourceData
+	var data metaBusinessUnit
 
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -73,20 +71,21 @@ func (r metaBusinessUnitResource) Create(ctx context.Context, req tfsdk.CreateRe
 	}
 	mbu, _, err := r.provider.client.MetaBusinessUnits.Create(ctx, mbuCreateRequest)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create meta business unit, got error: %s", err))
+		resp.Diagnostics.AddError(
+			"Client Error",
+			fmt.Sprintf("Unable to create meta business unit, got error: %s", err),
+		)
 		return
 	}
 
-	data.Id = types.Int64{Value: int64(mbu.ID)}
-
 	tflog.Trace(ctx, "created a meta business unit")
 
-	diags = resp.State.Set(ctx, &data)
+	diags = resp.State.Set(ctx, metaBusinessUnitForState(mbu))
 	resp.Diagnostics.Append(diags...)
 }
 
 func (r metaBusinessUnitResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
-	var data metaBusinessUnitResourceData
+	var data metaBusinessUnit
 
 	diags := req.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -95,25 +94,23 @@ func (r metaBusinessUnitResource) Read(ctx context.Context, req tfsdk.ReadResour
 		return
 	}
 
-	mbu, _, err := r.provider.client.MetaBusinessUnits.GetByID(ctx, int(data.Id.Value))
+	mbu, _, err := r.provider.client.MetaBusinessUnits.GetByID(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read meta business unit %d, got error: %s", data.Id.Value, err),
+			fmt.Sprintf("Unable to read meta business unit %d, got error: %s", data.ID.Value, err),
 		)
 		return
 	}
 
-	data.Name = types.String{Value: mbu.Name}
-
 	tflog.Trace(ctx, "read a meta business unit")
 
-	diags = resp.State.Set(ctx, &data)
+	diags = resp.State.Set(ctx, metaBusinessUnitForState(mbu))
 	resp.Diagnostics.Append(diags...)
 }
 
 func (r metaBusinessUnitResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
-	var data metaBusinessUnitResourceData
+	var data metaBusinessUnit
 
 	diags := req.Plan.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -125,23 +122,23 @@ func (r metaBusinessUnitResource) Update(ctx context.Context, req tfsdk.UpdateRe
 	mbuUpdateRequest := &goztl.MetaBusinessUnitUpdateRequest{
 		Name: data.Name.Value,
 	}
-	_, _, err := r.provider.client.MetaBusinessUnits.Update(ctx, int(data.Id.Value), mbuUpdateRequest)
+	mbu, _, err := r.provider.client.MetaBusinessUnits.Update(ctx, int(data.ID.Value), mbuUpdateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to update meta business unit %d, got error: %s", data.Id.Value, err),
+			fmt.Sprintf("Unable to update meta business unit %d, got error: %s", data.ID.Value, err),
 		)
 		return
 	}
 
 	tflog.Trace(ctx, "updated a meta business unit")
 
-	diags = resp.State.Set(ctx, &data)
+	diags = resp.State.Set(ctx, metaBusinessUnitForState(mbu))
 	resp.Diagnostics.Append(diags...)
 }
 
 func (r metaBusinessUnitResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
-	var data metaBusinessUnitResourceData
+	var data metaBusinessUnit
 
 	diags := req.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -150,11 +147,11 @@ func (r metaBusinessUnitResource) Delete(ctx context.Context, req tfsdk.DeleteRe
 		return
 	}
 
-	_, err := r.provider.client.MetaBusinessUnits.Delete(ctx, int(data.Id.Value))
+	_, err := r.provider.client.MetaBusinessUnits.Delete(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to delete meta business unit %d, got error: %s", data.Id.Value, err),
+			fmt.Sprintf("Unable to delete meta business unit %d, got error: %s", data.ID.Value, err),
 		)
 		return
 	}
