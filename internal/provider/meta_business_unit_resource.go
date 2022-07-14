@@ -3,12 +3,10 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
 )
@@ -161,13 +159,5 @@ func (r metaBusinessUnitResource) Delete(ctx context.Context, req tfsdk.DeleteRe
 }
 
 func (r metaBusinessUnitResource) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	mbuID, err := strconv.ParseInt(req.ID, 10, 64)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Invalid resource ID",
-			"Zentral meta business unit ID must be an integer",
-		)
-	} else {
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"), types.Int64{Value: mbuID})...)
-	}
+	resourceImportStatePassthroughZentralID(ctx, "meta business unit", req, resp)
 }
