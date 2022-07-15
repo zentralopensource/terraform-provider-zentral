@@ -20,8 +20,8 @@ type tagResourceType struct{}
 
 func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description:         "Meta business unit",
-		MarkdownDescription: "Meta business unit",
+		Description:         "Tag",
+		MarkdownDescription: "Tag",
 
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
