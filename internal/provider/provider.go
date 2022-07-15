@@ -101,6 +101,7 @@ func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceT
 	return map[string]tfsdk.ResourceType{
 		"zentral_meta_business_unit": metaBusinessUnitResourceType{},
 		"zentral_tag":                tagResourceType{},
+		"zentral_taxonomy":           taxonomyResourceType{},
 	}, nil
 }
 
@@ -108,6 +109,7 @@ func (p *provider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSou
 	return map[string]tfsdk.DataSourceType{
 		"zentral_meta_business_unit": metaBusinessUnitDataSourceType{},
 		"zentral_tag":                tagDataSourceType{},
+		"zentral_taxonomy":           TaxonomyDataSourceType{},
 	}, nil
 }
 
