@@ -85,7 +85,8 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 		return
 	}
 
-	c, err := goztl.NewClient(nil, baseURL, token)
+	userAgent := fmt.Sprintf("terraform-provider-zentral/%s", p.version)
+	c, err := goztl.NewClient(nil, baseURL, token, goztl.SetUserAgent(userAgent))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create client",
