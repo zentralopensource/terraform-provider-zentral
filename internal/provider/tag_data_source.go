@@ -28,6 +28,12 @@ func (t tagDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Di
 				Type:                types.Int64Type,
 				Optional:            true,
 			},
+			"taxonomy_id": {
+				Description:         "ID of the tag taxonomy",
+				MarkdownDescription: "ID of the tag taxonomy",
+				Type:                types.Int64Type,
+				Computed:            true,
+			},
 			"name": {
 				Description:         "Name of the tag",
 				MarkdownDescription: "Name of the tag",

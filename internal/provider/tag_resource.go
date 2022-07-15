@@ -33,6 +33,12 @@ func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 					tfsdk.UseStateForUnknown(),
 				},
 			},
+			"taxonomy_id": {
+				Description:         "ID of the tag taxonomy",
+				MarkdownDescription: "ID of the tag taxonomy",
+				Type:                types.Int64Type,
+				Optional:            true,
+			},
 			"name": {
 				Description:         "Name of the tag",
 				MarkdownDescription: "Name of the tag",
@@ -44,6 +50,7 @@ func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 				MarkdownDescription: "Color of the tag",
 				Type:                types.StringType,
 				Optional:            true,
+				Computed:            true,
 			},
 		},
 	}, nil
@@ -74,6 +81,9 @@ func (r tagResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	tagCreateRequest := &goztl.TagCreateRequest{
 		Name:  data.Name.Value,
 		Color: data.Color.Value,
+	}
+	if !data.TaxonomyID.Null {
+		tagCreateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.Value))
 	}
 	tag, _, err := r.provider.client.Tags.Create(ctx, tagCreateRequest)
 	if err != nil {
@@ -128,6 +138,9 @@ func (r tagResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	tagUpdateRequest := &goztl.TagUpdateRequest{
 		Name:  data.Name.Value,
 		Color: data.Color.Value,
+	}
+	if !data.TaxonomyID.Null {
+		tagUpdateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.Value))
 	}
 	tag, _, err := r.provider.client.Tags.Update(ctx, int(data.ID.Value), tagUpdateRequest)
 	if err != nil {
