@@ -4,9 +4,9 @@ go 1.18
 
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.13.0
-	github.com/hashicorp/terraform-plugin-framework v0.9.0
-	github.com/hashicorp/terraform-plugin-go v0.11.0
-	github.com/hashicorp/terraform-plugin-log v0.4.1
+	github.com/hashicorp/terraform-plugin-framework v0.10.0
+	github.com/hashicorp/terraform-plugin-go v0.12.0
+	github.com/hashicorp/terraform-plugin-log v0.6.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.18.0
 	github.com/zentralopensource/goztl v0.1.0
 )
@@ -68,6 +68,6 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
 	google.golang.org/genproto v0.0.0-20200904004341-0bd0a958aa1d // indirect
-	google.golang.org/grpc v1.47.0 // indirect
+	google.golang.org/grpc v1.48.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 )
