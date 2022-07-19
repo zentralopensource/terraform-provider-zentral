@@ -1,76 +1,78 @@
 package provider
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestAccTagDataSource(t *testing.T) {
+	taxName := acctest.RandString(12)
+	t1Name := acctest.RandString(12)
+	t2Name := acctest.RandString(12)
+	t1Color := "0079bf" // default color
+	t2Color := acctest.RandStringFromCharSet(6, "abcdef0123456789")
+	tResourceName := "zentral_taxonomy.test"
+	t1ResourceName := "zentral_tag.test1"
+	t2ResourceName := "zentral_tag.test2"
+	ds1ResourceName := "data.zentral_tag.test1_by_name"
+	ds2ResourceName := "data.zentral_tag.test2_by_id"
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Read by ID testing
 			{
-				Config: testAccTagDataSourceByIDConfig,
+				Config: testAccTagDataSourceConfig(taxName, t1Name, t2Name, t2Color),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckNoResourceAttr("data.zentral_tag.test", "taxonomy_id"),
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "name", "default"),
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "color", "c377e0"),
-				),
-			},
-			// Read by name testing
-			{
-				Config: testAccTagDataSourceByNameConfig,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckNoResourceAttr("data.zentral_tag.test", "taxonomy_id"),
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "id", "3"),
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "color", "c377e0"),
-				),
-			},
-			// Read by ID with taxonomy testing
-			{
-				Config: testAccTagDataSourceByIDWithTaxonomyConfig,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "taxonomy_id", "1"),
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "name", "default-with-taxonomy"),
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "color", "eb5a46"),
-				),
-			},
-			// Read by name with taxonomy testing
-			{
-				Config: testAccTagDataSourceByNameWithTaxonomyConfig,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "id", "44"),
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "taxonomy_id", "1"),
-					resource.TestCheckResourceAttr("data.zentral_tag.test", "color", "eb5a46"),
+					// Read by name, no taxonomy, default color
+					resource.TestCheckResourceAttrPair(
+						ds1ResourceName, "id", t1ResourceName, "id"),
+					resource.TestCheckNoResourceAttr(
+						ds1ResourceName, "taxonomy_id"),
+					resource.TestCheckResourceAttr(
+						ds1ResourceName, "name", t1Name),
+					resource.TestCheckResourceAttr(
+						ds1ResourceName, "color", t1Color),
+					// Read by ID, taxonomy, color
+					resource.TestCheckResourceAttrPair(
+						ds2ResourceName, "id", t2ResourceName, "id"),
+					resource.TestCheckResourceAttrPair(
+						ds2ResourceName, "taxonomy_id", tResourceName, "id"),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "name", t2Name),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "color", t2Color),
 				),
 			},
 		},
 	})
 }
 
-const testAccTagDataSourceByIDConfig = `
-data "zentral_tag" "test" {
-  id = 3
+func testAccTagDataSourceConfig(taxName string, t1Name string, t2Name string, t2Color string) string {
+	return fmt.Sprintf(`
+resource "zentral_taxonomy" "test" {
+  name = %q
 }
-`
 
-const testAccTagDataSourceByIDWithTaxonomyConfig = `
-data "zentral_tag" "test" {
-	id = 44
-  }
-`
-
-const testAccTagDataSourceByNameConfig = `
-data "zentral_tag" "test" {
-  name = "default"
+resource "zentral_tag" "test1" {
+  name = %q
 }
-`
 
-const testAccTagDataSourceByNameWithTaxonomyConfig = `
-data "zentral_tag" "test" {
-  name = "default-with-taxonomy"
+resource "zentral_tag" "test2" {
+  taxonomy_id = zentral_taxonomy.test.id
+  name        = %q
+  color       = %q
 }
-`
+
+data "zentral_tag" "test1_by_name" {
+  name = zentral_tag.test1.name
+}
+
+data "zentral_tag" "test2_by_id" {
+  id = zentral_tag.test2.id
+}
+`, taxName, t1Name, t2Name, t2Color)
+}

@@ -4,82 +4,110 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestAccTagResource(t *testing.T) {
+	firstName := acctest.RandString(12)
+	firstColor := acctest.RandStringFromCharSet(6, "abcdef0123456789")
+	txName := acctest.RandString(12)
+	secondName := acctest.RandString(12)
+	secondColor := acctest.RandStringFromCharSet(6, "abcdef0123456789")
+	txResourceName := "zentral_taxonomy.test"
+	resourceName := "zentral_tag.test"
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Create and Read testing
+			// Create and Read
 			{
-				Config: testAccTagResourceConfig("one", "110000"),
+				Config: testAccTagResourceConfig(txName, firstName, firstColor),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckNoResourceAttr("zentral_tag.test", "taxonomy_id"),
-					resource.TestCheckResourceAttr("zentral_tag.test", "name", "one"),
-					resource.TestCheckResourceAttr("zentral_tag.test", "color", "110000"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "taxonomy_id"),
+					resource.TestCheckResourceAttr(
+						resourceName, "name", firstName),
+					resource.TestCheckResourceAttr(
+						resourceName, "color", firstColor),
 				),
 			},
-			// ImportState testing
+			// ImportState
 			{
-				ResourceName:      "zentral_tag.test",
+				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
-			// Update and Read testing
+			// Update and Read
 			{
-				Config: testAccTagResourceConfig("two", "001100"),
+				Config: testAccTagResourceConfig(txName, secondName, secondColor),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckNoResourceAttr("zentral_tag.test", "taxonomy_id"),
-					resource.TestCheckResourceAttr("zentral_tag.test", "name", "two"),
-					resource.TestCheckResourceAttr("zentral_tag.test", "color", "001100"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "taxonomy_id"),
+					resource.TestCheckResourceAttr(
+						resourceName, "name", secondName),
+					resource.TestCheckResourceAttr(
+						resourceName, "color", secondColor),
 				),
 			},
-			// Update and Read with taxonomy testing
+			// Update and Read with taxonomy
 			{
-				Config: testAccTagWithTaxonomyResourceConfig("two", "001100"),
+				Config: testAccTagWithTaxonomyResourceConfig(txName, secondName, secondColor),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("zentral_tag.test", "taxonomy_id", "1"),
-					resource.TestCheckResourceAttr("zentral_tag.test", "name", "two"),
-					resource.TestCheckResourceAttr("zentral_tag.test", "color", "001100"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "taxonomy_id", txResourceName, "id"),
+					resource.TestCheckResourceAttr(
+						resourceName, "name", secondName),
+					resource.TestCheckResourceAttr(
+						resourceName, "color", secondColor),
 				),
 			},
-			// ImportState testing
+			// ImportState
 			{
-				ResourceName:      "zentral_tag.test",
+				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
-			// Update and Read without taxonomy testing
+			// Update and Read without taxonomy
 			{
-				Config: testAccTagResourceConfig("two", "001100"),
+				Config: testAccTagResourceConfig(txName, secondName, secondColor),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckNoResourceAttr("zentral_tag.test", "taxonomy_id"),
-					resource.TestCheckResourceAttr("zentral_tag.test", "name", "two"),
-					resource.TestCheckResourceAttr("zentral_tag.test", "color", "001100"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "taxonomy_id"),
+					resource.TestCheckResourceAttr(
+						resourceName, "name", secondName),
+					resource.TestCheckResourceAttr(
+						resourceName, "color", secondColor),
 				),
 			},
-			// Delete testing automatically occurs in TestCase
 		},
 	})
 }
 
-func testAccTagResourceConfig(name string, color string) string {
+func testAccTagResourceConfig(txName string, name string, color string) string {
 	return fmt.Sprintf(`
-resource "zentral_tag" "test" {
+resource "zentral_taxonomy" "test" {
   name = %[1]q
-  color = %[2]q
-}
-`, name, color)
 }
 
-func testAccTagWithTaxonomyResourceConfig(name string, color string) string {
-	return fmt.Sprintf(`
 resource "zentral_tag" "test" {
-  taxonomy_id = 1
-  name = %[1]q
-  color = %[2]q
+  name = %[2]q
+  color = %[3]q
 }
-`, name, color)
+`, txName, name, color)
+}
+
+func testAccTagWithTaxonomyResourceConfig(txName string, name string, color string) string {
+	return fmt.Sprintf(`
+resource "zentral_taxonomy" "test" {
+  name = %[1]q
+}
+
+resource "zentral_tag" "test" {
+  taxonomy_id = zentral_taxonomy.test.id
+  name = %[2]q
+  color = %[3]q
+}
+`, txName, name, color)
 }

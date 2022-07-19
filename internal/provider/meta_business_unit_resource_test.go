@@ -4,35 +4,41 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
 func TestAccMetaBusinessUnitResource(t *testing.T) {
+	firstName := acctest.RandString(12)
+	secondName := acctest.RandString(12)
+	resourceName := "zentral_meta_business_unit.test"
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Create and Read testing
+			// Create and Read
 			{
-				Config: testAccMetaBusinessUnitResourceConfig("one"),
+				Config: testAccMetaBusinessUnitResourceConfig(firstName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("zentral_meta_business_unit.test", "name", "one"),
+					resource.TestCheckResourceAttr(
+						resourceName, "name", firstName),
 				),
 			},
-			// ImportState testing
+			// ImportState
 			{
-				ResourceName:      "zentral_meta_business_unit.test",
+				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
-			// Update and Read testing
+			// Update and Read
 			{
-				Config: testAccMetaBusinessUnitResourceConfig("two"),
+				Config: testAccMetaBusinessUnitResourceConfig(secondName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("zentral_meta_business_unit.test", "name", "two"),
+					resource.TestCheckResourceAttr(
+						resourceName, "name", secondName),
 				),
 			},
-			// Delete testing automatically occurs in TestCase
 		},
 	})
 }
@@ -40,7 +46,7 @@ func TestAccMetaBusinessUnitResource(t *testing.T) {
 func testAccMetaBusinessUnitResourceConfig(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_meta_business_unit" "test" {
-  name = %[1]q
+  name = %q
 }
 `, name)
 }
