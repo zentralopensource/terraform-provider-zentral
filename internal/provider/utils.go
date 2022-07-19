@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-go/tftypes"
 )
 
 func resourceImportStatePassthroughZentralID(ctx context.Context, name string, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
@@ -18,6 +18,6 @@ func resourceImportStatePassthroughZentralID(ctx context.Context, name string, r
 			fmt.Sprintf("Zentral %s ID must be an integer", name),
 		)
 	} else {
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"), types.Int64{Value: tagID})...)
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), types.Int64{Value: tagID})...)
 	}
 }
