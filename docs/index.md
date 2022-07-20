@@ -15,7 +15,7 @@ management of [Zentral](https://github.com/zentralopensource/zentral/) resources
 terraform {
   required_providers {
     zentral = {
-      source = "zentral/zentral"
+      source = "zentralopensource/zentral"
     }
   }
 }
