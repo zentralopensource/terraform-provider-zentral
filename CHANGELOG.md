@@ -1,3 +1,9 @@
+## 0.1.1 (July 20, 2022)
+
+BUG FIXES:
+
+ * Fix the provider source in the example.
+
 ## 0.1.0 (July 20, 2022)
 
 NOTES:
