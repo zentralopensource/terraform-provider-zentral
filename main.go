@@ -11,6 +11,7 @@ import (
 
 var (
 	version string = "dev"
+	commit  string = "unknown"
 )
 
 // Generate the Terraform provider documentation using `tfplugindocs`:
