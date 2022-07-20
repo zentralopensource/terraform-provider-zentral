@@ -20,13 +20,13 @@ type taxonomyResourceType struct{}
 
 func (t taxonomyResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description:         "Taxonomy",
-		MarkdownDescription: "Taxonomy",
+		Description:         "Manages taxonomies.",
+		MarkdownDescription: "The resource `zentral_taxonomy` manages taxonomies.",
 
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description:         "ID of the taxonomy",
-				MarkdownDescription: "ID of the taxonomy",
+				Description:         "ID of the taxonomy.",
+				MarkdownDescription: "`ID` of the taxonomy.",
 				Type:                types.Int64Type,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -34,8 +34,8 @@ func (t taxonomyResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag
 				},
 			},
 			"name": {
-				Description:         "Name of the taxonomy",
-				MarkdownDescription: "Name of the taxonomy",
+				Description:         "Name of the taxonomy.",
+				MarkdownDescription: "Name of the taxonomy.",
 				Type:                types.StringType,
 				Required:            true,
 			},

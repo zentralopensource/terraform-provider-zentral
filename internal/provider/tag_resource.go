@@ -20,13 +20,13 @@ type tagResourceType struct{}
 
 func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description:         "Tag",
-		MarkdownDescription: "Tag",
+		Description:         "Manages tags.",
+		MarkdownDescription: "The resource `zentral_tag` manages tags.",
 
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description:         "ID of the tag",
-				MarkdownDescription: "ID of the tag",
+				Description:         "ID of the tag.",
+				MarkdownDescription: "`ID` of the tag.",
 				Type:                types.Int64Type,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -34,20 +34,20 @@ func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 				},
 			},
 			"taxonomy_id": {
-				Description:         "ID of the tag taxonomy",
-				MarkdownDescription: "ID of the tag taxonomy",
+				Description:         "ID of the tag taxonomy.",
+				MarkdownDescription: "`ID` of the tag taxonomy.",
 				Type:                types.Int64Type,
 				Optional:            true,
 			},
 			"name": {
-				Description:         "Name of the tag",
-				MarkdownDescription: "Name of the tag",
+				Description:         "Name of the tag.",
+				MarkdownDescription: "Name of the tag.",
 				Type:                types.StringType,
 				Required:            true,
 			},
 			"color": {
-				Description:         "Color of the tag",
-				MarkdownDescription: "Color of the tag",
+				Description:         "Color of the tag.",
+				MarkdownDescription: "Color of the tag.",
 				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,

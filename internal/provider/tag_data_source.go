@@ -18,31 +18,31 @@ type tagDataSourceType struct{}
 
 func (t tagDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description:         "Tag",
-		MarkdownDescription: "Tag",
+		Description:         "Allows details of a tag to be retrieved by its ID or name.",
+		MarkdownDescription: "The data source `zentral_tag` allows details of a tag to be retrieved by its `ID` or name.",
 
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description:         "ID of the tag",
-				MarkdownDescription: "ID of the tag",
+				Description:         "ID of the tag.",
+				MarkdownDescription: "`ID` of the tag.",
 				Type:                types.Int64Type,
 				Optional:            true,
 			},
 			"taxonomy_id": {
-				Description:         "ID of the tag taxonomy",
-				MarkdownDescription: "ID of the tag taxonomy",
+				Description:         "ID of the tag taxonomy.",
+				MarkdownDescription: "`ID` of the tag taxonomy.",
 				Type:                types.Int64Type,
 				Computed:            true,
 			},
 			"name": {
-				Description:         "Name of the tag",
-				MarkdownDescription: "Name of the tag",
+				Description:         "Name of the tag.",
+				MarkdownDescription: "Name of the tag.",
 				Type:                types.StringType,
 				Optional:            true,
 			},
 			"color": {
-				Description:         "Color of the tag",
-				MarkdownDescription: "Color of the tag",
+				Description:         "Color of the tag.",
+				MarkdownDescription: "Color of the tag.",
 				Type:                types.StringType,
 				Computed:            true,
 			},

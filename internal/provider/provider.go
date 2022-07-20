@@ -122,13 +122,16 @@ func (p *provider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostic
 				Optional:    true,
 				Computed:    true,
 				Description: "The API base URL.",
+				MarkdownDescription: "The base URL where the Zentral API is mounted, including the path. " +
+					"Can also be set using the `ZTL_API_BASE_URL` environment variable.",
 			},
 			"token": {
-				Type:        types.StringType,
-				Optional:    true,
-				Computed:    true,
-				Sensitive:   true,
-				Description: "The token key for API operations.",
+				Type:      types.StringType,
+				Optional:  true,
+				Computed:  true,
+				Sensitive: true,
+				Description: "The Zentral service account or user token. " +
+					"Can also be set using the `ZTL_API_TOKEN` environment variable.",
 			},
 		},
 	}, nil

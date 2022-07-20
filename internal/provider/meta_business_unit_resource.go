@@ -20,19 +20,19 @@ type metaBusinessUnitResourceType struct{}
 
 func (t metaBusinessUnitResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description:         "Meta business unit",
-		MarkdownDescription: "Meta business unit",
+		Description:         "Manages meta business units.",
+		MarkdownDescription: "The resource `zentral_meta_business_unit` manages meta business units.",
 
 		Attributes: map[string]tfsdk.Attribute{
 			"name": {
-				Description:         "Name of the meta business unit",
-				MarkdownDescription: "Name of the meta business unit",
+				Description:         "Name of the meta business unit.",
+				MarkdownDescription: "Name of the meta business unit.",
 				Type:                types.StringType,
 				Required:            true,
 			},
 			"id": {
-				Description:         "ID of the meta business unit",
-				MarkdownDescription: "ID of the meta business unit",
+				Description:         "ID of the meta business unit.",
+				MarkdownDescription: "`ID` of the meta business unit.",
 				Type:                types.Int64Type,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{

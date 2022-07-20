@@ -18,19 +18,19 @@ type TaxonomyDataSourceType struct{}
 
 func (t TaxonomyDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		Description:         "Taxonomy",
-		MarkdownDescription: "Taxonomy",
+		Description:         "Allows details of a taxonomy to be retrieved by its ID or name.",
+		MarkdownDescription: "The data source `zentral_taxonomy` allows details of a taxonomy to be retrieved by its `ID` or name.",
 
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				Description:         "ID of the Taxonomy",
-				MarkdownDescription: "ID of the Taxonomy",
+				Description:         "ID of the Taxonomy.",
+				MarkdownDescription: "`ID` of the Taxonomy.",
 				Type:                types.Int64Type,
 				Optional:            true,
 			},
 			"name": {
-				Description:         "Name of the Taxonomy",
-				MarkdownDescription: "Name of the Taxonomy",
+				Description:         "Name of the Taxonomy.",
+				MarkdownDescription: "Name of the Taxonomy.",
 				Type:                types.StringType,
 				Optional:            true,
 			},
