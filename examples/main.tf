@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     zentral = {
-      source = "zentral/zentral"
+      source = "zentralopensource/zentral"
     }
   }
 }
