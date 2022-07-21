@@ -1,3 +1,9 @@
+## 0.1.2 (July 21, 2022)
+
+FEATURES:
+
+ * `zentral_meta_business_unit`: New attribute `api_enrollment_enabled`.
+
 ## 0.1.1 (July 20, 2022)
 
 BUG FIXES:
