@@ -9,8 +9,10 @@ import (
 )
 
 func TestAccMetaBusinessUnitDataSource(t *testing.T) {
-	rName := acctest.RandString(12)
-	mbuResourceName := "zentral_meta_business_unit.test"
+	r1Name := acctest.RandString(12)
+	r2Name := acctest.RandString(12)
+	mbu1ResourceName := "zentral_meta_business_unit.test_aee"
+	mbu2ResourceName := "zentral_meta_business_unit.test_aed"
 	ds1ResourceName := "data.zentral_meta_business_unit.by_id"
 	ds2ResourceName := "data.zentral_meta_business_unit.by_name"
 
@@ -19,36 +21,45 @@ func TestAccMetaBusinessUnitDataSource(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccMetaBusinessUnitDataSourceConfig(rName),
+				Config: testAccMetaBusinessUnitDataSourceConfig(r1Name, r2Name),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					// Read by ID
 					resource.TestCheckResourceAttrPair(
-						ds1ResourceName, "id", mbuResourceName, "id"),
+						ds1ResourceName, "id", mbu1ResourceName, "id"),
 					resource.TestCheckResourceAttr(
-						ds1ResourceName, "name", rName),
+						ds1ResourceName, "name", r1Name),
+					resource.TestCheckResourceAttr(
+						ds1ResourceName, "api_enrollment_enabled", "true"),
 					// Read by name
 					resource.TestCheckResourceAttrPair(
-						ds2ResourceName, "id", mbuResourceName, "id"),
+						ds2ResourceName, "id", mbu2ResourceName, "id"),
 					resource.TestCheckResourceAttr(
-						ds2ResourceName, "name", rName),
+						ds2ResourceName, "name", r2Name),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "api_enrollment_enabled", "false"),
 				),
 			},
 		},
 	})
 }
 
-func testAccMetaBusinessUnitDataSourceConfig(rName string) string {
+func testAccMetaBusinessUnitDataSourceConfig(r1Name string, r2Name string) string {
 	return fmt.Sprintf(`
-resource "zentral_meta_business_unit" "test" {
+resource "zentral_meta_business_unit" "test_aee" {
   name = %q
 }
 
 data "zentral_meta_business_unit" "by_id" {
-  id = zentral_meta_business_unit.test.id
+  id = zentral_meta_business_unit.test_aee.id
+}
+
+resource "zentral_meta_business_unit" "test_aed" {
+  name = %q
+  api_enrollment_enabled = false
 }
 
 data "zentral_meta_business_unit" "by_name" {
-  name = zentral_meta_business_unit.test.name
+  name = zentral_meta_business_unit.test_aed.name
 }
-`, rName)
+`, r1Name, r2Name)
 }

@@ -20,4 +20,8 @@ The data source `zentral_meta_business_unit` allows details of a meta business u
 - `id` (Number) ID of the meta business unit.
 - `name` (String) Name of the meta business unit.
 
+### Read-Only
+
+- `api_enrollment_enabled` (Boolean) If API enrollments are enabled.
+
 

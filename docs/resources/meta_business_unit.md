@@ -19,6 +19,10 @@ The resource `zentral_meta_business_unit` manages meta business units.
 
 - `name` (String) Name of the meta business unit.
 
+### Optional
+
+- `api_enrollment_enabled` (Boolean) Enables API enrollments. Once enabled, it **CANNOT** be disabled. Defaults to `true`.
+
 ### Read-Only
 
 - `id` (Number) `ID` of the meta business unit.

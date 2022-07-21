@@ -22,17 +22,23 @@ func (t metaBusinessUnitDataSourceType) GetSchema(ctx context.Context) (tfsdk.Sc
 		MarkdownDescription: "The data source `zentral_meta_business_unit` allows details of a meta business unit to be retrieved by its `ID` or name.",
 
 		Attributes: map[string]tfsdk.Attribute{
+			"id": {
+				Description:         "ID of the meta business unit.",
+				MarkdownDescription: "ID of the meta business unit.",
+				Type:                types.Int64Type,
+				Optional:            true,
+			},
 			"name": {
 				Description:         "Name of the meta business unit.",
 				MarkdownDescription: "Name of the meta business unit.",
 				Type:                types.StringType,
 				Optional:            true,
 			},
-			"id": {
-				Description:         "ID of the meta business unit.",
-				MarkdownDescription: "ID of the meta business unit.",
-				Type:                types.Int64Type,
-				Optional:            true,
+			"api_enrollment_enabled": {
+				Description:         "If API enrollments are enabled.",
+				MarkdownDescription: "If API enrollments are enabled.",
+				Type:                types.BoolType,
+				Computed:            true,
 			},
 		},
 	}, nil

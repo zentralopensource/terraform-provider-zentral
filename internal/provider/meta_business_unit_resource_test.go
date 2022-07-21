@@ -19,10 +19,12 @@ func TestAccMetaBusinessUnitResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read
 			{
-				Config: testAccMetaBusinessUnitResourceConfig(firstName),
+				Config: testAccMetaBusinessUnitResourceAPIEnrollmentDisabledConfig(firstName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", firstName),
+					resource.TestCheckResourceAttr(
+						resourceName, "api_enrollment_enabled", "false"),
 				),
 			},
 			// ImportState
@@ -33,14 +35,35 @@ func TestAccMetaBusinessUnitResource(t *testing.T) {
 			},
 			// Update and Read
 			{
+				Config: testAccMetaBusinessUnitResourceAPIEnrollmentDisabledConfig(secondName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "name", secondName),
+					resource.TestCheckResourceAttr(
+						resourceName, "api_enrollment_enabled", "false"),
+				),
+			},
+			// Enable API enrollement
+			{
 				Config: testAccMetaBusinessUnitResourceConfig(secondName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
+					resource.TestCheckResourceAttr(
+						resourceName, "api_enrollment_enabled", "true"),
 				),
 			},
 		},
 	})
+}
+
+func testAccMetaBusinessUnitResourceAPIEnrollmentDisabledConfig(name string) string {
+	return fmt.Sprintf(`
+resource "zentral_meta_business_unit" "test" {
+  name = %q
+  api_enrollment_enabled = false
+}
+`, name)
 }
 
 func testAccMetaBusinessUnitResourceConfig(name string) string {

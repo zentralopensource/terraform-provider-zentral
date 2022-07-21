@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
+	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -24,12 +25,6 @@ func (t metaBusinessUnitResourceType) GetSchema(ctx context.Context) (tfsdk.Sche
 		MarkdownDescription: "The resource `zentral_meta_business_unit` manages meta business units.",
 
 		Attributes: map[string]tfsdk.Attribute{
-			"name": {
-				Description:         "Name of the meta business unit.",
-				MarkdownDescription: "Name of the meta business unit.",
-				Type:                types.StringType,
-				Required:            true,
-			},
 			"id": {
 				Description:         "ID of the meta business unit.",
 				MarkdownDescription: "`ID` of the meta business unit.",
@@ -37,6 +32,23 @@ func (t metaBusinessUnitResourceType) GetSchema(ctx context.Context) (tfsdk.Sche
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
 					tfsdk.UseStateForUnknown(),
+				},
+			},
+			"name": {
+				Description:         "Name of the meta business unit.",
+				MarkdownDescription: "Name of the meta business unit.",
+				Type:                types.StringType,
+				Required:            true,
+			},
+			"api_enrollment_enabled": {
+				Description: "Enables API enrollments.",
+				MarkdownDescription: "Enables API enrollments. Once enabled, it **CANNOT** be disabled. " +
+					"Defaults to `true`.",
+				Type:     types.BoolType,
+				Optional: true,
+				Computed: true,
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					planmodifiers.DefaultValue(types.Bool{Value: true}),
 				},
 			},
 		},
@@ -58,7 +70,7 @@ type metaBusinessUnitResource struct {
 func (r metaBusinessUnitResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
 	var data metaBusinessUnit
 
-	diags := req.Config.Get(ctx, &data)
+	diags := req.Plan.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {
@@ -67,6 +79,9 @@ func (r metaBusinessUnitResource) Create(ctx context.Context, req tfsdk.CreateRe
 
 	mbuCreateRequest := &goztl.MetaBusinessUnitCreateRequest{
 		Name: data.Name.Value,
+	}
+	if data.APIEnrollmentEnabled.Value {
+		mbuCreateRequest.APIEnrollmentEnabled = true
 	}
 	mbu, _, err := r.provider.client.MetaBusinessUnits.Create(ctx, mbuCreateRequest)
 	if err != nil {
@@ -120,6 +135,9 @@ func (r metaBusinessUnitResource) Update(ctx context.Context, req tfsdk.UpdateRe
 
 	mbuUpdateRequest := &goztl.MetaBusinessUnitUpdateRequest{
 		Name: data.Name.Value,
+	}
+	if data.APIEnrollmentEnabled.Value {
+		mbuUpdateRequest.APIEnrollmentEnabled = true
 	}
 	mbu, _, err := r.provider.client.MetaBusinessUnits.Update(ctx, int(data.ID.Value), mbuUpdateRequest)
 	if err != nil {
