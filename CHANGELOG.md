@@ -1,3 +1,9 @@
+## 0.1.3 (July 28, 2022)
+
+FEATURES:
+
+ * `zentral_jmespath_check` resource and data source.
+
 ## 0.1.2 (July 21, 2022)
 
 FEATURES:
