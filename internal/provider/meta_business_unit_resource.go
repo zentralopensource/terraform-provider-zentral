@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -13,9 +15,9 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ tfsdk.ResourceType = metaBusinessUnitResourceType{}
-var _ tfsdk.Resource = metaBusinessUnitResource{}
-var _ tfsdk.ResourceWithImportState = metaBusinessUnitResource{}
+var _ provider.ResourceType = metaBusinessUnitResourceType{}
+var _ resource.Resource = metaBusinessUnitResource{}
+var _ resource.ResourceWithImportState = metaBusinessUnitResource{}
 
 type metaBusinessUnitResourceType struct{}
 
@@ -31,7 +33,7 @@ func (t metaBusinessUnitResourceType) GetSchema(ctx context.Context) (tfsdk.Sche
 				Type:                types.Int64Type,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"name": {
@@ -55,7 +57,7 @@ func (t metaBusinessUnitResourceType) GetSchema(ctx context.Context) (tfsdk.Sche
 	}, nil
 }
 
-func (t metaBusinessUnitResourceType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t metaBusinessUnitResourceType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return metaBusinessUnitResource{
@@ -64,10 +66,10 @@ func (t metaBusinessUnitResourceType) NewResource(ctx context.Context, in tfsdk.
 }
 
 type metaBusinessUnitResource struct {
-	provider provider
+	provider zentralProvider
 }
 
-func (r metaBusinessUnitResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r metaBusinessUnitResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data metaBusinessUnit
 
 	diags := req.Plan.Get(ctx, &data)
@@ -98,7 +100,7 @@ func (r metaBusinessUnitResource) Create(ctx context.Context, req tfsdk.CreateRe
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r metaBusinessUnitResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r metaBusinessUnitResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data metaBusinessUnit
 
 	diags := req.State.Get(ctx, &data)
@@ -123,7 +125,7 @@ func (r metaBusinessUnitResource) Read(ctx context.Context, req tfsdk.ReadResour
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r metaBusinessUnitResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r metaBusinessUnitResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data metaBusinessUnit
 
 	diags := req.Plan.Get(ctx, &data)
@@ -154,7 +156,7 @@ func (r metaBusinessUnitResource) Update(ctx context.Context, req tfsdk.UpdateRe
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r metaBusinessUnitResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r metaBusinessUnitResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data metaBusinessUnit
 
 	diags := req.State.Get(ctx, &data)
@@ -176,6 +178,6 @@ func (r metaBusinessUnitResource) Delete(ctx context.Context, req tfsdk.DeleteRe
 	tflog.Trace(ctx, "deleted a meta business unit")
 }
 
-func (r metaBusinessUnitResource) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func (r metaBusinessUnitResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resourceImportStatePassthroughZentralID(ctx, "meta business unit", req, resp)
 }

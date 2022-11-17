@@ -4,15 +4,17 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ tfsdk.DataSourceType = tagDataSourceType{}
-var _ tfsdk.DataSource = tagDataSource{}
+var _ datasource.DataSource = tagDataSource{}
+var _ provider.DataSourceType = tagDataSourceType{}
 
 type tagDataSourceType struct{}
 
@@ -50,7 +52,7 @@ func (t tagDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Di
 	}, nil
 }
 
-func (t tagDataSourceType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
+func (t tagDataSourceType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return tagDataSource{
@@ -59,10 +61,10 @@ func (t tagDataSourceType) NewDataSource(ctx context.Context, in tfsdk.Provider)
 }
 
 type tagDataSource struct {
-	provider provider
+	provider zentralProvider
 }
 
-func (d tagDataSource) ValidateConfig(ctx context.Context, req tfsdk.ValidateDataSourceConfigRequest, resp *tfsdk.ValidateDataSourceConfigResponse) {
+func (d tagDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
 	var data tag
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -83,7 +85,7 @@ func (d tagDataSource) ValidateConfig(ctx context.Context, req tfsdk.ValidateDat
 	}
 }
 
-func (d tagDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (d tagDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data tag
 
 	diags := req.Config.Get(ctx, &data)

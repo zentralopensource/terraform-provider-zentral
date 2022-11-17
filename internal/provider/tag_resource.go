@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -12,9 +14,9 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ tfsdk.ResourceType = tagResourceType{}
-var _ tfsdk.Resource = tagResource{}
-var _ tfsdk.ResourceWithImportState = tagResource{}
+var _ provider.ResourceType = tagResourceType{}
+var _ resource.Resource = tagResource{}
+var _ resource.ResourceWithImportState = tagResource{}
 
 type tagResourceType struct{}
 
@@ -30,7 +32,7 @@ func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 				Type:                types.Int64Type,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"taxonomy_id": {
@@ -56,7 +58,7 @@ func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 	}, nil
 }
 
-func (t tagResourceType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t tagResourceType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return tagResource{
@@ -65,10 +67,10 @@ func (t tagResourceType) NewResource(ctx context.Context, in tfsdk.Provider) (tf
 }
 
 type tagResource struct {
-	provider provider
+	provider zentralProvider
 }
 
-func (r tagResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r tagResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data tag
 
 	diags := req.Plan.Get(ctx, &data)
@@ -100,7 +102,7 @@ func (r tagResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r tagResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r tagResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data tag
 
 	diags := req.State.Get(ctx, &data)
@@ -125,7 +127,7 @@ func (r tagResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r tagResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r tagResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data tag
 
 	diags := req.Plan.Get(ctx, &data)
@@ -157,7 +159,7 @@ func (r tagResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r tagResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r tagResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data tag
 
 	diags := req.State.Get(ctx, &data)
@@ -179,6 +181,6 @@ func (r tagResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 	tflog.Trace(ctx, "deleted a tag")
 }
 
-func (r tagResource) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func (r tagResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resourceImportStatePassthroughZentralID(ctx, "tag", req, resp)
 }

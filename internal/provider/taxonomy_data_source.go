@@ -4,15 +4,17 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ tfsdk.DataSourceType = TaxonomyDataSourceType{}
-var _ tfsdk.DataSource = TaxonomyDataSource{}
+var _ datasource.DataSource = TaxonomyDataSource{}
+var _ provider.DataSourceType = TaxonomyDataSourceType{}
 
 type TaxonomyDataSourceType struct{}
 
@@ -38,7 +40,7 @@ func (t TaxonomyDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 	}, nil
 }
 
-func (t TaxonomyDataSourceType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
+func (t TaxonomyDataSourceType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return TaxonomyDataSource{
@@ -47,10 +49,10 @@ func (t TaxonomyDataSourceType) NewDataSource(ctx context.Context, in tfsdk.Prov
 }
 
 type TaxonomyDataSource struct {
-	provider provider
+	provider zentralProvider
 }
 
-func (d TaxonomyDataSource) ValidateConfig(ctx context.Context, req tfsdk.ValidateDataSourceConfigRequest, resp *tfsdk.ValidateDataSourceConfigResponse) {
+func (d TaxonomyDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
 	var data taxonomy
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -71,7 +73,7 @@ func (d TaxonomyDataSource) ValidateConfig(ctx context.Context, req tfsdk.Valida
 	}
 }
 
-func (d TaxonomyDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (d TaxonomyDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data taxonomy
 
 	diags := req.Config.Get(ctx, &data)
