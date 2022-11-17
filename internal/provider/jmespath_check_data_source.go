@@ -4,15 +4,17 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ tfsdk.DataSourceType = jmespathCheckDataSourceType{}
-var _ tfsdk.DataSource = jmespathCheckDataSource{}
+var _ datasource.DataSource = jmespathCheckDataSource{}
+var _ provider.DataSourceType = jmespathCheckDataSourceType{}
 
 type jmespathCheckDataSourceType struct{}
 
@@ -74,7 +76,7 @@ func (t jmespathCheckDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schem
 	}, nil
 }
 
-func (t jmespathCheckDataSourceType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
+func (t jmespathCheckDataSourceType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return jmespathCheckDataSource{
@@ -83,10 +85,10 @@ func (t jmespathCheckDataSourceType) NewDataSource(ctx context.Context, in tfsdk
 }
 
 type jmespathCheckDataSource struct {
-	provider provider
+	provider zentralProvider
 }
 
-func (d jmespathCheckDataSource) ValidateConfig(ctx context.Context, req tfsdk.ValidateDataSourceConfigRequest, resp *tfsdk.ValidateDataSourceConfigResponse) {
+func (d jmespathCheckDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
 	var data jmespathCheck
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -107,7 +109,7 @@ func (d jmespathCheckDataSource) ValidateConfig(ctx context.Context, req tfsdk.V
 	}
 }
 
-func (d jmespathCheckDataSource) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (d jmespathCheckDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data jmespathCheck
 
 	diags := req.Config.Get(ctx, &data)

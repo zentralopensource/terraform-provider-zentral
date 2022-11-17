@@ -6,11 +6,11 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func resourceImportStatePassthroughZentralID(ctx context.Context, name string, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func resourceImportStatePassthroughZentralID(ctx context.Context, name string, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	ztlID, err := strconv.ParseInt(req.ID, 10, 64)
 	if err != nil {
 		resp.Diagnostics.AddError(

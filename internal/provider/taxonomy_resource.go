@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -12,9 +14,9 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ tfsdk.ResourceType = taxonomyResourceType{}
-var _ tfsdk.Resource = taxonomyResource{}
-var _ tfsdk.ResourceWithImportState = taxonomyResource{}
+var _ provider.ResourceType = taxonomyResourceType{}
+var _ resource.Resource = taxonomyResource{}
+var _ resource.ResourceWithImportState = taxonomyResource{}
 
 type taxonomyResourceType struct{}
 
@@ -30,7 +32,7 @@ func (t taxonomyResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag
 				Type:                types.Int64Type,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"name": {
@@ -43,7 +45,7 @@ func (t taxonomyResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag
 	}, nil
 }
 
-func (t taxonomyResourceType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t taxonomyResourceType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return taxonomyResource{
@@ -52,10 +54,10 @@ func (t taxonomyResourceType) NewResource(ctx context.Context, in tfsdk.Provider
 }
 
 type taxonomyResource struct {
-	provider provider
+	provider zentralProvider
 }
 
-func (r taxonomyResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r taxonomyResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data taxonomy
 
 	diags := req.Plan.Get(ctx, &data)
@@ -83,7 +85,7 @@ func (r taxonomyResource) Create(ctx context.Context, req tfsdk.CreateResourceRe
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r taxonomyResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r taxonomyResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data taxonomy
 
 	diags := req.State.Get(ctx, &data)
@@ -108,7 +110,7 @@ func (r taxonomyResource) Read(ctx context.Context, req tfsdk.ReadResourceReques
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r taxonomyResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r taxonomyResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data taxonomy
 
 	diags := req.Plan.Get(ctx, &data)
@@ -136,7 +138,7 @@ func (r taxonomyResource) Update(ctx context.Context, req tfsdk.UpdateResourceRe
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r taxonomyResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r taxonomyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data taxonomy
 
 	diags := req.State.Get(ctx, &data)
@@ -158,6 +160,6 @@ func (r taxonomyResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRe
 	tflog.Trace(ctx, "deleted a taxonomy")
 }
 
-func (r taxonomyResource) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func (r taxonomyResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resourceImportStatePassthroughZentralID(ctx, "taxonomy", req, resp)
 }

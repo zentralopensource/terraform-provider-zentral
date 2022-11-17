@@ -6,6 +6,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -14,9 +16,9 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ tfsdk.ResourceType = jmespathCheckResourceType{}
-var _ tfsdk.Resource = jmespathCheckResource{}
-var _ tfsdk.ResourceWithImportState = jmespathCheckResource{}
+var _ provider.ResourceType = jmespathCheckResourceType{}
+var _ resource.Resource = jmespathCheckResource{}
+var _ resource.ResourceWithImportState = jmespathCheckResource{}
 
 type jmespathCheckResourceType struct{}
 
@@ -32,7 +34,7 @@ func (t jmespathCheckResourceType) GetSchema(ctx context.Context) (tfsdk.Schema,
 				Type:                types.Int64Type,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"name": {
@@ -93,7 +95,7 @@ func (t jmespathCheckResourceType) GetSchema(ctx context.Context) (tfsdk.Schema,
 	}, nil
 }
 
-func (t jmespathCheckResourceType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t jmespathCheckResourceType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return jmespathCheckResource{
@@ -102,10 +104,10 @@ func (t jmespathCheckResourceType) NewResource(ctx context.Context, in tfsdk.Pro
 }
 
 type jmespathCheckResource struct {
-	provider provider
+	provider zentralProvider
 }
 
-func (r jmespathCheckResource) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r jmespathCheckResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data jmespathCheck
 
 	diags := req.Plan.Get(ctx, &data)
@@ -150,7 +152,7 @@ func (r jmespathCheckResource) Create(ctx context.Context, req tfsdk.CreateResou
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r jmespathCheckResource) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r jmespathCheckResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data jmespathCheck
 
 	diags := req.State.Get(ctx, &data)
@@ -175,7 +177,7 @@ func (r jmespathCheckResource) Read(ctx context.Context, req tfsdk.ReadResourceR
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r jmespathCheckResource) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r jmespathCheckResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data jmespathCheck
 
 	diags := req.Plan.Get(ctx, &data)
@@ -218,7 +220,7 @@ func (r jmespathCheckResource) Update(ctx context.Context, req tfsdk.UpdateResou
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r jmespathCheckResource) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r jmespathCheckResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data jmespathCheck
 
 	diags := req.State.Get(ctx, &data)
@@ -240,6 +242,6 @@ func (r jmespathCheckResource) Delete(ctx context.Context, req tfsdk.DeleteResou
 	tflog.Trace(ctx, "deleted a JMESPath check")
 }
 
-func (r jmespathCheckResource) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
+func (r jmespathCheckResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resourceImportStatePassthroughZentralID(ctx, "JMESPath check", req, resp)
 }
