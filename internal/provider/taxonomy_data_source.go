@@ -6,19 +6,28 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ datasource.DataSource = TaxonomyDataSource{}
-var _ provider.DataSourceType = TaxonomyDataSourceType{}
+var _ datasource.DataSource = &TaxonomyDataSource{}
 
-type TaxonomyDataSourceType struct{}
+func NewTaxonomyDataSource() datasource.DataSource {
+	return &TaxonomyDataSource{}
+}
 
-func (t TaxonomyDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// TaxonomyDataSource defines the data source implementation.
+type TaxonomyDataSource struct {
+	client *goztl.Client
+}
+
+func (d *TaxonomyDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_taxonomy"
+}
+
+func (d *TaxonomyDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description:         "Allows details of a taxonomy to be retrieved by its ID or name.",
 		MarkdownDescription: "The data source `zentral_taxonomy` allows details of a taxonomy to be retrieved by its `ID` or name.",
@@ -40,19 +49,27 @@ func (t TaxonomyDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 	}, nil
 }
 
-func (t TaxonomyDataSourceType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (d *TaxonomyDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return TaxonomyDataSource{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*goztl.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Data Source Configure Type",
+			fmt.Sprintf("Expected *goztl.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	d.client = client
 }
 
-type TaxonomyDataSource struct {
-	provider zentralProvider
-}
-
-func (d TaxonomyDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
+func (d *TaxonomyDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
 	var data taxonomy
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -73,11 +90,12 @@ func (d TaxonomyDataSource) ValidateConfig(ctx context.Context, req datasource.V
 	}
 }
 
-func (d TaxonomyDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *TaxonomyDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data taxonomy
 
-	diags := req.Config.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform configuration data into the model
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -85,7 +103,7 @@ func (d TaxonomyDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	var ztlTaxonomy *goztl.Taxonomy
 	var err error
 	if data.ID.Value > 0 {
-		ztlTaxonomy, _, err = d.provider.client.Taxonomies.GetByID(ctx, int(data.ID.Value))
+		ztlTaxonomy, _, err = d.client.Taxonomies.GetByID(ctx, int(data.ID.Value))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
@@ -93,7 +111,7 @@ func (d TaxonomyDataSource) Read(ctx context.Context, req datasource.ReadRequest
 			)
 		}
 	} else {
-		ztlTaxonomy, _, err = d.provider.client.Taxonomies.GetByName(ctx, data.Name.Value)
+		ztlTaxonomy, _, err = d.client.Taxonomies.GetByName(ctx, data.Name.Value)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
@@ -103,7 +121,6 @@ func (d TaxonomyDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	}
 
 	if ztlTaxonomy != nil {
-		diags = resp.State.Set(ctx, taxonomyForState(ztlTaxonomy))
-		resp.Diagnostics.Append(diags...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, taxonomyForState(ztlTaxonomy))...)
 	}
 }

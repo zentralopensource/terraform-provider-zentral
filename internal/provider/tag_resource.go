@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -14,13 +13,23 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = tagResourceType{}
-var _ resource.Resource = tagResource{}
-var _ resource.ResourceWithImportState = tagResource{}
+var _ resource.Resource = &TagResource{}
+var _ resource.ResourceWithImportState = &TagResource{}
 
-type tagResourceType struct{}
+func NewTagResource() resource.Resource {
+	return &TagResource{}
+}
 
-func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// TagResource defines the resource implementation.
+type TagResource struct {
+	client *goztl.Client
+}
+
+func (r *TagResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_tag"
+}
+
+func (r *TagResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description:         "Manages tags.",
 		MarkdownDescription: "The resource `zentral_tag` manages tags.",
@@ -58,23 +67,31 @@ func (t tagResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 	}, nil
 }
 
-func (t tagResourceType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *TagResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return tagResource{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*goztl.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *goztl.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-type tagResource struct {
-	provider zentralProvider
-}
-
-func (r tagResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data tag
 
-	diags := req.Plan.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -87,7 +104,7 @@ func (r tagResource) Create(ctx context.Context, req resource.CreateRequest, res
 	if !data.TaxonomyID.Null {
 		tagCreateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.Value))
 	}
-	tag, _, err := r.provider.client.Tags.Create(ctx, tagCreateRequest)
+	tag, _, err := r.client.Tags.Create(ctx, tagCreateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -98,21 +115,21 @@ func (r tagResource) Create(ctx context.Context, req resource.CreateRequest, res
 
 	tflog.Trace(ctx, "created a tag")
 
-	diags = resp.State.Set(ctx, tagForState(tag))
-	resp.Diagnostics.Append(diags...)
+	// Save data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, tagForState(tag))...)
 }
 
-func (r tagResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data tag
 
-	diags := req.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	tag, _, err := r.provider.client.Tags.GetByID(ctx, int(data.ID.Value))
+	tag, _, err := r.client.Tags.GetByID(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -123,15 +140,15 @@ func (r tagResource) Read(ctx context.Context, req resource.ReadRequest, resp *r
 
 	tflog.Trace(ctx, "read a tag")
 
-	diags = resp.State.Set(ctx, tagForState(tag))
-	resp.Diagnostics.Append(diags...)
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, tagForState(tag))...)
 }
 
-func (r tagResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data tag
 
-	diags := req.Plan.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -144,7 +161,7 @@ func (r tagResource) Update(ctx context.Context, req resource.UpdateRequest, res
 	if !data.TaxonomyID.Null {
 		tagUpdateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.Value))
 	}
-	tag, _, err := r.provider.client.Tags.Update(ctx, int(data.ID.Value), tagUpdateRequest)
+	tag, _, err := r.client.Tags.Update(ctx, int(data.ID.Value), tagUpdateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -155,11 +172,11 @@ func (r tagResource) Update(ctx context.Context, req resource.UpdateRequest, res
 
 	tflog.Trace(ctx, "updated a tag")
 
-	diags = resp.State.Set(ctx, tagForState(tag))
-	resp.Diagnostics.Append(diags...)
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, tagForState(tag))...)
 }
 
-func (r tagResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data tag
 
 	diags := req.State.Get(ctx, &data)
@@ -169,7 +186,7 @@ func (r tagResource) Delete(ctx context.Context, req resource.DeleteRequest, res
 		return
 	}
 
-	_, err := r.provider.client.Tags.Delete(ctx, int(data.ID.Value))
+	_, err := r.client.Tags.Delete(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -181,6 +198,6 @@ func (r tagResource) Delete(ctx context.Context, req resource.DeleteRequest, res
 	tflog.Trace(ctx, "deleted a tag")
 }
 
-func (r tagResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resourceImportStatePassthroughZentralID(ctx, "tag", req, resp)
 }

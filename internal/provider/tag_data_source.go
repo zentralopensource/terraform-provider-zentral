@@ -6,19 +6,28 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ datasource.DataSource = tagDataSource{}
-var _ provider.DataSourceType = tagDataSourceType{}
+var _ datasource.DataSource = &TagDataSource{}
 
-type tagDataSourceType struct{}
+func NewTagDataSource() datasource.DataSource {
+	return &TagDataSource{}
+}
 
-func (t tagDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// TagDataSource defines the data source implementation.
+type TagDataSource struct {
+	client *goztl.Client
+}
+
+func (d *TagDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_tag"
+}
+
+func (d *TagDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description:         "Allows details of a tag to be retrieved by its ID or name.",
 		MarkdownDescription: "The data source `zentral_tag` allows details of a tag to be retrieved by its `ID` or name.",
@@ -52,19 +61,27 @@ func (t tagDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Di
 	}, nil
 }
 
-func (t tagDataSourceType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (d *TagDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return tagDataSource{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*goztl.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Data Source Configure Type",
+			fmt.Sprintf("Expected *goztl.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	d.client = client
 }
 
-type tagDataSource struct {
-	provider zentralProvider
-}
-
-func (d tagDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
+func (d *TagDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
 	var data tag
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -85,11 +102,12 @@ func (d tagDataSource) ValidateConfig(ctx context.Context, req datasource.Valida
 	}
 }
 
-func (d tagDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data tag
 
-	diags := req.Config.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform configuration data into the model
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -97,7 +115,7 @@ func (d tagDataSource) Read(ctx context.Context, req datasource.ReadRequest, res
 	var ztlTag *goztl.Tag
 	var err error
 	if data.ID.Value > 0 {
-		ztlTag, _, err = d.provider.client.Tags.GetByID(ctx, int(data.ID.Value))
+		ztlTag, _, err = d.client.Tags.GetByID(ctx, int(data.ID.Value))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
@@ -105,7 +123,7 @@ func (d tagDataSource) Read(ctx context.Context, req datasource.ReadRequest, res
 			)
 		}
 	} else {
-		ztlTag, _, err = d.provider.client.Tags.GetByName(ctx, data.Name.Value)
+		ztlTag, _, err = d.client.Tags.GetByName(ctx, data.Name.Value)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
@@ -115,7 +133,6 @@ func (d tagDataSource) Read(ctx context.Context, req datasource.ReadRequest, res
 	}
 
 	if ztlTag != nil {
-		diags = resp.State.Set(ctx, tagForState(ztlTag))
-		resp.Diagnostics.Append(diags...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, tagForState(ztlTag))...)
 	}
 }

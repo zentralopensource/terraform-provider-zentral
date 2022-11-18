@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -15,13 +14,23 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = metaBusinessUnitResourceType{}
-var _ resource.Resource = metaBusinessUnitResource{}
-var _ resource.ResourceWithImportState = metaBusinessUnitResource{}
+var _ resource.Resource = &MetaBusinessUnitResource{}
+var _ resource.ResourceWithImportState = &MetaBusinessUnitResource{}
 
-type metaBusinessUnitResourceType struct{}
+func NewMetaBusinessUnitResource() resource.Resource {
+	return &MetaBusinessUnitResource{}
+}
 
-func (t metaBusinessUnitResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// MetaBusinessUnitResource defines the resource implementation.
+type MetaBusinessUnitResource struct {
+	client *goztl.Client
+}
+
+func (r *MetaBusinessUnitResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_meta_business_unit"
+}
+
+func (r *MetaBusinessUnitResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description:         "Manages meta business units.",
 		MarkdownDescription: "The resource `zentral_meta_business_unit` manages meta business units.",
@@ -57,23 +66,31 @@ func (t metaBusinessUnitResourceType) GetSchema(ctx context.Context) (tfsdk.Sche
 	}, nil
 }
 
-func (t metaBusinessUnitResourceType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *MetaBusinessUnitResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return metaBusinessUnitResource{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*goztl.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *goztl.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-type metaBusinessUnitResource struct {
-	provider zentralProvider
-}
-
-func (r metaBusinessUnitResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *MetaBusinessUnitResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data metaBusinessUnit
 
-	diags := req.Plan.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -85,7 +102,7 @@ func (r metaBusinessUnitResource) Create(ctx context.Context, req resource.Creat
 	if data.APIEnrollmentEnabled.Value {
 		mbuCreateRequest.APIEnrollmentEnabled = true
 	}
-	mbu, _, err := r.provider.client.MetaBusinessUnits.Create(ctx, mbuCreateRequest)
+	mbu, _, err := r.client.MetaBusinessUnits.Create(ctx, mbuCreateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -96,21 +113,21 @@ func (r metaBusinessUnitResource) Create(ctx context.Context, req resource.Creat
 
 	tflog.Trace(ctx, "created a meta business unit")
 
-	diags = resp.State.Set(ctx, metaBusinessUnitForState(mbu))
-	resp.Diagnostics.Append(diags...)
+	// Save data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, metaBusinessUnitForState(mbu))...)
 }
 
-func (r metaBusinessUnitResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *MetaBusinessUnitResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data metaBusinessUnit
 
-	diags := req.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	mbu, _, err := r.provider.client.MetaBusinessUnits.GetByID(ctx, int(data.ID.Value))
+	mbu, _, err := r.client.MetaBusinessUnits.GetByID(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -121,15 +138,15 @@ func (r metaBusinessUnitResource) Read(ctx context.Context, req resource.ReadReq
 
 	tflog.Trace(ctx, "read a meta business unit")
 
-	diags = resp.State.Set(ctx, metaBusinessUnitForState(mbu))
-	resp.Diagnostics.Append(diags...)
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, metaBusinessUnitForState(mbu))...)
 }
 
-func (r metaBusinessUnitResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *MetaBusinessUnitResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data metaBusinessUnit
 
-	diags := req.Plan.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -141,7 +158,7 @@ func (r metaBusinessUnitResource) Update(ctx context.Context, req resource.Updat
 	if data.APIEnrollmentEnabled.Value {
 		mbuUpdateRequest.APIEnrollmentEnabled = true
 	}
-	mbu, _, err := r.provider.client.MetaBusinessUnits.Update(ctx, int(data.ID.Value), mbuUpdateRequest)
+	mbu, _, err := r.client.MetaBusinessUnits.Update(ctx, int(data.ID.Value), mbuUpdateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -152,21 +169,21 @@ func (r metaBusinessUnitResource) Update(ctx context.Context, req resource.Updat
 
 	tflog.Trace(ctx, "updated a meta business unit")
 
-	diags = resp.State.Set(ctx, metaBusinessUnitForState(mbu))
-	resp.Diagnostics.Append(diags...)
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, metaBusinessUnitForState(mbu))...)
 }
 
-func (r metaBusinessUnitResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *MetaBusinessUnitResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data metaBusinessUnit
 
-	diags := req.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	_, err := r.provider.client.MetaBusinessUnits.Delete(ctx, int(data.ID.Value))
+	_, err := r.client.MetaBusinessUnits.Delete(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -178,6 +195,6 @@ func (r metaBusinessUnitResource) Delete(ctx context.Context, req resource.Delet
 	tflog.Trace(ctx, "deleted a meta business unit")
 }
 
-func (r metaBusinessUnitResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *MetaBusinessUnitResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resourceImportStatePassthroughZentralID(ctx, "meta business unit", req, resp)
 }
