@@ -98,11 +98,11 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 
 	tagCreateRequest := &goztl.TagCreateRequest{
-		Name:  data.Name.Value,
-		Color: data.Color.Value,
+		Name:  data.Name.ValueString(),
+		Color: data.Color.ValueString(),
 	}
-	if !data.TaxonomyID.Null {
-		tagCreateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.Value))
+	if !data.TaxonomyID.IsNull() {
+		tagCreateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.ValueInt64()))
 	}
 	tag, _, err := r.client.Tags.Create(ctx, tagCreateRequest)
 	if err != nil {
@@ -129,11 +129,11 @@ func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 		return
 	}
 
-	tag, _, err := r.client.Tags.GetByID(ctx, int(data.ID.Value))
+	tag, _, err := r.client.Tags.GetByID(ctx, int(data.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read tag %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to read tag %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}
@@ -155,17 +155,17 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	}
 
 	tagUpdateRequest := &goztl.TagUpdateRequest{
-		Name:  data.Name.Value,
-		Color: data.Color.Value,
+		Name:  data.Name.ValueString(),
+		Color: data.Color.ValueString(),
 	}
-	if !data.TaxonomyID.Null {
-		tagUpdateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.Value))
+	if !data.TaxonomyID.IsNull() {
+		tagUpdateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.ValueInt64()))
 	}
-	tag, _, err := r.client.Tags.Update(ctx, int(data.ID.Value), tagUpdateRequest)
+	tag, _, err := r.client.Tags.Update(ctx, int(data.ID.ValueInt64()), tagUpdateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to update tag %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to update tag %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}
@@ -186,11 +186,11 @@ func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
-	_, err := r.client.Tags.Delete(ctx, int(data.ID.Value))
+	_, err := r.client.Tags.Delete(ctx, int(data.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to delete tag %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to delete tag %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}

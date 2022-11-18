@@ -71,7 +71,7 @@ func (p *ZentralProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	// base URL
 	var baseURL string
-	if data.BaseURL.Unknown {
+	if data.BaseURL.IsUnknown() {
 		resp.Diagnostics.AddWarning(
 			"Zentral provider configuration error",
 			"Cannot use unknown value as base URL",
@@ -79,10 +79,10 @@ func (p *ZentralProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	if data.BaseURL.Null {
+	if data.BaseURL.IsNull() {
 		baseURL = os.Getenv("ZTL_API_BASE_URL")
 	} else {
-		baseURL = data.BaseURL.Value
+		baseURL = data.BaseURL.ValueString()
 	}
 
 	if baseURL == "" {
@@ -95,7 +95,7 @@ func (p *ZentralProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 	// base URL
 	var token string
-	if data.Token.Unknown {
+	if data.Token.IsUnknown() {
 		resp.Diagnostics.AddWarning(
 			"Zentral provider configuration error",
 			"Cannot use unknown value as token",
@@ -103,10 +103,10 @@ func (p *ZentralProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	if data.Token.Null {
+	if data.Token.IsNull() {
 		token = os.Getenv("ZTL_API_TOKEN")
 	} else {
-		token = data.Token.Value
+		token = data.Token.ValueString()
 	}
 
 	if token == "" {

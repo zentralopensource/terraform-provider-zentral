@@ -113,12 +113,12 @@ func (d *JMESPathCheckDataSource) ValidateConfig(ctx context.Context, req dataso
 		return
 	}
 
-	if data.ID.Null && data.Name.Null {
+	if data.ID.IsNull() && data.Name.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_jmespath_check` data source",
 			"`id` or `name` missing",
 		)
-	} else if !data.ID.Null && !data.Name.Null {
+	} else if !data.ID.IsNull() && !data.Name.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_jmespath_check` data source",
 			"`id` and `name` cannot be both set",
@@ -138,20 +138,20 @@ func (d *JMESPathCheckDataSource) Read(ctx context.Context, req datasource.ReadR
 
 	var ztlJC *goztl.JMESPathCheck
 	var err error
-	if data.ID.Value > 0 {
-		ztlJC, _, err = d.client.JMESPathChecks.GetByID(ctx, int(data.ID.Value))
+	if data.ID.ValueInt64() > 0 {
+		ztlJC, _, err = d.client.JMESPathChecks.GetByID(ctx, int(data.ID.ValueInt64()))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get JMESPath check '%d' by ID, got error: %s", data.ID.Value, err),
+				fmt.Sprintf("Unable to get JMESPath check '%d' by ID, got error: %s", data.ID.ValueInt64(), err),
 			)
 		}
 	} else {
-		ztlJC, _, err = d.client.JMESPathChecks.GetByName(ctx, data.Name.Value)
+		ztlJC, _, err = d.client.JMESPathChecks.GetByName(ctx, data.Name.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get JMESPath check '%s' by name, got error: %s", data.Name.Value, err),
+				fmt.Sprintf("Unable to get JMESPath check '%s' by name, got error: %s", data.Name.ValueString(), err),
 			)
 		}
 	}

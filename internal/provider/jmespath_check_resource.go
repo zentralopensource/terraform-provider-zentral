@@ -59,7 +59,7 @@ func (r *JMESPathCheckResource) GetSchema(ctx context.Context) (tfsdk.Schema, di
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					planmodifiers.DefaultValue(types.String{Value: ""}),
+					planmodifiers.DefaultValue(types.StringValue("")),
 				},
 			},
 			"source_name": {
@@ -75,7 +75,7 @@ func (r *JMESPathCheckResource) GetSchema(ctx context.Context) (tfsdk.Schema, di
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					planmodifiers.DefaultValue(types.Set{ElemType: types.StringType, Elems: []attr.Value{}}),
+					planmodifiers.DefaultValue(types.SetValueMust(types.StringType, []attr.Value{})),
 				},
 			},
 			"tag_ids": {
@@ -85,7 +85,7 @@ func (r *JMESPathCheckResource) GetSchema(ctx context.Context) (tfsdk.Schema, di
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					planmodifiers.DefaultValue(types.Set{ElemType: types.Int64Type, Elems: []attr.Value{}}),
+					planmodifiers.DefaultValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 				},
 			},
 			"jmespath_expression": {
@@ -135,22 +135,22 @@ func (r *JMESPathCheckResource) Create(ctx context.Context, req resource.CreateR
 	}
 
 	platforms := make([]string, 0)
-	for _, pv := range data.Platforms.Elems {
-		platforms = append(platforms, pv.(types.String).Value)
+	for _, pv := range data.Platforms.Elements() {
+		platforms = append(platforms, pv.(types.String).ValueString())
 	}
 
 	tagIDs := make([]int, 0)
-	for _, tv := range data.TagIDs.Elems {
-		tagIDs = append(tagIDs, int(tv.(types.Int64).Value))
+	for _, tv := range data.TagIDs.Elements() {
+		tagIDs = append(tagIDs, int(tv.(types.Int64).ValueInt64()))
 	}
 
 	ztlReq := &goztl.JMESPathCheckCreateRequest{
-		Name:               data.Name.Value,
-		Description:        data.Description.Value,
-		SourceName:         data.SourceName.Value,
+		Name:               data.Name.ValueString(),
+		Description:        data.Description.ValueString(),
+		SourceName:         data.SourceName.ValueString(),
 		Platforms:          platforms,
 		TagIDs:             tagIDs,
-		JMESPathExpression: data.JMESPathExpression.Value,
+		JMESPathExpression: data.JMESPathExpression.ValueString(),
 	}
 	ztlJC, _, err := r.client.JMESPathChecks.Create(ctx, ztlReq)
 	if err != nil {
@@ -177,11 +177,11 @@ func (r *JMESPathCheckResource) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 
-	ztlJC, _, err := r.client.JMESPathChecks.GetByID(ctx, int(data.ID.Value))
+	ztlJC, _, err := r.client.JMESPathChecks.GetByID(ctx, int(data.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read JMESPath check %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to read JMESPath check %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}
@@ -203,28 +203,28 @@ func (r *JMESPathCheckResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	platforms := make([]string, 0)
-	for _, pv := range data.Platforms.Elems {
-		platforms = append(platforms, pv.(types.String).Value)
+	for _, pv := range data.Platforms.Elements() {
+		platforms = append(platforms, pv.(types.String).ValueString())
 	}
 
 	tagIDs := make([]int, 0)
-	for _, tv := range data.TagIDs.Elems {
-		tagIDs = append(tagIDs, int(tv.(types.Int64).Value))
+	for _, tv := range data.TagIDs.Elements() {
+		tagIDs = append(tagIDs, int(tv.(types.Int64).ValueInt64()))
 	}
 
 	ztlReq := &goztl.JMESPathCheckUpdateRequest{
-		Name:               data.Name.Value,
-		Description:        data.Description.Value,
-		SourceName:         data.SourceName.Value,
+		Name:               data.Name.ValueString(),
+		Description:        data.Description.ValueString(),
+		SourceName:         data.SourceName.ValueString(),
 		Platforms:          platforms,
 		TagIDs:             tagIDs,
-		JMESPathExpression: data.JMESPathExpression.Value,
+		JMESPathExpression: data.JMESPathExpression.ValueString(),
 	}
-	ztlJC, _, err := r.client.JMESPathChecks.Update(ctx, int(data.ID.Value), ztlReq)
+	ztlJC, _, err := r.client.JMESPathChecks.Update(ctx, int(data.ID.ValueInt64()), ztlReq)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to update JMESPath check %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to update JMESPath check %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}
@@ -245,11 +245,11 @@ func (r *JMESPathCheckResource) Delete(ctx context.Context, req resource.DeleteR
 		return
 	}
 
-	_, err := r.client.JMESPathChecks.Delete(ctx, int(data.ID.Value))
+	_, err := r.client.JMESPathChecks.Delete(ctx, int(data.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to delete JMESPath check %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to delete JMESPath check %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}

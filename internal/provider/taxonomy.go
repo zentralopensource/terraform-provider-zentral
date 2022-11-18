@@ -12,7 +12,7 @@ type taxonomy struct {
 
 func taxonomyForState(t *goztl.Taxonomy) taxonomy {
 	return taxonomy{
-		ID:   types.Int64{Value: int64(t.ID)},
-		Name: types.String{Value: t.Name},
+		ID:   types.Int64Value(int64(t.ID)),
+		Name: types.StringValue(t.Name),
 	}
 }

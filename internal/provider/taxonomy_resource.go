@@ -85,7 +85,7 @@ func (r *TaxonomyResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	taxonomyCreateRequest := &goztl.TaxonomyCreateRequest{
-		Name: data.Name.Value,
+		Name: data.Name.ValueString(),
 	}
 	taxonomy, _, err := r.client.Taxonomies.Create(ctx, taxonomyCreateRequest)
 	if err != nil {
@@ -112,11 +112,11 @@ func (r *TaxonomyResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	taxonomy, _, err := r.client.Taxonomies.GetByID(ctx, int(data.ID.Value))
+	taxonomy, _, err := r.client.Taxonomies.GetByID(ctx, int(data.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read taxonomy %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to read taxonomy %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}
@@ -138,13 +138,13 @@ func (r *TaxonomyResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	taxonomyUpdateRequest := &goztl.TaxonomyUpdateRequest{
-		Name: data.Name.Value,
+		Name: data.Name.ValueString(),
 	}
-	taxonomy, _, err := r.client.Taxonomies.Update(ctx, int(data.ID.Value), taxonomyUpdateRequest)
+	taxonomy, _, err := r.client.Taxonomies.Update(ctx, int(data.ID.ValueInt64()), taxonomyUpdateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to update taxonomy %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to update taxonomy %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}
@@ -165,11 +165,11 @@ func (r *TaxonomyResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
-	_, err := r.client.Taxonomies.Delete(ctx, int(data.ID.Value))
+	_, err := r.client.Taxonomies.Delete(ctx, int(data.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to delete taxonomy %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to delete taxonomy %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}

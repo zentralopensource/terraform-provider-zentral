@@ -89,12 +89,12 @@ func (d *TagDataSource) ValidateConfig(ctx context.Context, req datasource.Valid
 		return
 	}
 
-	if data.ID.Null && data.Name.Null {
+	if data.ID.IsNull() && data.Name.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_tag` data source",
 			"`id` or `name` missing",
 		)
-	} else if !data.ID.Null && !data.Name.Null {
+	} else if !data.ID.IsNull() && !data.Name.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_tag` data source",
 			"`id` and `name` cannot be both set",
@@ -114,20 +114,20 @@ func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 
 	var ztlTag *goztl.Tag
 	var err error
-	if data.ID.Value > 0 {
-		ztlTag, _, err = d.client.Tags.GetByID(ctx, int(data.ID.Value))
+	if data.ID.ValueInt64() > 0 {
+		ztlTag, _, err = d.client.Tags.GetByID(ctx, int(data.ID.ValueInt64()))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get tag '%d', got error: %s", data.ID.Value, err),
+				fmt.Sprintf("Unable to get tag '%d', got error: %s", data.ID.ValueInt64(), err),
 			)
 		}
 	} else {
-		ztlTag, _, err = d.client.Tags.GetByName(ctx, data.Name.Value)
+		ztlTag, _, err = d.client.Tags.GetByName(ctx, data.Name.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get tag '%s', got error: %s", data.Name.Value, err),
+				fmt.Sprintf("Unable to get tag '%s', got error: %s", data.Name.ValueString(), err),
 			)
 		}
 	}

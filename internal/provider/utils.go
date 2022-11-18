@@ -18,6 +18,6 @@ func resourceImportStatePassthroughZentralID(ctx context.Context, name string, r
 			fmt.Sprintf("Zentral %s ID must be an integer", name),
 		)
 	} else {
-		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), types.Int64{Value: ztlID})...)
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), types.Int64Value(ztlID))...)
 	}
 }

@@ -77,12 +77,12 @@ func (d *TaxonomyDataSource) ValidateConfig(ctx context.Context, req datasource.
 		return
 	}
 
-	if data.ID.Null && data.Name.Null {
+	if data.ID.IsNull() && data.Name.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_taxonomy` data source",
 			"`id` or `name` missing",
 		)
-	} else if !data.ID.Null && !data.Name.Null {
+	} else if !data.ID.IsNull() && !data.Name.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_taxonomy` data source",
 			"`id` and `name` cannot be both set",
@@ -102,20 +102,20 @@ func (d *TaxonomyDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 	var ztlTaxonomy *goztl.Taxonomy
 	var err error
-	if data.ID.Value > 0 {
-		ztlTaxonomy, _, err = d.client.Taxonomies.GetByID(ctx, int(data.ID.Value))
+	if data.ID.ValueInt64() > 0 {
+		ztlTaxonomy, _, err = d.client.Taxonomies.GetByID(ctx, int(data.ID.ValueInt64()))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get taxonomy '%d', got error: %s", data.ID.Value, err),
+				fmt.Sprintf("Unable to get taxonomy '%d', got error: %s", data.ID.ValueInt64(), err),
 			)
 		}
 	} else {
-		ztlTaxonomy, _, err = d.client.Taxonomies.GetByName(ctx, data.Name.Value)
+		ztlTaxonomy, _, err = d.client.Taxonomies.GetByName(ctx, data.Name.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get taxonomy '%s', got error: %s", data.Name.Value, err),
+				fmt.Sprintf("Unable to get taxonomy '%s', got error: %s", data.Name.ValueString(), err),
 			)
 		}
 	}

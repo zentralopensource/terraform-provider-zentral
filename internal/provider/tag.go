@@ -15,14 +15,14 @@ type tag struct {
 func tagForState(t *goztl.Tag) tag {
 	var taxonomyID types.Int64
 	if t.TaxonomyID != nil {
-		taxonomyID = types.Int64{Value: int64(*t.TaxonomyID)}
+		taxonomyID = types.Int64Value(int64(*t.TaxonomyID))
 	} else {
-		taxonomyID = types.Int64{Null: true}
+		taxonomyID = types.Int64Null()
 	}
 	return tag{
-		ID:         types.Int64{Value: int64(t.ID)},
+		ID:         types.Int64Value(int64(t.ID)),
 		TaxonomyID: taxonomyID,
-		Name:       types.String{Value: t.Name},
-		Color:      types.String{Value: t.Color},
+		Name:       types.StringValue(t.Name),
+		Color:      types.StringValue(t.Color),
 	}
 }

@@ -13,8 +13,8 @@ type metaBusinessUnit struct {
 
 func metaBusinessUnitForState(mbu *goztl.MetaBusinessUnit) metaBusinessUnit {
 	return metaBusinessUnit{
-		ID:                   types.Int64{Value: int64(mbu.ID)},
-		Name:                 types.String{Value: mbu.Name},
-		APIEnrollmentEnabled: types.Bool{Value: mbu.APIEnrollmentEnabled},
+		ID:                   types.Int64Value(int64(mbu.ID)),
+		Name:                 types.StringValue(mbu.Name),
+		APIEnrollmentEnabled: types.BoolValue(mbu.APIEnrollmentEnabled),
 	}
 }

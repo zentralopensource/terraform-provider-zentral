@@ -59,7 +59,7 @@ func (r *MetaBusinessUnitResource) GetSchema(ctx context.Context) (tfsdk.Schema,
 				Optional: true,
 				Computed: true,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					planmodifiers.DefaultValue(types.Bool{Value: true}),
+					planmodifiers.DefaultValue(types.BoolValue(true)),
 				},
 			},
 		},
@@ -97,9 +97,9 @@ func (r *MetaBusinessUnitResource) Create(ctx context.Context, req resource.Crea
 	}
 
 	mbuCreateRequest := &goztl.MetaBusinessUnitCreateRequest{
-		Name: data.Name.Value,
+		Name: data.Name.ValueString(),
 	}
-	if data.APIEnrollmentEnabled.Value {
+	if data.APIEnrollmentEnabled.ValueBool() {
 		mbuCreateRequest.APIEnrollmentEnabled = true
 	}
 	mbu, _, err := r.client.MetaBusinessUnits.Create(ctx, mbuCreateRequest)
@@ -127,11 +127,11 @@ func (r *MetaBusinessUnitResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
-	mbu, _, err := r.client.MetaBusinessUnits.GetByID(ctx, int(data.ID.Value))
+	mbu, _, err := r.client.MetaBusinessUnits.GetByID(ctx, int(data.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read meta business unit %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to read meta business unit %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}
@@ -153,16 +153,16 @@ func (r *MetaBusinessUnitResource) Update(ctx context.Context, req resource.Upda
 	}
 
 	mbuUpdateRequest := &goztl.MetaBusinessUnitUpdateRequest{
-		Name: data.Name.Value,
+		Name: data.Name.ValueString(),
 	}
-	if data.APIEnrollmentEnabled.Value {
+	if data.APIEnrollmentEnabled.ValueBool() {
 		mbuUpdateRequest.APIEnrollmentEnabled = true
 	}
-	mbu, _, err := r.client.MetaBusinessUnits.Update(ctx, int(data.ID.Value), mbuUpdateRequest)
+	mbu, _, err := r.client.MetaBusinessUnits.Update(ctx, int(data.ID.ValueInt64()), mbuUpdateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to update meta business unit %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to update meta business unit %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}
@@ -183,11 +183,11 @@ func (r *MetaBusinessUnitResource) Delete(ctx context.Context, req resource.Dele
 		return
 	}
 
-	_, err := r.client.MetaBusinessUnits.Delete(ctx, int(data.ID.Value))
+	_, err := r.client.MetaBusinessUnits.Delete(ctx, int(data.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
-			fmt.Sprintf("Unable to delete meta business unit %d, got error: %s", data.ID.Value, err),
+			fmt.Sprintf("Unable to delete meta business unit %d, got error: %s", data.ID.ValueInt64(), err),
 		)
 		return
 	}

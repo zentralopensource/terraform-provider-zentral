@@ -83,12 +83,12 @@ func (d *MetaBusinessUnitDataSource) ValidateConfig(ctx context.Context, req dat
 		return
 	}
 
-	if data.ID.Null && data.Name.Null {
+	if data.ID.IsNull() && data.Name.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_meta_business_unit` data source",
 			"`id` or `name` missing",
 		)
-	} else if !data.ID.Null && !data.Name.Null {
+	} else if !data.ID.IsNull() && !data.Name.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_meta_business_unit` data source",
 			"`id` and `name` cannot be both set",
@@ -108,20 +108,20 @@ func (d *MetaBusinessUnitDataSource) Read(ctx context.Context, req datasource.Re
 
 	var mbu *goztl.MetaBusinessUnit
 	var err error
-	if data.ID.Value > 0 {
-		mbu, _, err = d.client.MetaBusinessUnits.GetByID(ctx, int(data.ID.Value))
+	if data.ID.ValueInt64() > 0 {
+		mbu, _, err = d.client.MetaBusinessUnits.GetByID(ctx, int(data.ID.ValueInt64()))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get meta business unit '%d', got error: %s", data.ID.Value, err),
+				fmt.Sprintf("Unable to get meta business unit '%d', got error: %s", data.ID.ValueInt64(), err),
 			)
 		}
 	} else {
-		mbu, _, err = d.client.MetaBusinessUnits.GetByName(ctx, data.Name.Value)
+		mbu, _, err = d.client.MetaBusinessUnits.GetByName(ctx, data.Name.ValueString())
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get meta business unit '%s', got error: %s", data.Name.Value, err),
+				fmt.Sprintf("Unable to get meta business unit '%s', got error: %s", data.Name.ValueString(), err),
 			)
 		}
 	}

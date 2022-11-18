@@ -20,22 +20,22 @@ type jmespathCheck struct {
 func jmespathCheckForState(j *goztl.JMESPathCheck) jmespathCheck {
 	platforms := make([]attr.Value, 0)
 	for _, pv := range j.Platforms {
-		platforms = append(platforms, types.String{Value: pv})
+		platforms = append(platforms, types.StringValue(pv))
 	}
 
 	tagIDs := make([]attr.Value, 0)
 	for _, tv := range j.TagIDs {
-		tagIDs = append(tagIDs, types.Int64{Value: int64(tv)})
+		tagIDs = append(tagIDs, types.Int64Value(int64(tv)))
 	}
 
 	return jmespathCheck{
-		ID:                 types.Int64{Value: int64(j.ID)},
-		Name:               types.String{Value: j.Name},
-		Description:        types.String{Value: j.Description},
-		SourceName:         types.String{Value: j.SourceName},
-		Platforms:          types.Set{ElemType: types.StringType, Elems: platforms},
-		TagIDs:             types.Set{ElemType: types.Int64Type, Elems: tagIDs},
-		JMESPathExpression: types.String{Value: j.JMESPathExpression},
-		Version:            types.Int64{Value: int64(j.Version)},
+		ID:                 types.Int64Value(int64(j.ID)),
+		Name:               types.StringValue(j.Name),
+		Description:        types.StringValue(j.Description),
+		SourceName:         types.StringValue(j.SourceName),
+		Platforms:          types.SetValueMust(types.StringType, platforms),
+		TagIDs:             types.SetValueMust(types.Int64Type, tagIDs),
+		JMESPathExpression: types.StringValue(j.JMESPathExpression),
+		Version:            types.Int64Value(int64(j.Version)),
 	}
 }
