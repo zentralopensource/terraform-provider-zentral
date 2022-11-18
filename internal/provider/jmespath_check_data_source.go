@@ -6,19 +6,28 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ datasource.DataSource = jmespathCheckDataSource{}
-var _ provider.DataSourceType = jmespathCheckDataSourceType{}
+var _ datasource.DataSource = &JMESPathCheckDataSource{}
 
-type jmespathCheckDataSourceType struct{}
+func NewJMESPathCheckDataSource() datasource.DataSource {
+	return &JMESPathCheckDataSource{}
+}
 
-func (t jmespathCheckDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// JMESPathCheckDataSource defines the data source implementation.
+type JMESPathCheckDataSource struct {
+	client *goztl.Client
+}
+
+func (d *JMESPathCheckDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_jmespath_check"
+}
+
+func (d *JMESPathCheckDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description:         "Allows details of a JMESPath compliance check to be retrieved by its ID or name.",
 		MarkdownDescription: "The data source `zentral_jmespath_check` allows details of a JMESPath compliance check to be retrieved by its `ID` or name.",
@@ -76,19 +85,27 @@ func (t jmespathCheckDataSourceType) GetSchema(ctx context.Context) (tfsdk.Schem
 	}, nil
 }
 
-func (t jmespathCheckDataSourceType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (d *JMESPathCheckDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return jmespathCheckDataSource{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*goztl.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Data Source Configure Type",
+			fmt.Sprintf("Expected *goztl.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	d.client = client
 }
 
-type jmespathCheckDataSource struct {
-	provider zentralProvider
-}
-
-func (d jmespathCheckDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
+func (d *JMESPathCheckDataSource) ValidateConfig(ctx context.Context, req datasource.ValidateConfigRequest, resp *datasource.ValidateConfigResponse) {
 	var data jmespathCheck
 	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
@@ -109,11 +126,12 @@ func (d jmespathCheckDataSource) ValidateConfig(ctx context.Context, req datasou
 	}
 }
 
-func (d jmespathCheckDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *JMESPathCheckDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data jmespathCheck
 
-	diags := req.Config.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform configuration data into the model
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -121,7 +139,7 @@ func (d jmespathCheckDataSource) Read(ctx context.Context, req datasource.ReadRe
 	var ztlJC *goztl.JMESPathCheck
 	var err error
 	if data.ID.Value > 0 {
-		ztlJC, _, err = d.provider.client.JMESPathChecks.GetByID(ctx, int(data.ID.Value))
+		ztlJC, _, err = d.client.JMESPathChecks.GetByID(ctx, int(data.ID.Value))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
@@ -129,7 +147,7 @@ func (d jmespathCheckDataSource) Read(ctx context.Context, req datasource.ReadRe
 			)
 		}
 	} else {
-		ztlJC, _, err = d.provider.client.JMESPathChecks.GetByName(ctx, data.Name.Value)
+		ztlJC, _, err = d.client.JMESPathChecks.GetByName(ctx, data.Name.Value)
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
@@ -139,7 +157,6 @@ func (d jmespathCheckDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	if ztlJC != nil {
-		diags = resp.State.Set(ctx, jmespathCheckForState(ztlJC))
-		resp.Diagnostics.Append(diags...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, jmespathCheckForState(ztlJC))...)
 	}
 }

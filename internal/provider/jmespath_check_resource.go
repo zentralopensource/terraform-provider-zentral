@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -16,13 +15,23 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = jmespathCheckResourceType{}
-var _ resource.Resource = jmespathCheckResource{}
-var _ resource.ResourceWithImportState = jmespathCheckResource{}
+var _ resource.Resource = &JMESPathCheckResource{}
+var _ resource.ResourceWithImportState = &JMESPathCheckResource{}
 
-type jmespathCheckResourceType struct{}
+func NewJMESPathCheckResource() resource.Resource {
+	return &JMESPathCheckResource{}
+}
 
-func (t jmespathCheckResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// JMESPathCheckResource defines the resource implementation.
+type JMESPathCheckResource struct {
+	client *goztl.Client
+}
+
+func (r *JMESPathCheckResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_jmespath_check"
+}
+
+func (r *JMESPathCheckResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description:         "Manages JMESPath compliance checks.",
 		MarkdownDescription: "The resource `zentral_jmespath_check` manages JMESPath compliance checks.",
@@ -95,23 +104,31 @@ func (t jmespathCheckResourceType) GetSchema(ctx context.Context) (tfsdk.Schema,
 	}, nil
 }
 
-func (t jmespathCheckResourceType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *JMESPathCheckResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return jmespathCheckResource{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*goztl.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *goztl.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-type jmespathCheckResource struct {
-	provider zentralProvider
-}
-
-func (r jmespathCheckResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *JMESPathCheckResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data jmespathCheck
 
-	diags := req.Plan.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -135,7 +152,7 @@ func (r jmespathCheckResource) Create(ctx context.Context, req resource.CreateRe
 		TagIDs:             tagIDs,
 		JMESPathExpression: data.JMESPathExpression.Value,
 	}
-	ztlJC, _, err := r.provider.client.JMESPathChecks.Create(ctx, ztlReq)
+	ztlJC, _, err := r.client.JMESPathChecks.Create(ctx, ztlReq)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -145,24 +162,22 @@ func (r jmespathCheckResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	tflog.Trace(ctx, "created a JMESPath check")
-	newC := jmespathCheckForState(ztlJC)
-	tflog.Error(ctx, goztl.Stringify(newC))
 
-	diags = resp.State.Set(ctx, newC)
-	resp.Diagnostics.Append(diags...)
+	// Save data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, jmespathCheckForState(ztlJC))...)
 }
 
-func (r jmespathCheckResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *JMESPathCheckResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data jmespathCheck
 
-	diags := req.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	ztlJC, _, err := r.provider.client.JMESPathChecks.GetByID(ctx, int(data.ID.Value))
+	ztlJC, _, err := r.client.JMESPathChecks.GetByID(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -173,15 +188,15 @@ func (r jmespathCheckResource) Read(ctx context.Context, req resource.ReadReques
 
 	tflog.Trace(ctx, "read a JMESPath check")
 
-	diags = resp.State.Set(ctx, jmespathCheckForState(ztlJC))
-	resp.Diagnostics.Append(diags...)
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, jmespathCheckForState(ztlJC))...)
 }
 
-func (r jmespathCheckResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *JMESPathCheckResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data jmespathCheck
 
-	diags := req.Plan.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -205,7 +220,7 @@ func (r jmespathCheckResource) Update(ctx context.Context, req resource.UpdateRe
 		TagIDs:             tagIDs,
 		JMESPathExpression: data.JMESPathExpression.Value,
 	}
-	ztlJC, _, err := r.provider.client.JMESPathChecks.Update(ctx, int(data.ID.Value), ztlReq)
+	ztlJC, _, err := r.client.JMESPathChecks.Update(ctx, int(data.ID.Value), ztlReq)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -216,21 +231,21 @@ func (r jmespathCheckResource) Update(ctx context.Context, req resource.UpdateRe
 
 	tflog.Trace(ctx, "updated a JMESPath check")
 
-	diags = resp.State.Set(ctx, jmespathCheckForState(ztlJC))
-	resp.Diagnostics.Append(diags...)
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, jmespathCheckForState(ztlJC))...)
 }
 
-func (r jmespathCheckResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *JMESPathCheckResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data jmespathCheck
 
-	diags := req.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	_, err := r.provider.client.JMESPathChecks.Delete(ctx, int(data.ID.Value))
+	_, err := r.client.JMESPathChecks.Delete(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -242,6 +257,6 @@ func (r jmespathCheckResource) Delete(ctx context.Context, req resource.DeleteRe
 	tflog.Trace(ctx, "deleted a JMESPath check")
 }
 
-func (r jmespathCheckResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *JMESPathCheckResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resourceImportStatePassthroughZentralID(ctx, "JMESPath check", req, resp)
 }

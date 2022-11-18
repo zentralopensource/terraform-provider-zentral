@@ -5,34 +5,65 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ provider.Provider = &zentralProvider{}
+var _ provider.Provider = &ZentralProvider{}
+var _ provider.ProviderWithMetadata = &ZentralProvider{}
 
-// provider satisfies the provider.Provider interface and usually is included
-// with all Resource and DataSource implementations.
-type zentralProvider struct {
-	configured bool
-	version    string
-	client     *goztl.Client
+// ZentralProvider defines the provider implementation.
+type ZentralProvider struct {
+	// version is set to the provider version on release, "dev" when the
+	// provider is built and ran locally, and "test" when running acceptance
+	// testing.
+	version string
 }
 
-// providerData can be used to store data from the Terraform configuration.
-type providerData struct {
+// ZentralProviderModel describes the provider data model.
+type ZentralProviderModel struct {
 	BaseURL types.String `tfsdk:"base_url"`
 	Token   types.String `tfsdk:"token"`
 }
 
-func (p *zentralProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	var data providerData
-	diags := req.Config.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+func (p *ZentralProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "zentral"
+	resp.Version = p.version
+}
+
+func (p *ZentralProvider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+	return tfsdk.Schema{
+		Attributes: map[string]tfsdk.Attribute{
+			"base_url": {
+				Type:        types.StringType,
+				Optional:    true,
+				Computed:    true,
+				Description: "The API base URL.",
+				MarkdownDescription: "The base URL where the Zentral API is mounted, including the path. " +
+					"Can also be set using the `ZTL_API_BASE_URL` environment variable.",
+			},
+			"token": {
+				Type:      types.StringType,
+				Optional:  true,
+				Computed:  true,
+				Sensitive: true,
+				Description: "The Zentral service account or user token. " +
+					"Can also be set using the `ZTL_API_TOKEN` environment variable.",
+			},
+		},
+	}, nil
+}
+
+func (p *ZentralProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	var data ZentralProviderModel
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -95,84 +126,32 @@ func (p *zentralProvider) Configure(ctx context.Context, req provider.ConfigureR
 		)
 	}
 
-	p.client = c
-	p.configured = true
+	resp.DataSourceData = c
+	resp.ResourceData = c
 }
 
-func (p *zentralProvider) GetResources(ctx context.Context) (map[string]provider.ResourceType, diag.Diagnostics) {
-	return map[string]provider.ResourceType{
-		"zentral_jmespath_check":     jmespathCheckResourceType{},
-		"zentral_meta_business_unit": metaBusinessUnitResourceType{},
-		"zentral_tag":                tagResourceType{},
-		"zentral_taxonomy":           taxonomyResourceType{},
-	}, nil
+func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resource {
+	return []func() resource.Resource{
+		NewJMESPathCheckResource,
+		NewMetaBusinessUnitResource,
+		NewTagResource,
+		NewTaxonomyResource,
+	}
 }
 
-func (p *zentralProvider) GetDataSources(ctx context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
-	return map[string]provider.DataSourceType{
-		"zentral_jmespath_check":     jmespathCheckDataSourceType{},
-		"zentral_meta_business_unit": metaBusinessUnitDataSourceType{},
-		"zentral_tag":                tagDataSourceType{},
-		"zentral_taxonomy":           TaxonomyDataSourceType{},
-	}, nil
-}
-
-func (p *zentralProvider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
-		Attributes: map[string]tfsdk.Attribute{
-			"base_url": {
-				Type:        types.StringType,
-				Optional:    true,
-				Computed:    true,
-				Description: "The API base URL.",
-				MarkdownDescription: "The base URL where the Zentral API is mounted, including the path. " +
-					"Can also be set using the `ZTL_API_BASE_URL` environment variable.",
-			},
-			"token": {
-				Type:      types.StringType,
-				Optional:  true,
-				Computed:  true,
-				Sensitive: true,
-				Description: "The Zentral service account or user token. " +
-					"Can also be set using the `ZTL_API_TOKEN` environment variable.",
-			},
-		},
-	}, nil
+func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+	return []func() datasource.DataSource{
+		NewJMESPathCheckDataSource,
+		NewMetaBusinessUnitDataSource,
+		NewTagDataSource,
+		NewTaxonomyDataSource,
+	}
 }
 
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
-		return &zentralProvider{
+		return &ZentralProvider{
 			version: version,
 		}
 	}
-}
-
-// convertProviderType is a helper function for NewResource and NewDataSource
-// implementations to associate the concrete provider type. Alternatively,
-// this helper can be skipped and the provider type can be directly type
-// asserted (e.g. provider: in.(*provider)), however using this can prevent
-// potential panics.
-func convertProviderType(in provider.Provider) (zentralProvider, diag.Diagnostics) {
-	var diags diag.Diagnostics
-
-	p, ok := in.(*zentralProvider)
-
-	if !ok {
-		diags.AddError(
-			"Unexpected Provider Instance Type",
-			fmt.Sprintf("While creating the data source or resource, an unexpected provider type (%T) was received. This is always a bug in the provider code and should be reported to the provider developers.", p),
-		)
-		return zentralProvider{}, diags
-	}
-
-	if p == nil {
-		diags.AddError(
-			"Unexpected Provider Instance Type",
-			"While creating the data source or resource, an unexpected empty provider instance was received. This is always a bug in the provider code and should be reported to the provider developers.",
-		)
-		return zentralProvider{}, diags
-	}
-
-	return *p, diags
 }

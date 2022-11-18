@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -14,13 +13,23 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = taxonomyResourceType{}
-var _ resource.Resource = taxonomyResource{}
-var _ resource.ResourceWithImportState = taxonomyResource{}
+var _ resource.Resource = &TaxonomyResource{}
+var _ resource.ResourceWithImportState = &TaxonomyResource{}
 
-type taxonomyResourceType struct{}
+func NewTaxonomyResource() resource.Resource {
+	return &TaxonomyResource{}
+}
 
-func (t taxonomyResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// TaxonomyResource defines the resource implementation.
+type TaxonomyResource struct {
+	client *goztl.Client
+}
+
+func (r *TaxonomyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_taxonomy"
+}
+
+func (t *TaxonomyResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Description:         "Manages taxonomies.",
 		MarkdownDescription: "The resource `zentral_taxonomy` manages taxonomies.",
@@ -45,23 +54,31 @@ func (t taxonomyResourceType) GetSchema(ctx context.Context) (tfsdk.Schema, diag
 	}, nil
 }
 
-func (t taxonomyResourceType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *TaxonomyResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return taxonomyResource{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*goztl.Client)
+
+	if !ok {
+		resp.Diagnostics.AddError(
+			"Unexpected Resource Configure Type",
+			fmt.Sprintf("Expected *goztl.Client, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-type taxonomyResource struct {
-	provider zentralProvider
-}
-
-func (r taxonomyResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *TaxonomyResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var data taxonomy
 
-	diags := req.Plan.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -70,7 +87,7 @@ func (r taxonomyResource) Create(ctx context.Context, req resource.CreateRequest
 	taxonomyCreateRequest := &goztl.TaxonomyCreateRequest{
 		Name: data.Name.Value,
 	}
-	taxonomy, _, err := r.provider.client.Taxonomies.Create(ctx, taxonomyCreateRequest)
+	taxonomy, _, err := r.client.Taxonomies.Create(ctx, taxonomyCreateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -81,21 +98,21 @@ func (r taxonomyResource) Create(ctx context.Context, req resource.CreateRequest
 
 	tflog.Trace(ctx, "created a taxonomy")
 
-	diags = resp.State.Set(ctx, taxonomyForState(taxonomy))
-	resp.Diagnostics.Append(diags...)
+	// Save data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, taxonomyForState(taxonomy))...)
 }
 
-func (r taxonomyResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *TaxonomyResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	var data taxonomy
 
-	diags := req.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	taxonomy, _, err := r.provider.client.Taxonomies.GetByID(ctx, int(data.ID.Value))
+	taxonomy, _, err := r.client.Taxonomies.GetByID(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -106,15 +123,15 @@ func (r taxonomyResource) Read(ctx context.Context, req resource.ReadRequest, re
 
 	tflog.Trace(ctx, "read a taxonomy")
 
-	diags = resp.State.Set(ctx, taxonomyForState(taxonomy))
-	resp.Diagnostics.Append(diags...)
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, taxonomyForState(taxonomy))...)
 }
 
-func (r taxonomyResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *TaxonomyResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	var data taxonomy
 
-	diags := req.Plan.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform plan data into the model
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -123,7 +140,7 @@ func (r taxonomyResource) Update(ctx context.Context, req resource.UpdateRequest
 	taxonomyUpdateRequest := &goztl.TaxonomyUpdateRequest{
 		Name: data.Name.Value,
 	}
-	taxonomy, _, err := r.provider.client.Taxonomies.Update(ctx, int(data.ID.Value), taxonomyUpdateRequest)
+	taxonomy, _, err := r.client.Taxonomies.Update(ctx, int(data.ID.Value), taxonomyUpdateRequest)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -134,21 +151,21 @@ func (r taxonomyResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	tflog.Trace(ctx, "updated a taxonomy")
 
-	diags = resp.State.Set(ctx, taxonomyForState(taxonomy))
-	resp.Diagnostics.Append(diags...)
+	// Save updated data into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, taxonomyForState(taxonomy))...)
 }
 
-func (r taxonomyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *TaxonomyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var data taxonomy
 
-	diags := req.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	_, err := r.provider.client.Taxonomies.Delete(ctx, int(data.ID.Value))
+	_, err := r.client.Taxonomies.Delete(ctx, int(data.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client Error",
@@ -160,6 +177,6 @@ func (r taxonomyResource) Delete(ctx context.Context, req resource.DeleteRequest
 	tflog.Trace(ctx, "deleted a taxonomy")
 }
 
-func (r taxonomyResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *TaxonomyResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resourceImportStatePassthroughZentralID(ctx, "taxonomy", req, resp)
 }
