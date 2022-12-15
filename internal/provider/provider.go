@@ -6,17 +6,15 @@ import (
 	"os"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
 var _ provider.Provider = &ZentralProvider{}
-var _ provider.ProviderWithMetadata = &ZentralProvider{}
 
 // ZentralProvider defines the provider implementation.
 type ZentralProvider struct {
@@ -37,27 +35,23 @@ func (p *ZentralProvider) Metadata(ctx context.Context, req provider.MetadataReq
 	resp.Version = p.version
 }
 
-func (p *ZentralProvider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
-		Attributes: map[string]tfsdk.Attribute{
-			"base_url": {
-				Type:        types.StringType,
+func (p *ZentralProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+	resp.Schema = schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"base_url": schema.StringAttribute{
 				Optional:    true,
-				Computed:    true,
 				Description: "The API base URL.",
 				MarkdownDescription: "The base URL where the Zentral API is mounted, including the path. " +
 					"Can also be set using the `ZTL_API_BASE_URL` environment variable.",
 			},
-			"token": {
-				Type:      types.StringType,
+			"token": schema.StringAttribute{
 				Optional:  true,
-				Computed:  true,
 				Sensitive: true,
 				Description: "The Zentral service account or user token. " +
 					"Can also be set using the `ZTL_API_TOKEN` environment variable.",
 			},
 		},
-	}, nil
+	}
 }
 
 func (p *ZentralProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -93,7 +87,7 @@ func (p *ZentralProvider) Configure(ctx context.Context, req provider.ConfigureR
 		return
 	}
 
-	// base URL
+	// API token
 	var token string
 	if data.Token.IsUnknown() {
 		resp.Diagnostics.AddWarning(

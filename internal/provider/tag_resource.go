@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
 )
@@ -29,42 +29,38 @@ func (r *TagResource) Metadata(ctx context.Context, req resource.MetadataRequest
 	resp.TypeName = req.ProviderTypeName + "_tag"
 }
 
-func (r *TagResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *TagResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description:         "Manages tags.",
 		MarkdownDescription: "The resource `zentral_tag` manages tags.",
 
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				Description:         "ID of the tag.",
 				MarkdownDescription: "`ID` of the tag.",
-				Type:                types.Int64Type,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"taxonomy_id": {
+			"taxonomy_id": schema.Int64Attribute{
 				Description:         "ID of the tag taxonomy.",
 				MarkdownDescription: "`ID` of the tag taxonomy.",
-				Type:                types.Int64Type,
 				Optional:            true,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description:         "Name of the tag.",
 				MarkdownDescription: "Name of the tag.",
-				Type:                types.StringType,
 				Required:            true,
 			},
-			"color": {
+			"color": schema.StringAttribute{
 				Description:         "Color of the tag.",
 				MarkdownDescription: "Color of the tag.",
-				Type:                types.StringType,
 				Optional:            true,
 				Computed:            true,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *TagResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

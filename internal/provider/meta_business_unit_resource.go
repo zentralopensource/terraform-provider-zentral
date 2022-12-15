@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
 	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
@@ -30,40 +30,37 @@ func (r *MetaBusinessUnitResource) Metadata(ctx context.Context, req resource.Me
 	resp.TypeName = req.ProviderTypeName + "_meta_business_unit"
 }
 
-func (r *MetaBusinessUnitResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *MetaBusinessUnitResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description:         "Manages meta business units.",
 		MarkdownDescription: "The resource `zentral_meta_business_unit` manages meta business units.",
 
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				Description:         "ID of the meta business unit.",
 				MarkdownDescription: "`ID` of the meta business unit.",
-				Type:                types.Int64Type,
 				Computed:            true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description:         "Name of the meta business unit.",
 				MarkdownDescription: "Name of the meta business unit.",
-				Type:                types.StringType,
 				Required:            true,
 			},
-			"api_enrollment_enabled": {
+			"api_enrollment_enabled": schema.BoolAttribute{
 				Description: "Enables API enrollments.",
 				MarkdownDescription: "Enables API enrollments. Once enabled, it **CANNOT** be disabled. " +
 					"Defaults to `true`.",
-				Type:     types.BoolType,
 				Optional: true,
 				Computed: true,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					planmodifiers.DefaultValue(types.BoolValue(true)),
+				PlanModifiers: []planmodifier.Bool{
+					planmodifiers.DefaultTrue(),
 				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *MetaBusinessUnitResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

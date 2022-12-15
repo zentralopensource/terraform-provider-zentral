@@ -5,9 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/zentralopensource/goztl"
 )
 
@@ -27,38 +25,34 @@ func (d *TagDataSource) Metadata(ctx context.Context, req datasource.MetadataReq
 	resp.TypeName = req.ProviderTypeName + "_tag"
 }
 
-func (d *TagDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *TagDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description:         "Allows details of a tag to be retrieved by its ID or name.",
 		MarkdownDescription: "The data source `zentral_tag` allows details of a tag to be retrieved by its `ID` or name.",
 
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				Description:         "ID of the tag.",
 				MarkdownDescription: "`ID` of the tag.",
-				Type:                types.Int64Type,
 				Optional:            true,
 			},
-			"taxonomy_id": {
+			"taxonomy_id": schema.Int64Attribute{
 				Description:         "ID of the tag taxonomy.",
 				MarkdownDescription: "`ID` of the tag taxonomy.",
-				Type:                types.Int64Type,
 				Computed:            true,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description:         "Name of the tag.",
 				MarkdownDescription: "Name of the tag.",
-				Type:                types.StringType,
 				Optional:            true,
 			},
-			"color": {
+			"color": schema.StringAttribute{
 				Description:         "Color of the tag.",
 				MarkdownDescription: "Color of the tag.",
-				Type:                types.StringType,
 				Computed:            true,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *TagDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

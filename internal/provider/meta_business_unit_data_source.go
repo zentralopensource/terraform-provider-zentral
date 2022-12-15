@@ -5,9 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/zentralopensource/goztl"
 )
 
@@ -27,32 +25,29 @@ func (d *MetaBusinessUnitDataSource) Metadata(ctx context.Context, req datasourc
 	resp.TypeName = req.ProviderTypeName + "_meta_business_unit"
 }
 
-func (d *MetaBusinessUnitDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *MetaBusinessUnitDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description:         "Allows details of a meta business unit to be retrieved by its ID or name.",
 		MarkdownDescription: "The data source `zentral_meta_business_unit` allows details of a meta business unit to be retrieved by its `ID` or name.",
 
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				Description:         "ID of the meta business unit.",
 				MarkdownDescription: "ID of the meta business unit.",
-				Type:                types.Int64Type,
 				Optional:            true,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description:         "Name of the meta business unit.",
 				MarkdownDescription: "Name of the meta business unit.",
-				Type:                types.StringType,
 				Optional:            true,
 			},
-			"api_enrollment_enabled": {
+			"api_enrollment_enabled": schema.BoolAttribute{
 				Description:         "If API enrollments are enabled.",
 				MarkdownDescription: "If API enrollments are enabled.",
-				Type:                types.BoolType,
 				Computed:            true,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *MetaBusinessUnitDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

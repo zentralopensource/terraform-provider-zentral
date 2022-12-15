@@ -5,9 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/zentralopensource/goztl"
 )
 
@@ -27,26 +25,24 @@ func (d *TaxonomyDataSource) Metadata(ctx context.Context, req datasource.Metada
 	resp.TypeName = req.ProviderTypeName + "_taxonomy"
 }
 
-func (d *TaxonomyDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *TaxonomyDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description:         "Allows details of a taxonomy to be retrieved by its ID or name.",
 		MarkdownDescription: "The data source `zentral_taxonomy` allows details of a taxonomy to be retrieved by its `ID` or name.",
 
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				Description:         "ID of the Taxonomy.",
 				MarkdownDescription: "`ID` of the Taxonomy.",
-				Type:                types.Int64Type,
 				Optional:            true,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description:         "Name of the Taxonomy.",
 				MarkdownDescription: "Name of the Taxonomy.",
-				Type:                types.StringType,
 				Optional:            true,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *TaxonomyDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

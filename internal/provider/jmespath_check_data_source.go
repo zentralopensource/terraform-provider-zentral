@@ -5,8 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
@@ -27,62 +26,56 @@ func (d *JMESPathCheckDataSource) Metadata(ctx context.Context, req datasource.M
 	resp.TypeName = req.ProviderTypeName + "_jmespath_check"
 }
 
-func (d *JMESPathCheckDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *JMESPathCheckDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		Description:         "Allows details of a JMESPath compliance check to be retrieved by its ID or name.",
 		MarkdownDescription: "The data source `zentral_jmespath_check` allows details of a JMESPath compliance check to be retrieved by its `ID` or name.",
 
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				Description:         "ID of the JMESPath compliance check.",
 				MarkdownDescription: "`ID` of the JMESPath compliance check.",
-				Type:                types.Int64Type,
 				Optional:            true,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				Description:         "Name of the JMESPath compliance check.",
 				MarkdownDescription: "Name of the JMESPath compliance check.",
-				Type:                types.StringType,
 				Optional:            true,
 			},
-			"description": {
+			"description": schema.StringAttribute{
 				Description:         "Description of the JMESPath compliance check.",
 				MarkdownDescription: "Description of the JMESPath compliance check.",
-				Type:                types.StringType,
 				Computed:            true,
 			},
-			"source_name": {
+			"source_name": schema.StringAttribute{
 				Description:         "The name of the inventory source the JMESPath compliance check is restricted to.",
 				MarkdownDescription: "The name of the inventory source the JMESPath compliance check is restricted to.",
-				Type:                types.StringType,
 				Computed:            true,
 			},
-			"platforms": {
+			"platforms": schema.SetAttribute{
 				Description:         "The platforms the JMESPath compliance check is restricted to.",
 				MarkdownDescription: "The platforms the JMESPath compliance check is restricted to.",
-				Type:                types.SetType{ElemType: types.StringType},
+				ElementType:         types.StringType,
 				Computed:            true,
 			},
-			"tag_ids": {
+			"tag_ids": schema.SetAttribute{
 				Description:         "The IDs of the tags the JMESPath compliance check is restricted to.",
 				MarkdownDescription: "The IDs of the tags the JMESPath compliance check is restricted to.",
-				Type:                types.SetType{ElemType: types.Int64Type},
+				ElementType:         types.Int64Type,
 				Computed:            true,
 			},
-			"jmespath_expression": {
+			"jmespath_expression": schema.StringAttribute{
 				Description:         "The JMESPath compliance check expression.",
 				MarkdownDescription: "The JMESPath compliance check expression.",
-				Type:                types.StringType,
 				Computed:            true,
 			},
-			"version": {
+			"version": schema.Int64Attribute{
 				Description:         "The JMESPath compliance check version.",
 				MarkdownDescription: "The JMESPath compliance check version.",
-				Type:                types.Int64Type,
 				Computed:            true,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *JMESPathCheckDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
