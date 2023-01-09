@@ -56,7 +56,7 @@ func (r *MetaBusinessUnitResource) Schema(ctx context.Context, req resource.Sche
 				Optional: true,
 				Computed: true,
 				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.DefaultTrue(),
+					planmodifiers.BoolDefault(true),
 				},
 			},
 		},

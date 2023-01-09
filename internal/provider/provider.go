@@ -128,6 +128,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 	return []func() resource.Resource{
 		NewJMESPathCheckResource,
 		NewMetaBusinessUnitResource,
+		NewSantaConfigurationResource,
 		NewTagResource,
 		NewTaxonomyResource,
 	}
@@ -137,6 +138,7 @@ func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.D
 	return []func() datasource.DataSource{
 		NewJMESPathCheckDataSource,
 		NewMetaBusinessUnitDataSource,
+		NewSantaConfigurationDataSource,
 		NewTagDataSource,
 		NewTaxonomyDataSource,
 	}
