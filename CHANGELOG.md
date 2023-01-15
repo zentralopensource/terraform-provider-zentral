@@ -1,3 +1,15 @@
+## 0.1.6 (January 14, 2022)
+
+FEATURES:
+
+ * `zentral_santa_enrollment` resource and data source.
+
+## 0.1.4, 0.1.5 (January 9, 2022)
+
+FEATURES:
+
+ * `zentral_santa_configuration` resource and data source.
+
 ## 0.1.3 (July 28, 2022)
 
 FEATURES:
