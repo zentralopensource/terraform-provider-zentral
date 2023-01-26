@@ -3,12 +3,12 @@
 page_title: "zentral_santa_enrollment Data Source - terraform-provider-zentral"
 subcategory: ""
 description: |-
-  The data source zentral_santa_enrollment allows details of a Santa enrollment to be retrieved by its ID or name.
+  The data source zentral_santa_enrollment allows details of a Santa enrollment to be retrieved by its ID.
 ---
 
 # zentral_santa_enrollment (Data Source)
 
-The data source `zentral_santa_enrollment` allows details of a Santa enrollment to be retrieved by its `ID` or name.
+The data source `zentral_santa_enrollment` allows details of a Santa enrollment to be retrieved by its `ID`.
 
 
 

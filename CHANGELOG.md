@@ -1,3 +1,9 @@
+## 0.1.7 (January 27, 2022)
+
+FEATURES:
+
+ * `zentral_santa_rule` resource and data source.
+
 ## 0.1.6 (January 14, 2022)
 
 FEATURES:
