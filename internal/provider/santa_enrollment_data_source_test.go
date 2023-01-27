@@ -24,7 +24,7 @@ func TestAccSantaEnrollmentDataSource(t *testing.T) {
 			{
 				Config: testAccSantaEnrollmentDataSourceConfig(name, tagName),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					// Read by name, platforms, tag
+					// Read by id
 					resource.TestCheckResourceAttrPair(
 						dataSourceName, "id", resourceName, "id"),
 					resource.TestCheckResourceAttrPair(

@@ -28,8 +28,8 @@ func (d *SantaEnrollmentDataSource) Metadata(ctx context.Context, req datasource
 
 func (d *SantaEnrollmentDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description:         "Allows details of a Santa enrollment to be retrieved by its ID or name.",
-		MarkdownDescription: "The data source `zentral_santa_enrollment` allows details of a Santa enrollment to be retrieved by its `ID` or name.",
+		Description:         "Allows details of a Santa enrollment to be retrieved by its ID.",
+		MarkdownDescription: "The data source `zentral_santa_enrollment` allows details of a Santa enrollment to be retrieved by its `ID`.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
@@ -122,7 +122,7 @@ func (d *SantaEnrollmentDataSource) ValidateConfig(ctx context.Context, req data
 		return
 	}
 
-	if data.ID.IsNull() && data.ConfigurationID.IsNull() {
+	if data.ID.IsNull() {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_santa_enrollment` data source",
 			"`id` missing",
