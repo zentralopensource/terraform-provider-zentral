@@ -18,6 +18,7 @@ type osqueryConfiguration struct {
 	InventoryInterval types.Int64  `tfsdk:"inventory_interval"`
 	Options           types.Map    `tfsdk:"options"`
 	ATCs              types.Set    `tfsdk:"automatic_table_constructions"`
+	FileCategories    types.Set    `tfsdk:"file_categories"`
 }
 
 func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfiguration {
@@ -31,6 +32,11 @@ func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfigu
 		atcIDs = append(atcIDs, types.Int64Value(int64(atcID)))
 	}
 
+	fileCategoryIDs := make([]attr.Value, 0)
+	for _, fileCategoryID := range oc.FileCategories {
+		fileCategoryIDs = append(fileCategoryIDs, types.Int64Value(int64(fileCategoryID)))
+	}
+
 	return osqueryConfiguration{
 		ID:                types.Int64Value(int64(oc.ID)),
 		Name:              types.StringValue(oc.Name),
@@ -41,6 +47,7 @@ func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfigu
 		InventoryInterval: types.Int64Value(int64(oc.InventoryInterval)),
 		Options:           types.MapValueMust(types.StringType, options),
 		ATCs:              types.SetValueMust(types.Int64Type, atcIDs),
+		FileCategories:    types.SetValueMust(types.Int64Type, fileCategoryIDs),
 	}
 }
 
@@ -55,6 +62,11 @@ func osqueryConfigurationRequestWithState(data osqueryConfiguration) *goztl.Osqu
 		atcIDs = append(atcIDs, int(atcID.(types.Int64).ValueInt64()))
 	}
 
+	fileCategoryIDs := make([]int, 0)
+	for _, fileCategoryID := range data.FileCategories.Elements() { // nil if null or unknown → no iterations
+		fileCategoryIDs = append(fileCategoryIDs, int(fileCategoryID.(types.Int64).ValueInt64()))
+	}
+
 	return &goztl.OsqueryConfigurationRequest{
 		Name:              data.Name.ValueString(),
 		Description:       data.Description.ValueString(),
@@ -64,5 +76,6 @@ func osqueryConfigurationRequestWithState(data osqueryConfiguration) *goztl.Osqu
 		InventoryInterval: int(data.InventoryInterval.ValueInt64()),
 		Options:           options,
 		ATCs:              atcIDs,
+		FileCategories:    fileCategoryIDs,
 	}
 }

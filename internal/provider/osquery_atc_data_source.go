@@ -108,12 +108,12 @@ func (d *OsqueryATCDataSource) ValidateConfig(ctx context.Context, req datasourc
 
 	if data.ID.IsNull() && data.Name.IsNull() {
 		resp.Diagnostics.AddError(
-			"Invalid `zentral_osquery_configuration` data source",
+			"Invalid `zentral_osquery_atc` data source",
 			"`id` or `name` missing",
 		)
 	} else if !data.ID.IsNull() && !data.Name.IsNull() {
 		resp.Diagnostics.AddError(
-			"Invalid `zentral_osquery_configuration` data source",
+			"Invalid `zentral_osquery_atc` data source",
 			"`id` and `name` cannot be both set",
 		)
 	}

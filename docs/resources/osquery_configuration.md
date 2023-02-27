@@ -21,8 +21,9 @@ The resource `zentral_osquery_configuration` manages Osquery configurations.
 
 ### Optional
 
-- `automatic_table_constructions` (Set of Number) List of ATC IDs to include in this configuration.
+- `automatic_table_constructions` (Set of Number) List of the IDs of the ATCs to include in this configuration.
 - `description` (String) Description of the Osquery configuration.
+- `file_categories` (Set of Number) List of the IDs of the file categories to include in this configuration.
 - `inventory` (Boolean) If `true`, Osquery is configured to collect inventory data. Defaults to `true`.
 - `inventory_apps` (Boolean) If `true`, Osquery is configured to collect the applications. Defaults to `false`.
 - `inventory_ec2` (Boolean) If `true`, Osquery is configured to collect the EC2 metadata. Defaults to `false`.

@@ -13,6 +13,7 @@ func TestAccOsqueryConfigurationResource(t *testing.T) {
 	secondName := acctest.RandString(12)
 	resourceName := "zentral_osquery_configuration.test"
 	atcResourceName := "zentral_osquery_atc.test"
+	fcResourceName := "zentral_osquery_file_category.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -38,6 +39,8 @@ func TestAccOsqueryConfigurationResource(t *testing.T) {
 						resourceName, "options.%", "0"),
 					resource.TestCheckResourceAttr(
 						resourceName, "automatic_table_constructions.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "file_categories.#", "0"),
 				),
 			},
 			// ImportState
@@ -70,6 +73,10 @@ func TestAccOsqueryConfigurationResource(t *testing.T) {
 						resourceName, "automatic_table_constructions.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
 						resourceName, "automatic_table_constructions.*", atcResourceName, "id"),
+					resource.TestCheckResourceAttr(
+						resourceName, "file_categories.#", "1"),
+					resource.TestCheckTypeSetElemAttrPair(
+						resourceName, "file_categories.*", fcResourceName, "id"),
 				),
 			},
 			// ImportState
@@ -93,13 +100,19 @@ resource "zentral_osquery_configuration" "test" {
 func testAccOsqueryConfigurationResourceConfigFull(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_osquery_atc" "test" {
-  name        = "%[1]s_atc"
+  name        = %[1]q
   description = "Access the Google Santa rules.db"
   table_name  = "%[1]s_test_tf_santa_rules"
   query       = "SELECT * FROM rules;"
   path        = "/var/db/santa/rules.db"
   columns     = ["identifier", "state", "type", "custommsg", "timestamp"]
   platforms   = ["darwin"]
+}
+
+resource "zentral_osquery_file_category" "test" {
+  name        = %[1]q
+  description = "%[1]s description"
+  file_paths = ["/root/.ssh/%%%%", "/home/%%/.ssh/%%%%"]
 }
 
 resource "zentral_osquery_configuration" "test" {
@@ -111,6 +124,7 @@ resource "zentral_osquery_configuration" "test" {
   inventory_interval            = 600
   options                       = { config_refresh = "120" }
   automatic_table_constructions = [zentral_osquery_atc.test.id]
+  file_categories               = [zentral_osquery_file_category.test.id]
 }
 `, name)
 }
