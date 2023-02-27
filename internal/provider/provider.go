@@ -141,6 +141,7 @@ func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.D
 	return []func() datasource.DataSource{
 		NewJMESPathCheckDataSource,
 		NewMetaBusinessUnitDataSource,
+		NewOsqueryConfigurationDataSource,
 		NewSantaConfigurationDataSource,
 		NewSantaEnrollmentDataSource,
 		NewSantaRuleDataSource,
