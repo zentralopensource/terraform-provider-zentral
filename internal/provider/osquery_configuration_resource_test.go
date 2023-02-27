@@ -12,6 +12,7 @@ func TestAccOsqueryConfigurationResource(t *testing.T) {
 	firstName := acctest.RandString(12)
 	secondName := acctest.RandString(12)
 	resourceName := "zentral_osquery_configuration.test"
+	atcResourceName := "zentral_osquery_atc.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -35,6 +36,8 @@ func TestAccOsqueryConfigurationResource(t *testing.T) {
 						resourceName, "inventory_interval", "86400"),
 					resource.TestCheckResourceAttr(
 						resourceName, "options.%", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "automatic_table_constructions.#", "0"),
 				),
 			},
 			// ImportState
@@ -63,6 +66,10 @@ func TestAccOsqueryConfigurationResource(t *testing.T) {
 						resourceName, "options.%", "1"),
 					resource.TestCheckResourceAttr(
 						resourceName, "options.config_refresh", "120"),
+					resource.TestCheckResourceAttr(
+						resourceName, "automatic_table_constructions.#", "1"),
+					resource.TestCheckTypeSetElemAttrPair(
+						resourceName, "automatic_table_constructions.*", atcResourceName, "id"),
 				),
 			},
 			// ImportState
@@ -85,14 +92,25 @@ resource "zentral_osquery_configuration" "test" {
 
 func testAccOsqueryConfigurationResourceConfigFull(name string) string {
 	return fmt.Sprintf(`
+resource "zentral_osquery_atc" "test" {
+  name        = "%[1]s_atc"
+  description = "Access the Google Santa rules.db"
+  table_name  = "%[1]s_test_tf_santa_rules"
+  query       = "SELECT * FROM rules;"
+  path        = "/var/db/santa/rules.db"
+  columns     = ["identifier", "state", "type", "custommsg", "timestamp"]
+  platforms   = ["darwin"]
+}
+
 resource "zentral_osquery_configuration" "test" {
-  name               = %[1]q
-  description        = "description"
-  inventory          = true
-  inventory_apps     = true
-  inventory_ec2      = true
-  inventory_interval = 600
-  options            = { config_refresh = "120" }
+  name                          = %[1]q
+  description                   = "description"
+  inventory                     = true
+  inventory_apps                = true
+  inventory_ec2                 = true
+  inventory_interval            = 600
+  options                       = { config_refresh = "120" }
+  automatic_table_constructions = [zentral_osquery_atc.test.id]
 }
 `, name)
 }
