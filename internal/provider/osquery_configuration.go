@@ -17,12 +17,18 @@ type osqueryConfiguration struct {
 	InventoryEC2      types.Bool   `tfsdk:"inventory_ec2"`
 	InventoryInterval types.Int64  `tfsdk:"inventory_interval"`
 	Options           types.Map    `tfsdk:"options"`
+	ATCs              types.Set    `tfsdk:"automatic_table_constructions"`
 }
 
 func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfiguration {
 	options := make(map[string]attr.Value)
 	for k, v := range oc.Options {
 		options[k] = types.StringValue(fmt.Sprintf("%v", v))
+	}
+
+	atcIDs := make([]attr.Value, 0)
+	for _, atcID := range oc.ATCs {
+		atcIDs = append(atcIDs, types.Int64Value(int64(atcID)))
 	}
 
 	return osqueryConfiguration{
@@ -34,6 +40,7 @@ func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfigu
 		InventoryEC2:      types.BoolValue(oc.InventoryEC2),
 		InventoryInterval: types.Int64Value(int64(oc.InventoryInterval)),
 		Options:           types.MapValueMust(types.StringType, options),
+		ATCs:              types.SetValueMust(types.Int64Type, atcIDs),
 	}
 }
 
@@ -41,6 +48,11 @@ func osqueryConfigurationRequestWithState(data osqueryConfiguration) *goztl.Osqu
 	options := make(map[string]interface{})
 	for k, v := range data.Options.Elements() {
 		options[k] = v.(types.String).ValueString()
+	}
+
+	atcIDs := make([]int, 0)
+	for _, atcID := range data.ATCs.Elements() { // nil if null or unknown → no iterations
+		atcIDs = append(atcIDs, int(atcID.(types.Int64).ValueInt64()))
 	}
 
 	return &goztl.OsqueryConfigurationRequest{
@@ -51,5 +63,6 @@ func osqueryConfigurationRequestWithState(data osqueryConfiguration) *goztl.Osqu
 		InventoryEC2:      data.InventoryEC2.ValueBool(),
 		InventoryInterval: int(data.InventoryInterval.ValueInt64()),
 		Options:           options,
+		ATCs:              atcIDs,
 	}
 }

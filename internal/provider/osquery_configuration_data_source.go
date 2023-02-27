@@ -76,6 +76,12 @@ func (d *OsqueryConfigurationDataSource) Schema(ctx context.Context, req datasou
 				ElementType: types.StringType,
 				Computed:    true,
 			},
+			"automatic_table_constructions": schema.SetAttribute{
+				Description:         "List of ATC IDs to include in this configuration.",
+				MarkdownDescription: "List of ATC IDs to include in this configuration.",
+				ElementType:         types.Int64Type,
+				Computed:            true,
+			},
 		},
 	}
 }
