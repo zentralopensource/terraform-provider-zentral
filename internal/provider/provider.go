@@ -151,7 +151,6 @@ func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewOsqueryConfigurationDataSource,
 		NewOsqueryFileCategoryDataSource,
 		NewOsqueryPackDataSource,
-		NewOsqueryPackQueryDataSource,
 		NewOsqueryQueryDataSource,
 		NewSantaConfigurationDataSource,
 		NewSantaEnrollmentDataSource,
