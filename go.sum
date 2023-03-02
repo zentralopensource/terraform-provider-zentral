@@ -233,8 +233,8 @@ github.com/zclconf/go-cty v1.10.0/go.mod h1:vVKLxnk3puL4qRAv72AO+W99LUD4da90g3uU
 github.com/zclconf/go-cty v1.13.0 h1:It5dfKTTZHe9aeppbNOda3mN7Ag7sg6QkBNm6TkyFa0=
 github.com/zclconf/go-cty v1.13.0/go.mod h1:YKQzy/7pZ7iq2jNFzy5go57xdxdWoLLpaEp4u238AE0=
 github.com/zclconf/go-cty-debug v0.0.0-20191215020915-b22d67c1ba0b/go.mod h1:ZRKQfBXbGkpdV6QMzT3rU1kSTAnfu1dO8dPKjYprgj8=
-github.com/zentralopensource/goztl v0.1.18 h1:R9u+hLmn6uK+zzRLOLdqIWpXS6vNs9sYihoQyQeto1c=
-github.com/zentralopensource/goztl v0.1.18/go.mod h1:zakEe4QjAUvawFpzehwryMM5f2RI61a8m1wcNxQ8G/A=
+github.com/zentralopensource/goztl v0.1.19 h1:YaCNUmtvNFiNc9SVL5iwiFataDH5JGDz/cYBVuZgwms=
+github.com/zentralopensource/goztl v0.1.19/go.mod h1:zakEe4QjAUvawFpzehwryMM5f2RI61a8m1wcNxQ8G/A=
 golang.org/x/crypto v0.0.0-20190219172222-a4c6cb3142f2/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20200414173820-0848c9571904/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
