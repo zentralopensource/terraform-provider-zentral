@@ -17,8 +17,8 @@ type osqueryConfiguration struct {
 	InventoryEC2      types.Bool   `tfsdk:"inventory_ec2"`
 	InventoryInterval types.Int64  `tfsdk:"inventory_interval"`
 	Options           types.Map    `tfsdk:"options"`
-	ATCs              types.Set    `tfsdk:"automatic_table_constructions"`
-	FileCategories    types.Set    `tfsdk:"file_categories"`
+	ATCIDs            types.Set    `tfsdk:"atc_ids"`
+	FileCategoryIDs   types.Set    `tfsdk:"file_category_ids"`
 }
 
 func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfiguration {
@@ -28,12 +28,12 @@ func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfigu
 	}
 
 	atcIDs := make([]attr.Value, 0)
-	for _, atcID := range oc.ATCs {
+	for _, atcID := range oc.ATCIDs {
 		atcIDs = append(atcIDs, types.Int64Value(int64(atcID)))
 	}
 
 	fileCategoryIDs := make([]attr.Value, 0)
-	for _, fileCategoryID := range oc.FileCategories {
+	for _, fileCategoryID := range oc.FileCategoryIDs {
 		fileCategoryIDs = append(fileCategoryIDs, types.Int64Value(int64(fileCategoryID)))
 	}
 
@@ -46,8 +46,8 @@ func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfigu
 		InventoryEC2:      types.BoolValue(oc.InventoryEC2),
 		InventoryInterval: types.Int64Value(int64(oc.InventoryInterval)),
 		Options:           types.MapValueMust(types.StringType, options),
-		ATCs:              types.SetValueMust(types.Int64Type, atcIDs),
-		FileCategories:    types.SetValueMust(types.Int64Type, fileCategoryIDs),
+		ATCIDs:            types.SetValueMust(types.Int64Type, atcIDs),
+		FileCategoryIDs:   types.SetValueMust(types.Int64Type, fileCategoryIDs),
 	}
 }
 
@@ -58,12 +58,12 @@ func osqueryConfigurationRequestWithState(data osqueryConfiguration) *goztl.Osqu
 	}
 
 	atcIDs := make([]int, 0)
-	for _, atcID := range data.ATCs.Elements() { // nil if null or unknown → no iterations
+	for _, atcID := range data.ATCIDs.Elements() { // nil if null or unknown → no iterations
 		atcIDs = append(atcIDs, int(atcID.(types.Int64).ValueInt64()))
 	}
 
 	fileCategoryIDs := make([]int, 0)
-	for _, fileCategoryID := range data.FileCategories.Elements() { // nil if null or unknown → no iterations
+	for _, fileCategoryID := range data.FileCategoryIDs.Elements() { // nil if null or unknown → no iterations
 		fileCategoryIDs = append(fileCategoryIDs, int(fileCategoryID.(types.Int64).ValueInt64()))
 	}
 
@@ -75,7 +75,7 @@ func osqueryConfigurationRequestWithState(data osqueryConfiguration) *goztl.Osqu
 		InventoryEC2:      data.InventoryEC2.ValueBool(),
 		InventoryInterval: int(data.InventoryInterval.ValueInt64()),
 		Options:           options,
-		ATCs:              atcIDs,
-		FileCategories:    fileCategoryIDs,
+		ATCIDs:            atcIDs,
+		FileCategoryIDs:   fileCategoryIDs,
 	}
 }

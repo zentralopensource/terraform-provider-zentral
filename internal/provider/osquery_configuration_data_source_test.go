@@ -43,9 +43,9 @@ func TestAccOsqueryConfigurationDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "options.%", "0"),
 					resource.TestCheckResourceAttr(
-						ds1ResourceName, "automatic_table_constructions.#", "0"),
+						ds1ResourceName, "atc_ids.#", "0"),
 					resource.TestCheckResourceAttr(
-						ds1ResourceName, "file_categories.#", "0"),
+						ds1ResourceName, "file_category_ids.#", "0"),
 					// Read by ID
 					resource.TestCheckResourceAttrPair(
 						ds2ResourceName, "id", c2ResourceName, "id"),
@@ -66,13 +66,13 @@ func TestAccOsqueryConfigurationDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "options.config_refresh", "120"),
 					resource.TestCheckResourceAttr(
-						ds2ResourceName, "automatic_table_constructions.#", "1"),
+						ds2ResourceName, "atc_ids.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
-						ds2ResourceName, "automatic_table_constructions.*", atcResourceName, "id"),
+						ds2ResourceName, "atc_ids.*", atcResourceName, "id"),
 					resource.TestCheckResourceAttr(
-						ds2ResourceName, "file_categories.#", "1"),
+						ds2ResourceName, "file_category_ids.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
-						ds2ResourceName, "file_categories.*", fcResourceName, "id"),
+						ds2ResourceName, "file_category_ids.*", fcResourceName, "id"),
 				),
 			},
 		},
@@ -102,15 +102,15 @@ resource "zentral_osquery_file_category" "test" {
 }
 
 resource "zentral_osquery_configuration" "check2" {
-  name                          = %[2]q
-  description                   = "description"
-  inventory                     = true
-  inventory_apps                = true
-  inventory_ec2                 = true
-  inventory_interval            = 600
-  options                       = { config_refresh = "120" }
-  automatic_table_constructions = [zentral_osquery_atc.test.id]
-  file_categories               = [zentral_osquery_file_category.test.id]
+  name              = %[2]q
+  description        = "description"
+  inventory          = true
+  inventory_apps     = true
+  inventory_ec2      = true
+  inventory_interval = 600
+  options            = { config_refresh = "120" }
+  atc_ids            = [zentral_osquery_atc.test.id]
+  file_category_ids  = [zentral_osquery_file_category.test.id]
 }
 
 data "zentral_osquery_configuration" "check1_by_name" {

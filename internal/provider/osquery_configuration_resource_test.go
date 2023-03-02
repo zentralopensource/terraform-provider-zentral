@@ -38,9 +38,9 @@ func TestAccOsqueryConfigurationResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "options.%", "0"),
 					resource.TestCheckResourceAttr(
-						resourceName, "automatic_table_constructions.#", "0"),
+						resourceName, "atc_ids.#", "0"),
 					resource.TestCheckResourceAttr(
-						resourceName, "file_categories.#", "0"),
+						resourceName, "file_category_ids.#", "0"),
 				),
 			},
 			// ImportState
@@ -70,13 +70,13 @@ func TestAccOsqueryConfigurationResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "options.config_refresh", "120"),
 					resource.TestCheckResourceAttr(
-						resourceName, "automatic_table_constructions.#", "1"),
+						resourceName, "atc_ids.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
-						resourceName, "automatic_table_constructions.*", atcResourceName, "id"),
+						resourceName, "atc_ids.*", atcResourceName, "id"),
 					resource.TestCheckResourceAttr(
-						resourceName, "file_categories.#", "1"),
+						resourceName, "file_category_ids.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
-						resourceName, "file_categories.*", fcResourceName, "id"),
+						resourceName, "file_category_ids.*", fcResourceName, "id"),
 				),
 			},
 			// ImportState
@@ -116,15 +116,15 @@ resource "zentral_osquery_file_category" "test" {
 }
 
 resource "zentral_osquery_configuration" "test" {
-  name                          = %[1]q
-  description                   = "description"
-  inventory                     = true
-  inventory_apps                = true
-  inventory_ec2                 = true
-  inventory_interval            = 600
-  options                       = { config_refresh = "120" }
-  automatic_table_constructions = [zentral_osquery_atc.test.id]
-  file_categories               = [zentral_osquery_file_category.test.id]
+  name               = %[1]q
+  description        = "description"
+  inventory          = true
+  inventory_apps     = true
+  inventory_ec2      = true
+  inventory_interval = 600
+  options            = { config_refresh = "120" }
+  atc_ids            = [zentral_osquery_atc.test.id]
+  file_category_ids  = [zentral_osquery_file_category.test.id]
 }
 `, name)
 }

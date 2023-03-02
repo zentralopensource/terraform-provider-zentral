@@ -105,14 +105,14 @@ func (r *OsqueryConfigurationResource) Schema(ctx context.Context, req resource.
 				Optional:    true,
 				Computed:    true,
 			},
-			"automatic_table_constructions": schema.SetAttribute{
+			"atc_ids": schema.SetAttribute{
 				Description:         "List of the IDs of the ATCs to include in this configuration.",
 				MarkdownDescription: "List of the IDs of the ATCs to include in this configuration.",
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
 			},
-			"file_categories": schema.SetAttribute{
+			"file_category_ids": schema.SetAttribute{
 				Description:         "List of the IDs of the file categories to include in this configuration.",
 				MarkdownDescription: "List of the IDs of the file categories to include in this configuration.",
 				ElementType:         types.Int64Type,
