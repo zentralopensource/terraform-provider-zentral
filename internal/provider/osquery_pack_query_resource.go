@@ -33,7 +33,7 @@ func (r *OsqueryPackQueryResource) Metadata(ctx context.Context, req resource.Me
 func (r *OsqueryPackQueryResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Description:         "Manages Osquery pack queries.",
-		MarkdownDescription: "The resource `zentral_osquery_query` manages Osquery pack queries.",
+		MarkdownDescription: "The resource `zentral_osquery_pack_query` manages Osquery pack queries.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
