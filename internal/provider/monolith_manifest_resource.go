@@ -49,8 +49,8 @@ func (r *MonolithManifestResource) Schema(ctx context.Context, req resource.Sche
 				Required:            true,
 			},
 			"meta_business_unit_id": schema.Int64Attribute{
-				Description:         "The ID of the meta business unit the machine will be assigned to at manifest.",
-				MarkdownDescription: "The `ID` of the meta business unit the machine will be assigned to at manifest.",
+				Description:         "The ID of the meta business unit this manifest is attached to.",
+				MarkdownDescription: "The `ID` of the meta business unit this manifest is attached to.",
 				Required:            true,
 			},
 			"version": schema.Int64Attribute{
