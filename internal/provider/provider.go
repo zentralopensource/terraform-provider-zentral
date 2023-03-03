@@ -128,6 +128,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 	return []func() resource.Resource{
 		NewJMESPathCheckResource,
 		NewMetaBusinessUnitResource,
+		NewMonolithManifestResource,
 		NewOsqueryATCResource,
 		NewOsqueryConfigurationResource,
 		NewOsqueryConfigurationPackResource,
