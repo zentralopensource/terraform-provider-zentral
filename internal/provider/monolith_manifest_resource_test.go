@@ -21,7 +21,7 @@ func TestAccMonolithManifestResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read
 			{
-				Config: testAccMonolithManifestResource(firstName, mbuName),
+				Config: testAccMonolithManifestResourceConfig(firstName, mbuName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", firstName),
@@ -39,7 +39,7 @@ func TestAccMonolithManifestResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccMonolithManifestResource(secondName, mbuName),
+				Config: testAccMonolithManifestResourceConfig(secondName, mbuName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -59,7 +59,7 @@ func TestAccMonolithManifestResource(t *testing.T) {
 	})
 }
 
-func testAccMonolithManifestResource(name string, mbuName string) string {
+func testAccMonolithManifestResourceConfig(name string, mbuName string) string {
 	return fmt.Sprintf(`
 resource "zentral_meta_business_unit" "test" {
   name = %[2]q
