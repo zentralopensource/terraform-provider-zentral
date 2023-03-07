@@ -131,6 +131,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewMonolithCatalogResource,
 		NewMonolithManifestResource,
 		NewMonolithManifestCatalogResource,
+		NewMonolithManifestSubManifestResource,
 		NewMonolithSubManifestResource,
 		NewOsqueryATCResource,
 		NewOsqueryConfigurationResource,
