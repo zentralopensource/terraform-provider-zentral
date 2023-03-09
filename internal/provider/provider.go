@@ -162,6 +162,7 @@ func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewMonolithEnrollmentDataSource,
 		NewMonolithManifestDataSource,
 		NewMonolithSubManifestDataSource,
+		NewMunkiConfigurationDataSource,
 		NewOsqueryATCDataSource,
 		NewOsqueryConfigurationDataSource,
 		NewOsqueryEnrollmentDataSource,
