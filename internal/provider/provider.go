@@ -137,6 +137,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewMonolithSubManifestResource,
 		NewMonolithSubManifestPkgInfoResource,
 		NewMunkiConfigurationResource,
+		NewMunkiEnrollmentResource,
 		NewOsqueryATCResource,
 		NewOsqueryConfigurationResource,
 		NewOsqueryConfigurationPackResource,
