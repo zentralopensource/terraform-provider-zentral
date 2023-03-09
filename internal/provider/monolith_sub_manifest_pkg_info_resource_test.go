@@ -13,6 +13,7 @@ func TestAccMonolithSubManifestPkgInfoResource(t *testing.T) {
 	resourceName := "zentral_monolith_sub_manifest_pkg_info.test"
 	smResourceName := "zentral_monolith_sub_manifest.test"
 	etResourceName := "zentral_tag.excluded"
+	cResourceName := "zentral_monolith_condition.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -60,8 +61,8 @@ func TestAccMonolithSubManifestPkgInfoResource(t *testing.T) {
 						resourceName, "pkg_info_name", "Firefox"),
 					resource.TestCheckResourceAttr(
 						resourceName, "featured_item", "true"),
-					resource.TestCheckNoResourceAttr(
-						resourceName, "condition_id"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "condition_id", cResourceName, "id"),
 					resource.TestCheckResourceAttr(
 						resourceName, "shard_modulo", "5"),
 					resource.TestCheckResourceAttr(
@@ -119,10 +120,16 @@ resource "zentral_tag" "shard" {
   name = "%[1]s shard"
 }
 
+resource "zentral_monolith_condition" "test" {
+  name = %[1]q
+  predicate = "machine_type == \"laptop\""
+}
+
 resource "zentral_monolith_sub_manifest_pkg_info" "test" {
   sub_manifest_id  = zentral_monolith_sub_manifest.test.id
   key              = "optional_installs"
   pkg_info_name    = "Firefox"
+  condition_id     = zentral_monolith_condition.test.id
   featured_item    = true
   shard_modulo     = 5
   default_shard    = 1
