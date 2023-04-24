@@ -6,12 +6,13 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
-	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -72,18 +73,14 @@ func (r *OsqueryQueryResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "Description of the query.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"value": schema.StringAttribute{
 				Description:         "Description of the results returned by the query.",
 				MarkdownDescription: "Description of the results returned by the query.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"version": schema.Int64Attribute{
 				Description:         "Version of the query.",
@@ -95,9 +92,7 @@ func (r *OsqueryQueryResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "If `true`, the query will be used as compliance check. Defaults to `false`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 		},
 	}

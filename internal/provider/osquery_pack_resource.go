@@ -8,10 +8,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
-	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -60,9 +60,7 @@ func (r *OsqueryPackResource) Schema(ctx context.Context, req resource.SchemaReq
 				MarkdownDescription: "Description of the pack.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"discovery_queries": schema.ListAttribute{
 				Description:         "List of osquery queries which control whether or not the pack will execute.",
@@ -81,9 +79,7 @@ func (r *OsqueryPackResource) Schema(ctx context.Context, req resource.SchemaReq
 				MarkdownDescription: "Routing key added to the metadata of the events that the queries of this pack generate.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 		},
 	}

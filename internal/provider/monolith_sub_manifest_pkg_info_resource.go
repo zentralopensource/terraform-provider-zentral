@@ -4,14 +4,17 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
-	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -65,9 +68,7 @@ func (r *MonolithSubManifestPkgInfoResource) Schema(ctx context.Context, req res
 				MarkdownDescription: "If `true`, this pkg info will be displayed in the featured items section in Managed Software Center. Defaults to `false`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"condition_id": schema.Int64Attribute{
 				Description:         "The ID of the condition that is evaluated to decide if this pkg info is included.",
@@ -79,18 +80,14 @@ func (r *MonolithSubManifestPkgInfoResource) Schema(ctx context.Context, req res
 				MarkdownDescription: "The modulo used to calculate the shards. Defaults to `100`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(100),
-				},
+				Default:             int64default.StaticInt64(100),
 			},
 			"default_shard": schema.Int64Attribute{
 				Description:         "The default shard value. Defaults to 100.",
 				MarkdownDescription: "The default shard value. Defaults to `100`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(100),
-				},
+				Default:             int64default.StaticInt64(100),
 			},
 			"excluded_tag_ids": schema.SetAttribute{
 				Description:         "Machines tagged with one of these tags will not receive the pkg info.",
@@ -98,6 +95,7 @@ func (r *MonolithSubManifestPkgInfoResource) Schema(ctx context.Context, req res
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
 			"tag_shards": schema.SetNestedAttribute{
 				Description:         "A set of tag shard values different from the default shard, to determine if the tagged machines will receive the pkg info.",
@@ -118,6 +116,7 @@ func (r *MonolithSubManifestPkgInfoResource) Schema(ctx context.Context, req res
 				},
 				Optional: true,
 				Computed: true,
+				Default:  setdefault.StaticValue(types.SetValueMust(types.ObjectType{AttrTypes: tagShardAttrTypes}, []attr.Value{})),
 			},
 		},
 	}

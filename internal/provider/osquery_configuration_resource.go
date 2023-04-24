@@ -4,14 +4,19 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
-	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -55,45 +60,35 @@ func (r *OsqueryConfigurationResource) Schema(ctx context.Context, req resource.
 				MarkdownDescription: "Description of the Osquery configuration.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"inventory": schema.BoolAttribute{
 				Description:         "If true, Osquery is configured to collect inventory data. Defaults to true.",
 				MarkdownDescription: "If `true`, Osquery is configured to collect inventory data. Defaults to `true`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(true),
-				},
+				Default:             booldefault.StaticBool(true),
 			},
 			"inventory_apps": schema.BoolAttribute{
 				Description:         "If true, Osquery is configured to collect the applications. Defaults to false.",
 				MarkdownDescription: "If `true`, Osquery is configured to collect the applications. Defaults to `false`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"inventory_ec2": schema.BoolAttribute{
 				Description:         "If true, Osquery is configured to collect the EC2 metadata. Defaults to false.",
 				MarkdownDescription: "If `true`, Osquery is configured to collect the EC2 metadata. Defaults to `false`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"inventory_interval": schema.Int64Attribute{
 				Description:         "Number of seconds to wait between collecting the inventory data.",
 				MarkdownDescription: "Number of seconds to wait between collecting the inventory data.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(86400)),
-				},
+				Default:             int64default.StaticInt64(86400),
 			},
 			"options": schema.MapAttribute{
 				Description:         "A map of extra options to pass to Osquery in the flag file.",
@@ -104,6 +99,7 @@ func (r *OsqueryConfigurationResource) Schema(ctx context.Context, req resource.
 				ElementType: types.StringType,
 				Optional:    true,
 				Computed:    true,
+				Default:     mapdefault.StaticValue(types.MapValueMust(types.StringType, map[string]attr.Value{})),
 			},
 			"atc_ids": schema.SetAttribute{
 				Description:         "List of the IDs of the ATCs to include in this configuration.",
@@ -111,6 +107,7 @@ func (r *OsqueryConfigurationResource) Schema(ctx context.Context, req resource.
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
 			"file_category_ids": schema.SetAttribute{
 				Description:         "List of the IDs of the file categories to include in this configuration.",
@@ -118,6 +115,7 @@ func (r *OsqueryConfigurationResource) Schema(ctx context.Context, req resource.
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
 		},
 	}

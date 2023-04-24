@@ -4,14 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
-	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -70,18 +72,14 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "Description of the rule. Only displayed in the Zentral GUI.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"custom_message": schema.StringAttribute{
 				Description:         "Custom message displayed in the popover when a binary is blocked.",
 				MarkdownDescription: "Custom message displayed in the popover when a binary is blocked.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"ruleset_id": schema.Int64Attribute{
 				Description:         "ID of the Santa ruleset.",
@@ -94,6 +92,7 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"excluded_primary_users": schema.SetAttribute{
 				Description:         "The excluded primary users used to scope the rule.",
@@ -101,6 +100,7 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"serial_numbers": schema.SetAttribute{
 				Description:         "The serial numbers used to scope the rule.",
@@ -108,6 +108,7 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"excluded_serial_numbers": schema.SetAttribute{
 				Description:         "The excluded serial numbers used to scope the rule.",
@@ -115,6 +116,7 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"tag_ids": schema.SetAttribute{
 				Description:         "The IDs of the tags used to scope the rule.",
@@ -122,6 +124,7 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
 			"excluded_tag_ids": schema.SetAttribute{
 				Description:         "The IDs of the excluded tags used to scope the rule.",
@@ -129,6 +132,7 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
 			"version": schema.Int64Attribute{
 				Description:         "Rule version.",

@@ -6,11 +6,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
-	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -55,9 +55,7 @@ func (r *MetaBusinessUnitResource) Schema(ctx context.Context, req resource.Sche
 					"Defaults to `true`.",
 				Optional: true,
 				Computed: true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(true),
-				},
+				Default:  booldefault.StaticBool(true),
 			},
 		},
 	}

@@ -4,14 +4,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
-	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -55,81 +59,63 @@ func (r *SantaConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				MarkdownDescription: "Client mode of the Santa configuration.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(1)), // MONITOR
-				},
+				Default:             int64default.StaticInt64(1), // MONITOR
 			},
 			"client_certificate_auth": schema.BoolAttribute{
 				Description:         "If `true`, mTLS is required between Santa and Zentral.",
 				MarkdownDescription: "If `true`, mTLS is required between Santa and Zentral.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"batch_size": schema.Int64Attribute{
 				Description:         "The number of rules to download or events to upload per request.",
 				MarkdownDescription: "The number of rules to download or events to upload per request.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(50)),
-				},
+				Default:             int64default.StaticInt64(50),
 			},
 			"full_sync_interval": schema.Int64Attribute{
 				Description:         "The max time to wait before performing a full sync with the server.",
 				MarkdownDescription: "The max time to wait before performing a full sync with the server.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(600)),
-				},
+				Default:             int64default.StaticInt64(600),
 			},
 			"enable_bundles": schema.BoolAttribute{
 				Description:         "If set to true the bundle scanning feature is enabled.",
 				MarkdownDescription: "If set to `true` the bundle scanning feature is enabled.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"enable_transitive_rules": schema.BoolAttribute{
 				Description:         "If set to true the transitive rule feature is enabled.",
 				MarkdownDescription: "If set to `true` the transitive rule feature is enabled.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"allowed_path_regex": schema.StringAttribute{
 				Description:         "A regex to allow if the binary, certificate, or Team ID scopes did not allow/block execution.",
 				MarkdownDescription: "A regex to allow if the binary, certificate, or Team ID scopes did not allow/block execution.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"blocked_path_regex": schema.StringAttribute{
 				Description:         "A regex to block if the binary, certificate, or Team ID scopes did not allow/block an execution.",
 				MarkdownDescription: "A regex to block if the binary, certificate, or Team ID scopes did not allow/block an execution.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"block_usb_mount": schema.BoolAttribute{
 				Description:         "If set to true blocking USB Mass storage feature is enabled.",
 				MarkdownDescription: "If set to `true` blocking USB Mass storage feature is enabled.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"remount_usb_mode": schema.SetAttribute{
 				Description:         "Array of strings for arguments to pass to mount -o.",
@@ -137,33 +123,28 @@ func (r *SantaConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"allow_unknown_shard": schema.Int64Attribute{
 				Description:         "Restrict the reporting of 'Allow Unknown' events to a percentage (0-100) of hosts.",
 				MarkdownDescription: "Restrict the reporting of 'Allow Unknown' events to a percentage (0-100) of hosts.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(100)),
-				},
+				Default:             int64default.StaticInt64(100),
 			},
 			"enable_all_event_upload_shard": schema.Int64Attribute{
 				Description:         "Restrict the upload of all execution events to Zentral, including those that were explicitly allowed, to a percentage (0-100) of hosts",
 				MarkdownDescription: "Restrict the upload of all execution events to Zentral, including those that were explicitly allowed, to a percentage (0-100) of hosts",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(0)),
-				},
+				Default:             int64default.StaticInt64(0),
 			},
 			"sync_incident_severity": schema.Int64Attribute{
 				Description:         "If 100, 200, 300, incidents will be automatically opened and closed when the santa agent rules are out of sync.",
 				MarkdownDescription: "If 100, 200, 300, incidents will be automatically opened and closed when the santa agent rules are out of sync.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(0)), // Severity.None
-				},
+				Default:             int64default.StaticInt64(0), // Severity.None
 			},
 		},
 	}

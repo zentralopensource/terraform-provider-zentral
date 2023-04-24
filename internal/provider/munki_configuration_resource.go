@@ -4,14 +4,19 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
-	"github.com/zentralopensource/terraform-provider-zentral/internal/planmodifiers"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces
@@ -55,18 +60,14 @@ func (r *MunkiConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				MarkdownDescription: "Description of the Munki configuration.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					planmodifiers.StringDefault(""),
-				},
+				Default:             stringdefault.StaticString(""),
 			},
 			"inventory_apps_full_info_shard": schema.Int64Attribute{
 				Description:         "Percentage of machines configured to collect the full inventory apps information. Defaults to 100.",
 				MarkdownDescription: "Percentage of machines configured to collect the full inventory apps information. Defaults to `100`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(100)),
-				},
+				Default:             int64default.StaticInt64(100),
 			},
 			"principal_user_detection_sources": schema.ListAttribute{
 				Description:         "List of principal user detection sources.",
@@ -74,6 +75,7 @@ func (r *MunkiConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
 			},
 			"principal_user_detection_domains": schema.SetAttribute{
 				Description:         "Set of principal user detection domains.",
@@ -81,6 +83,7 @@ func (r *MunkiConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"collected_condition_keys": schema.SetAttribute{
 				Description:         "Set of the condition keys to collect.",
@@ -88,33 +91,28 @@ func (r *MunkiConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"managed_installs_sync_interval_days": schema.Int64Attribute{
 				Description:         "Interval in days between full managed installs sync. Defaults to 7 days.",
 				MarkdownDescription: "Interval in days between full managed installs sync. Defaults to 7 days.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Int64{
-					planmodifiers.Int64Default(int64(7)),
-				},
+				Default:             int64default.StaticInt64(7),
 			},
 			"auto_reinstall_incidents": schema.BoolAttribute{
 				Description:         "If true, incidents will be managed automatically when package reinstalls are observed. Defaults to false.",
 				MarkdownDescription: "If `true`, incidents will be managed automatically when package reinstalls are observed. Defaults to `false`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"auto_failed_install_incidents": schema.BoolAttribute{
 				Description:         "If true, incidents will be managed automatically when package failed installs are observed. Defaults to false.",
 				MarkdownDescription: "If `true`, incidents will be managed automatically when package failed installs are observed. Defaults to `false`.",
 				Optional:            true,
 				Computed:            true,
-				PlanModifiers: []planmodifier.Bool{
-					planmodifiers.BoolDefault(false),
-				},
+				Default:             booldefault.StaticBool(false),
 			},
 			"version": schema.Int64Attribute{
 				Description:         "Version of the Munki configuration.",
