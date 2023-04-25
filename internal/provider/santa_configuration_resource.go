@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -13,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
@@ -54,12 +56,15 @@ func (r *SantaConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				MarkdownDescription: "Name of the Santa configuration.",
 				Required:            true,
 			},
-			"client_mode": schema.Int64Attribute{
-				Description:         "Client mode of the Santa configuration.",
-				MarkdownDescription: "Client mode of the Santa configuration.",
+			"client_mode": schema.StringAttribute{
+				Description:         "Client mode of the Santa configuration. Valid values are MONITOR and LOCKDOWN. Defaults to MONITOR.",
+				MarkdownDescription: "Client mode of the Santa configuration. Valid values are `MONITOR` and `LOCKDOWN`. Defaults to `MONITOR`.",
 				Optional:            true,
 				Computed:            true,
-				Default:             int64default.StaticInt64(1), // MONITOR
+				Default:             stringdefault.StaticString(tfSantaMonitor),
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{tfSantaMonitor, tfSantaLockdown}...),
+				},
 			},
 			"client_certificate_auth": schema.BoolAttribute{
 				Description:         "If `true`, mTLS is required between Santa and Zentral.",

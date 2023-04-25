@@ -42,7 +42,7 @@ func (d *SantaConfigurationDataSource) Schema(ctx context.Context, req datasourc
 				MarkdownDescription: "Name of the Santa configuration.",
 				Optional:            true,
 			},
-			"client_mode": schema.Int64Attribute{
+			"client_mode": schema.StringAttribute{
 				Description:         "Client mode of the Santa configuration.",
 				MarkdownDescription: "Client mode of the Santa configuration.",
 				Computed:            true,

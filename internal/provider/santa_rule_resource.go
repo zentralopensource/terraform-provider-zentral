@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -11,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
@@ -52,15 +54,21 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				MarkdownDescription: "`ID` of the Santa configuration.",
 				Required:            true,
 			},
-			"policy": schema.Int64Attribute{
-				Description:         "Policy: 1 Allowlist, 2 Blocklist, 3 Silent blocklist, 4 Allowlist compiler.",
-				MarkdownDescription: "Policy: `1` Allowlist, `2` Blocklist, `3` Silent blocklist, `4` Allowlist compiler.",
+			"policy": schema.StringAttribute{
+				Description:         "Policy. Valid values are ALLOWLIST, BLOCKLIST, SILENT_BLOCKLIST and ALLOWLIST_COMPILER.",
+				MarkdownDescription: "Policy. Valid values are `ALLOWLIST`, `BLOCKLIST`, `SILENT_BLOCKLIST` and `ALLOWLIST_COMPILER`.",
 				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{tfSantaAllowlist, tfSantaBlocklist, tfSantaSilentBlocklist, tfSantaAllowlistCompiler}...),
+				},
 			},
 			"target_type": schema.StringAttribute{
-				Description:         "Target type: BINARY, BUNDLE, CERTIFICATE, TEAM_ID.",
-				MarkdownDescription: "Target type: `BINARY`, `BUNDLE`, `CERTIFICATE`, `TEAM_ID`.",
+				Description:         "Target type. Valid values are BINARY, BUNDLE, CERTIFICATE and TEAM_ID.",
+				MarkdownDescription: "Target type. Valid values are `BINARY`, `BUNDLE`, `CERTIFICATE` and `TEAM_ID`.",
 				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"BINARY", "BUNDLE", "CERTIFICATE", "TEAM_ID"}...),
+				},
 			},
 			"target_identifier": schema.StringAttribute{
 				Description:         "Target identifier: binary, bundle, certificate sha256 or team ID.",

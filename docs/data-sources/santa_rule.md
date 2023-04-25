@@ -27,13 +27,13 @@ The data source `zentral_santa_rule` allows details of a Santa rule to be retrie
 - `excluded_primary_users` (Set of String) The excluded primary users used to scope the rule.
 - `excluded_serial_numbers` (Set of String) The excluded serial numbers used to scope the rule.
 - `excluded_tag_ids` (Set of Number) The `ID`s of the excluded tags used to scope the rule.
-- `policy` (Number) Policy: `1` Allowlist, `2` Blocklist, `3` Silent blocklist, `4` Allowlist compiler.
+- `policy` (String) Policy. Valid values are `ALLOWLIST`, `BLOCKLIST`, `SILENT_BLOCKLIST` and `ALLOWLIST_COMPILER`.
 - `primary_users` (Set of String) The primary users used to scope the rule.
 - `ruleset_id` (Number) `ID` of the Santa ruleset.
 - `serial_numbers` (Set of String) The serial numbers used to scope the rule.
 - `tag_ids` (Set of Number) The `ID`s of the tags used to scope the rule.
 - `target_identifier` (String) Target identifier: binary, bundle, certificate sha256 or team ID.
-- `target_type` (String) Target type: `BINARY`, `BUNDLE`, `CERTIFICATE`, `TEAM_ID`.
+- `target_type` (String) Target type. Valid values are `BINARY`, `BUNDLE`, `CERTIFICATE` and `TEAM_ID`.
 - `version` (Number) Rule version.
 
 
