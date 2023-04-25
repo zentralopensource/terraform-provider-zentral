@@ -28,7 +28,7 @@ func TestAccSantaRuleResource(t *testing.T) {
 					resource.TestCheckResourceAttrPair(
 						resourceName, "configuration_id", cfgResourceName, "id"),
 					resource.TestCheckResourceAttr(
-						resourceName, "policy", "1"),
+						resourceName, "policy", "ALLOWLIST"),
 					resource.TestCheckResourceAttr(
 						resourceName, "target_type", "BINARY"),
 					resource.TestCheckResourceAttr(
@@ -68,7 +68,7 @@ func TestAccSantaRuleResource(t *testing.T) {
 					resource.TestCheckResourceAttrPair(
 						resourceName, "configuration_id", cfgResourceName, "id"),
 					resource.TestCheckResourceAttr(
-						resourceName, "policy", "2"),
+						resourceName, "policy", "BLOCKLIST"),
 					resource.TestCheckResourceAttr(
 						resourceName, "target_type", "CERTIFICATE"),
 					resource.TestCheckResourceAttr(
@@ -133,7 +133,7 @@ resource "zentral_santa_configuration" "test" {
 
 resource "zentral_santa_rule" "test" {
   configuration_id  = zentral_santa_configuration.test.id
-  policy            = 1
+  policy            = "ALLOWLIST"
   target_type       = "BINARY"
   target_identifier = "9f3e7b21a0a745297dd906dad4a4a4637bdec066cdf331b457230aa32fe68b4b"
 }
@@ -162,7 +162,7 @@ resource "zentral_tag" "test2" {
 
 resource "zentral_santa_rule" "test" {
   configuration_id        = zentral_santa_configuration.test.id
-  policy                  = 2
+  policy                  = "BLOCKLIST"
   target_type             = "CERTIFICATE"
   target_identifier       = "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409a785e0c65409e3bef9ad8887"
   description             = "description"

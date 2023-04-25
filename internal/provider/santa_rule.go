@@ -6,10 +6,21 @@ import (
 	"github.com/zentralopensource/goztl"
 )
 
+const (
+	ztlSantaAllowlist         int    = 1
+	ztlSantaBlocklist                = 2
+	ztlSantaSilentBlocklist          = 3
+	ztlSantaAllowlistCompiler        = 5
+	tfSantaAllowlist          string = "ALLOWLIST"
+	tfSantaBlocklist                 = "BLOCKLIST"
+	tfSantaSilentBlocklist           = "SILENT_BLOCKLIST"
+	tfSantaAllowlistCompiler         = "ALLOWLIST_COMPILER"
+)
+
 type santaRule struct {
 	ID                    types.Int64  `tfsdk:"id"`
 	ConfigurationID       types.Int64  `tfsdk:"configuration_id"`
-	Policy                types.Int64  `tfsdk:"policy"`
+	Policy                types.String `tfsdk:"policy"`
 	TargetType            types.String `tfsdk:"target_type"`
 	TargetIdentifier      types.String `tfsdk:"target_identifier"`
 	Description           types.String `tfsdk:"description"`
@@ -25,6 +36,20 @@ type santaRule struct {
 }
 
 func santaRuleForState(sr *goztl.SantaRule) santaRule {
+	var policy string
+	switch sr.Policy {
+	case ztlSantaAllowlist:
+		policy = tfSantaAllowlist
+	case ztlSantaBlocklist:
+		policy = tfSantaBlocklist
+	case ztlSantaSilentBlocklist:
+		policy = tfSantaSilentBlocklist
+	case ztlSantaAllowlistCompiler:
+		policy = tfSantaAllowlistCompiler
+	default:
+		panic("Unknown Santa rule policy")
+	}
+
 	var rulesetID types.Int64
 	if sr.RulesetID != nil {
 		rulesetID = types.Int64Value(int64(*sr.RulesetID))
@@ -65,7 +90,7 @@ func santaRuleForState(sr *goztl.SantaRule) santaRule {
 	return santaRule{
 		ID:                    types.Int64Value(int64(sr.ID)),
 		ConfigurationID:       types.Int64Value(int64(sr.ConfigurationID)),
-		Policy:                types.Int64Value(int64(sr.Policy)),
+		Policy:                types.StringValue(policy),
 		TargetType:            types.StringValue(sr.TargetType),
 		TargetIdentifier:      types.StringValue(sr.TargetIdentifier),
 		Description:           types.StringValue(sr.Description),
@@ -82,6 +107,20 @@ func santaRuleForState(sr *goztl.SantaRule) santaRule {
 }
 
 func santaRuleRequestWithState(data santaRule) *goztl.SantaRuleRequest {
+	var policy int
+	switch data.Policy {
+	case types.StringValue(tfSantaAllowlist):
+		policy = ztlSantaAllowlist
+	case types.StringValue(tfSantaBlocklist):
+		policy = ztlSantaBlocklist
+	case types.StringValue(tfSantaSilentBlocklist):
+		policy = ztlSantaSilentBlocklist
+	case types.StringValue(tfSantaAllowlistCompiler):
+		policy = ztlSantaAllowlistCompiler
+	default:
+		panic("Unknown Santa rule policy")
+	}
+
 	primaryUsers := make([]string, 0)
 	for _, primaryUser := range data.PrimaryUsers.Elements() { // nil if null or unknown → no iterations
 		primaryUsers = append(primaryUsers, primaryUser.(types.String).ValueString())
@@ -114,7 +153,7 @@ func santaRuleRequestWithState(data santaRule) *goztl.SantaRuleRequest {
 
 	return &goztl.SantaRuleRequest{
 		ConfigurationID:       int(data.ConfigurationID.ValueInt64()),
-		Policy:                int(data.Policy.ValueInt64()),
+		Policy:                policy,
 		TargetType:            data.TargetType.ValueString(),
 		TargetIdentifier:      data.TargetIdentifier.ValueString(),
 		Description:           data.Description.ValueString(),

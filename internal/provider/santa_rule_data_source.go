@@ -42,14 +42,14 @@ func (d *SantaRuleDataSource) Schema(ctx context.Context, req datasource.SchemaR
 				MarkdownDescription: "`ID` of the Santa configuration.",
 				Computed:            true,
 			},
-			"policy": schema.Int64Attribute{
-				Description:         "Policy: 1 Allowlist, 2 Blocklist, 3 Silent blocklist, 4 Allowlist compiler.",
-				MarkdownDescription: "Policy: `1` Allowlist, `2` Blocklist, `3` Silent blocklist, `4` Allowlist compiler.",
+			"policy": schema.StringAttribute{
+				Description:         "Policy. Valid values are ALLOWLIST, BLOCKLIST, SILENT_BLOCKLIST and ALLOWLIST_COMPILER.",
+				MarkdownDescription: "Policy. Valid values are `ALLOWLIST`, `BLOCKLIST`, `SILENT_BLOCKLIST` and `ALLOWLIST_COMPILER`.",
 				Computed:            true,
 			},
 			"target_type": schema.StringAttribute{
-				Description:         "Target type: BINARY, BUNDLE, CERTIFICATE, TEAM_ID.",
-				MarkdownDescription: "Target type: `BINARY`, `BUNDLE`, `CERTIFICATE`, `TEAM_ID`.",
+				Description:         "Target type. Valid values are BINARY, BUNDLE, CERTIFICATE and TEAM_ID.",
+				MarkdownDescription: "Target type. Valid values are `BINARY`, `BUNDLE`, `CERTIFICATE` and `TEAM_ID`.",
 				Computed:            true,
 			},
 			"target_identifier": schema.StringAttribute{
