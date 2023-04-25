@@ -7,10 +7,10 @@ import (
 )
 
 const (
-	ztlClientModeMonitor  int    = 1
-	ztlClientModeLockdown        = 2
-	tfClientModeMonitor   string = "MONITOR"
-	tfClientModeLockdown         = "LOCKDOWN"
+	ztlSantaMonitor  int    = 1
+	ztlSantaLockdown        = 2
+	tfSantaMonitor   string = "MONITOR"
+	tfSantaLockdown         = "LOCKDOWN"
 )
 
 type santaConfiguration struct {
@@ -38,9 +38,9 @@ func santaConfigurationForState(sc *goztl.SantaConfiguration) santaConfiguration
 		remountUSBModes = append(remountUSBModes, types.StringValue(rumv))
 	}
 
-	clientMode := tfClientModeMonitor // default to MONITOR
-	if sc.ClientMode == ztlClientModeLockdown {
-		clientMode = tfClientModeLockdown
+	clientMode := tfSantaMonitor // default to MONITOR
+	if sc.ClientMode == ztlSantaLockdown {
+		clientMode = tfSantaLockdown
 	}
 
 	return santaConfiguration{
@@ -68,9 +68,9 @@ func santaConfigurationRequestWithState(data santaConfiguration) *goztl.SantaCon
 		remountUSBMode = append(remountUSBMode, rumv.(types.String).ValueString())
 	}
 
-	clientMode := ztlClientModeMonitor // default to MONITOR
-	if data.ClientMode.ValueString() == tfClientModeLockdown {
-		clientMode = ztlClientModeLockdown
+	clientMode := ztlSantaMonitor // default to MONITOR
+	if data.ClientMode.ValueString() == tfSantaLockdown {
+		clientMode = ztlSantaLockdown
 	}
 
 	return &goztl.SantaConfigurationRequest{

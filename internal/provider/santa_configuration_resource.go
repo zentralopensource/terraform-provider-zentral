@@ -61,9 +61,9 @@ func (r *SantaConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				MarkdownDescription: "Client mode of the Santa configuration. Valid values are `MONITOR` and `LOCKDOWN`. Defaults to `MONITOR`.",
 				Optional:            true,
 				Computed:            true,
-				Default:             stringdefault.StaticString(tfClientModeMonitor),
+				Default:             stringdefault.StaticString(tfSantaMonitor),
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{tfClientModeMonitor, tfClientModeLockdown}...),
+					stringvalidator.OneOf([]string{tfSantaMonitor, tfSantaLockdown}...),
 				},
 			},
 			"client_certificate_auth": schema.BoolAttribute{
