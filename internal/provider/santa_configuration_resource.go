@@ -57,8 +57,8 @@ func (r *SantaConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				Required:            true,
 			},
 			"client_mode": schema.StringAttribute{
-				Description:         "Client mode of the Santa configuration.",
-				MarkdownDescription: "Client mode of the Santa configuration.",
+				Description:         "Client mode of the Santa configuration. Valid values are MONITOR and LOCKDOWN. Defaults to MONITOR.",
+				MarkdownDescription: "Client mode of the Santa configuration. Valid values are `MONITOR` and `LOCKDOWN`. Defaults to `MONITOR`.",
 				Optional:            true,
 				Computed:            true,
 				Default:             stringdefault.StaticString(tfClientModeMonitor),

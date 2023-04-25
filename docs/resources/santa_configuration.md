@@ -27,7 +27,7 @@ The resource `zentral_santa_configuration` manages Santa configurations.
 - `block_usb_mount` (Boolean) If set to `true` blocking USB Mass storage feature is enabled.
 - `blocked_path_regex` (String) A regex to block if the binary, certificate, or Team ID scopes did not allow/block an execution.
 - `client_certificate_auth` (Boolean) If `true`, mTLS is required between Santa and Zentral.
-- `client_mode` (Number) Client mode of the Santa configuration.
+- `client_mode` (String) Client mode of the Santa configuration. Valid values are `MONITOR` and `LOCKDOWN`. Defaults to `MONITOR`.
 - `enable_all_event_upload_shard` (Number) Restrict the upload of all execution events to Zentral, including those that were explicitly allowed, to a percentage (0-100) of hosts
 - `enable_bundles` (Boolean) If set to `true` the bundle scanning feature is enabled.
 - `enable_transitive_rules` (Boolean) If set to `true` the transitive rule feature is enabled.
