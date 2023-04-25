@@ -24,7 +24,7 @@ func TestAccSantaConfigurationResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "name", firstName),
 					resource.TestCheckResourceAttr(
-						resourceName, "client_mode", "1"),
+						resourceName, "client_mode", "MONITOR"),
 					resource.TestCheckResourceAttr(
 						resourceName, "client_certificate_auth", "false"),
 					resource.TestCheckResourceAttr(
@@ -64,7 +64,7 @@ func TestAccSantaConfigurationResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
 					resource.TestCheckResourceAttr(
-						resourceName, "client_mode", "2"),
+						resourceName, "client_mode", "LOCKDOWN"),
 					resource.TestCheckResourceAttr(
 						resourceName, "client_certificate_auth", "true"),
 					resource.TestCheckResourceAttr(
@@ -117,7 +117,7 @@ func testAccSantaConfigurationResourceConfigFull(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_santa_configuration" "test" {
   name                          = %[1]q
-  client_mode                   = 2
+  client_mode                   = "LOCKDOWN"
   client_certificate_auth       = true
   batch_size                    = 51
   full_sync_interval            = 601

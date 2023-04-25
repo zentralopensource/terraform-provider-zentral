@@ -29,7 +29,7 @@ func TestAccSantaConfigurationDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "name", c1Name),
 					resource.TestCheckResourceAttr(
-						ds1ResourceName, "client_mode", "1"),
+						ds1ResourceName, "client_mode", "MONITOR"),
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "client_certificate_auth", "false"),
 					resource.TestCheckResourceAttr(
@@ -60,7 +60,7 @@ func TestAccSantaConfigurationDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "name", c2Name),
 					resource.TestCheckResourceAttr(
-						ds2ResourceName, "client_mode", "2"),
+						ds2ResourceName, "client_mode", "LOCKDOWN"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "client_certificate_auth", "false"),
 					resource.TestCheckResourceAttr(
@@ -102,9 +102,9 @@ resource "zentral_santa_configuration" "check1" {
 }
 
 resource "zentral_santa_configuration" "check2" {
-  name = %q
-  client_mode = 2
-  block_usb_mount = true
+  name             = %q
+  client_mode      = "LOCKDOWN"
+  block_usb_mount  = true
   remount_usb_mode = ["noexec", "rdonly"]
 }
 
