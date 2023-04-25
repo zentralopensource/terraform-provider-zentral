@@ -48,8 +48,8 @@ func (d *SantaRuleDataSource) Schema(ctx context.Context, req datasource.SchemaR
 				Computed:            true,
 			},
 			"target_type": schema.StringAttribute{
-				Description:         "Target type. Valid values are BINARY, BUNDLE, CERTIFICATE and TEAM_ID.",
-				MarkdownDescription: "Target type. Valid values are `BINARY`, `BUNDLE`, `CERTIFICATE` and `TEAM_ID`.",
+				Description:         "Target type. Valid values are BINARY, BUNDLE, CERTIFICATE and TEAMID.",
+				MarkdownDescription: "Target type. Valid values are `BINARY`, `BUNDLE`, `CERTIFICATE` and `TEAMID`.",
 				Computed:            true,
 			},
 			"target_identifier": schema.StringAttribute{
