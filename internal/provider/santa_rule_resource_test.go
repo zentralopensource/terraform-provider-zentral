@@ -70,9 +70,9 @@ func TestAccSantaRuleResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "policy", "BLOCKLIST"),
 					resource.TestCheckResourceAttr(
-						resourceName, "target_type", "CERTIFICATE"),
+						resourceName, "target_type", "SIGNINGID"),
 					resource.TestCheckResourceAttr(
-						resourceName, "target_identifier", "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409a785e0c65409e3bef9ad8887"),
+						resourceName, "target_identifier", "platform:com.apple.curl"),
 					resource.TestCheckResourceAttr(
 						resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(
@@ -163,8 +163,8 @@ resource "zentral_tag" "test2" {
 resource "zentral_santa_rule" "test" {
   configuration_id        = zentral_santa_configuration.test.id
   policy                  = "BLOCKLIST"
-  target_type             = "CERTIFICATE"
-  target_identifier       = "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409a785e0c65409e3bef9ad8887"
+  target_type             = "SIGNINGID"
+  target_identifier       = "platform:com.apple.curl"
   description             = "description"
   custom_message          = "custom message"
   primary_users           = ["un", "deux"]

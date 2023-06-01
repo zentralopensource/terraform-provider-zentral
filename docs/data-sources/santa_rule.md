@@ -33,7 +33,7 @@ The data source `zentral_santa_rule` allows details of a Santa rule to be retrie
 - `serial_numbers` (Set of String) The serial numbers used to scope the rule.
 - `tag_ids` (Set of Number) The `ID`s of the tags used to scope the rule.
 - `target_identifier` (String) Target identifier: binary, bundle, certificate sha256 or team ID.
-- `target_type` (String) Target type. Valid values are `BINARY`, `BUNDLE`, `CERTIFICATE` and `TEAMID`.
+- `target_type` (String) Target type. Valid values are `BINARY`, `BUNDLE`, `CERTIFICATE`, `SIGNINGID` and `TEAMID`.
 - `version` (Number) Rule version.
 
 
