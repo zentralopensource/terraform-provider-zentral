@@ -144,7 +144,6 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewOsqueryEnrollmentResource,
 		NewOsqueryFileCategoryResource,
 		NewOsqueryPackResource,
-		NewOsqueryPackQueryResource,
 		NewOsqueryQueryResource,
 		NewSantaConfigurationResource,
 		NewSantaEnrollmentResource,

@@ -78,6 +78,45 @@ func (d *OsqueryQueryDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "If `true`, the query will be used as compliance check. Defaults to `false`.",
 				Computed:            true,
 			},
+			"scheduling": schema.SingleNestedAttribute{
+				Description:         "Attributes to link a query to a pack for scheduling.",
+				MarkdownDescription: "Attributes to link a query to a pack for scheduling.",
+				Attributes: map[string]schema.Attribute{
+					"pack_id": schema.Int64Attribute{
+						Description:         "The ID of the pack.",
+						MarkdownDescription: "The `ID` of the pack.",
+						Computed:            true,
+					},
+					"interval": schema.Int64Attribute{
+						Description:         "the query frequency, in seconds. It has a maximum value of 604,800 (1 week).",
+						MarkdownDescription: "the query frequency, in seconds. It has a maximum value of 604,800 (1 week).",
+						Computed:            true,
+					},
+					"log_removed_actions": schema.BoolAttribute{
+						Description:         "If true, removed actions should be logged. Default to true.",
+						MarkdownDescription: "If `true`, remove actions should be logged. Default to `true`.",
+						Computed:            true,
+					},
+					"snapshot_mode": schema.BoolAttribute{
+						Description:         "If true, differentials will not be stored and this query will not emulate an event stream. Defaults to false.",
+						MarkdownDescription: "If `true`, differentials will not be stored and this query will not emulate an event stream. Defaults to `false`.",
+						Computed:            true,
+					},
+					"shard": schema.Int64Attribute{
+						Description:         "Restrict this query to a percentage (1-100) of target hosts.",
+						MarkdownDescription: "Restrict this query to a percentage (1-100) of target hosts.",
+						Computed:            true,
+						Optional:            true,
+					},
+					"can_be_denylisted": schema.BoolAttribute{
+						Description:         "If true, this query can be denylisted when stopped by the watchdog for excessive resource consumption. Defaults to true.",
+						MarkdownDescription: "If `true`, this query can be denylisted when stopped by the watchdog for excessive resource consumption. Defaults to `true`.",
+						Computed:            true,
+					},
+				},
+				Computed: true,
+				Optional: true,
+			},
 		},
 	}
 }

@@ -26,11 +26,27 @@ The resource `zentral_osquery_query` manages Osquery queries.
 - `description` (String) Description of the query.
 - `minimum_osquery_version` (String) Only run on Osquery versions greater than or equal-to this version string
 - `platforms` (Set of String) Restrict the query to some platforms, default is 'all' platforms
+- `scheduling` (Attributes) Attributes to link a query to a pack for scheduling. (see [below for nested schema](#nestedatt--scheduling))
 - `value` (String) Description of the results returned by the query.
 
 ### Read-Only
 
 - `id` (Number) `ID` of the query.
 - `version` (Number) Version of the query.
+
+<a id="nestedatt--scheduling"></a>
+### Nested Schema for `scheduling`
+
+Required:
+
+- `interval` (Number) the query frequency, in seconds. It has a maximum value of 604,800 (1 week).
+- `pack_id` (Number) The `ID` of the pack.
+
+Optional:
+
+- `can_be_denylisted` (Boolean) If `true`, this query can be denylisted when stopped by the watchdog for excessive resource consumption. Defaults to `true`.
+- `log_removed_actions` (Boolean) If `true`, remove actions should be logged. Default to `true`.
+- `shard` (Number) Restrict this query to a percentage (1-100) of target hosts.
+- `snapshot_mode` (Boolean) If `true`, differentials will not be stored and this query will not emulate an event stream. Defaults to `false`.
 
 

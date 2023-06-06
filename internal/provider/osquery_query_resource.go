@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
@@ -93,6 +95,55 @@ func (r *OsqueryQueryResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
+			},
+			"scheduling": schema.SingleNestedAttribute{
+				Description:         "Attributes to link a query to a pack for scheduling.",
+				MarkdownDescription: "Attributes to link a query to a pack for scheduling.",
+				Attributes: map[string]schema.Attribute{
+					"pack_id": schema.Int64Attribute{
+						Description:         "The ID of the pack.",
+						MarkdownDescription: "The `ID` of the pack.",
+						Required:            true,
+					},
+					"interval": schema.Int64Attribute{
+						Description:         "the query frequency, in seconds. It has a maximum value of 604,800 (1 week).",
+						MarkdownDescription: "the query frequency, in seconds. It has a maximum value of 604,800 (1 week).",
+						Required:            true,
+						Validators: []validator.Int64{
+							int64validator.Between(10, 604800),
+						},
+					},
+					"log_removed_actions": schema.BoolAttribute{
+						Description:         "If true, removed actions should be logged. Default to true.",
+						MarkdownDescription: "If `true`, remove actions should be logged. Default to `true`.",
+						Optional:            true,
+						Computed:            true,
+						Default:             booldefault.StaticBool(true),
+					},
+					"snapshot_mode": schema.BoolAttribute{
+						Description:         "If true, differentials will not be stored and this query will not emulate an event stream. Defaults to false.",
+						MarkdownDescription: "If `true`, differentials will not be stored and this query will not emulate an event stream. Defaults to `false`.",
+						Optional:            true,
+						Computed:            true,
+						Default:             booldefault.StaticBool(false),
+					},
+					"shard": schema.Int64Attribute{
+						Description:         "Restrict this query to a percentage (1-100) of target hosts.",
+						MarkdownDescription: "Restrict this query to a percentage (1-100) of target hosts.",
+						Optional:            true,
+						Validators: []validator.Int64{
+							int64validator.Between(1, 100),
+						},
+					},
+					"can_be_denylisted": schema.BoolAttribute{
+						Description:         "If true, this query can be denylisted when stopped by the watchdog for excessive resource consumption. Defaults to true.",
+						MarkdownDescription: "If `true`, this query can be denylisted when stopped by the watchdog for excessive resource consumption. Defaults to `true`.",
+						Optional:            true,
+						Computed:            true,
+						Default:             booldefault.StaticBool(true),
+					},
+				},
+				Optional: true,
 			},
 		},
 	}

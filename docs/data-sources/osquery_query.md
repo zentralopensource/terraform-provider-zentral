@@ -19,6 +19,7 @@ The data source `zentral_osquery_query` allows details of a Osquery query to be 
 
 - `id` (Number) `ID` of the query.
 - `name` (String) Name of the query.
+- `scheduling` (Attributes) Attributes to link a query to a pack for scheduling. (see [below for nested schema](#nestedatt--scheduling))
 
 ### Read-Only
 
@@ -29,5 +30,20 @@ The data source `zentral_osquery_query` allows details of a Osquery query to be 
 - `sql` (String) The SQL query to run.
 - `value` (String) Description of the results returned by the query.
 - `version` (Number) Version of the query.
+
+<a id="nestedatt--scheduling"></a>
+### Nested Schema for `scheduling`
+
+Optional:
+
+- `shard` (Number) Restrict this query to a percentage (1-100) of target hosts.
+
+Read-Only:
+
+- `can_be_denylisted` (Boolean) If `true`, this query can be denylisted when stopped by the watchdog for excessive resource consumption. Defaults to `true`.
+- `interval` (Number) the query frequency, in seconds. It has a maximum value of 604,800 (1 week).
+- `log_removed_actions` (Boolean) If `true`, remove actions should be logged. Default to `true`.
+- `pack_id` (Number) The `ID` of the pack.
+- `snapshot_mode` (Boolean) If `true`, differentials will not be stored and this query will not emulate an event stream. Defaults to `false`.
 
 
