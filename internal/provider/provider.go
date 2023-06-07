@@ -128,6 +128,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 	return []func() resource.Resource{
 		NewJMESPathCheckResource,
 		NewMetaBusinessUnitResource,
+		NewMDMBlueprintResource,
 		NewMonolithCatalogResource,
 		NewMonolithConditionResource,
 		NewMonolithEnrollmentResource,
@@ -157,6 +158,7 @@ func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.D
 	return []func() datasource.DataSource{
 		NewJMESPathCheckDataSource,
 		NewMetaBusinessUnitDataSource,
+		NewMDMBlueprintDataSource,
 		NewMonolithCatalogDataSource,
 		NewMonolithConditionDataSource,
 		NewMonolithEnrollmentDataSource,
