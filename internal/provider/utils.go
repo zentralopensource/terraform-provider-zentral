@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -19,5 +20,21 @@ func resourceImportStatePassthroughZentralID(ctx context.Context, name string, r
 		)
 	} else {
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), types.Int64Value(ztlID))...)
+	}
+}
+
+var (
+	uuidMatchRe = regexp.MustCompile(`[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}`)
+)
+
+func resourceImportStatePassthroughZentralUUID(ctx context.Context, name string, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	matched := uuidMatchRe.MatchString(req.ID)
+	if !matched {
+		resp.Diagnostics.AddError(
+			"Invalid resource ID",
+			fmt.Sprintf("Zentral %s ID must be a valid UUID", name),
+		)
+	} else {
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), req.ID)...)
 	}
 }
