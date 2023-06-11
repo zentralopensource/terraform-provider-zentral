@@ -24,5 +24,3 @@ The resource `zentral_monolith_manifest` manages Monolith manifests.
 
 - `id` (Number) `ID` of the manifest.
 - `version` (Number) Manifest version.
-
-

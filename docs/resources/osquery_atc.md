@@ -31,5 +31,3 @@ The resource `zentral_osquery_atc` manages Osquery automatic table constructions
 ### Read-Only
 
 - `id` (Number) `ID` of the Osquery ATC.
-
-

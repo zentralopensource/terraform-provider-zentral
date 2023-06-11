@@ -34,5 +34,3 @@ The resource `zentral_santa_enrollment` manages Santa enrollments.
 - `plist_url` (String) Plist download URL.
 - `secret` (String) Enrollment secret.
 - `version` (Number) Enrollment version.
-
-

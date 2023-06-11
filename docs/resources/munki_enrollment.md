@@ -33,5 +33,3 @@ The resource `zentral_munki_enrollment` manages Munki enrollments.
 - `package_url` (String) Configuration package download URL.
 - `secret` (String) Enrollment secret.
 - `version` (Number) Enrollment version.
-
-

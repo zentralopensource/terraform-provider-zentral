@@ -26,5 +26,3 @@ The resource `zentral_meta_business_unit` manages meta business units.
 ### Read-Only
 
 - `id` (Number) `ID` of the meta business unit.
-
-

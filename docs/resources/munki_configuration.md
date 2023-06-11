@@ -34,5 +34,3 @@ The resource `zentral_munki_configuration` manages Munki configurations.
 
 - `id` (Number) `ID` of the Munki configuration.
 - `version` (Number) Version of the Munki configuration.
-
-

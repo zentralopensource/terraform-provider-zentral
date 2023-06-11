@@ -26,5 +26,3 @@ The resource `zentral_monolith_catalog` manages Monolith catalogs.
 ### Read-Only
 
 - `id` (Number) `ID` of the catalog.
-
-

@@ -48,5 +48,3 @@ Optional:
 - `log_removed_actions` (Boolean) If `true`, remove actions should be logged. Default to `true`.
 - `shard` (Number) Restrict this query to a percentage (1-100) of target hosts.
 - `snapshot_mode` (Boolean) If `true`, differentials will not be stored and this query will not emulate an event stream. Defaults to `false`.
-
-

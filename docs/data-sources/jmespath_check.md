@@ -28,5 +28,3 @@ The data source `zentral_jmespath_check` allows details of a JMESPath compliance
 - `source_name` (String) The name of the inventory source the JMESPath compliance check is restricted to.
 - `tag_ids` (Set of Number) The IDs of the tags the JMESPath compliance check is restricted to.
 - `version` (Number) The JMESPath compliance check version.
-
-

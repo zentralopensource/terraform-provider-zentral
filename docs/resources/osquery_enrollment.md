@@ -36,5 +36,3 @@ The resource `zentral_osquery_enrollment` manages Osquery enrollments.
 - `script_url` (String) Linux script download URL.
 - `secret` (String) Enrollment secret.
 - `version` (Number) Enrollment version.
-
-

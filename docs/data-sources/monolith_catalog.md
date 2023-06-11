@@ -23,5 +23,3 @@ The data source `zentral_monolith_catalog` allows details of a Monolith catalog 
 ### Read-Only
 
 - `priority` (Number) Priority of the catalog.
-
-

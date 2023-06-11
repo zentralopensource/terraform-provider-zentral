@@ -30,5 +30,3 @@ The resource `zentral_osquery_file_category` manages Osquery file categories.
 ### Read-Only
 
 - `id` (Number) `ID` of the Osquery file category.
-
-

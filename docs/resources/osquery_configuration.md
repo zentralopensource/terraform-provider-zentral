@@ -33,5 +33,3 @@ The resource `zentral_osquery_configuration` manages Osquery configurations.
 ### Read-Only
 
 - `id` (Number) `ID` of the Osquery configuration.
-
-

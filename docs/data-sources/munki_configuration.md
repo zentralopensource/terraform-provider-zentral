@@ -31,5 +31,3 @@ The data source `zentral_munki_configuration` allows details of a Munki configur
 - `principal_user_detection_domains` (Set of String) Set of principal user detection domains.
 - `principal_user_detection_sources` (List of String) List of principal user detection sources.
 - `version` (Number) Version of the Munki configuration.
-
-

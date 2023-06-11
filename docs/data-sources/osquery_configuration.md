@@ -30,5 +30,3 @@ The data source `zentral_osquery_configuration` allows details of a Osquery conf
 - `inventory_ec2` (Boolean) If `true`, Osquery is configured to collect the EC2 metadata. Defaults to `false`.
 - `inventory_interval` (Number) Number of seconds to wait between collecting the inventory data.
 - `options` (Map of String) A map of extra options to pass to Osquery in the flag file.
-
-

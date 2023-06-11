@@ -30,5 +30,3 @@ The resource `zentral_osquery_pack` manages Osquery packs.
 
 - `id` (Number) `ID` of the pack.
 - `slug` (String) Slug of the pack.
-
-

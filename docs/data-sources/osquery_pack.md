@@ -27,5 +27,3 @@ The data source `zentral_osquery_pack` allows details of a Osquery pack to be re
 - `event_routing_key` (String) Routing key added to the metadata of the events that the queries of this pack generate.
 - `shard` (Number) Restrict the pack to a percentage (1-100) of target hosts.
 - `slug` (String) Slug of the pack.
-
-

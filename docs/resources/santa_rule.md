@@ -38,5 +38,3 @@ The resource `zentral_santa_rule` manages Santa rules.
 - `id` (Number) `ID` of the Santa rule.
 - `ruleset_id` (Number) `ID` of the Santa ruleset.
 - `version` (Number) Rule version.
-
-

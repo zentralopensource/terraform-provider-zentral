@@ -19,5 +19,3 @@ The data source `zentral_taxonomy` allows details of a taxonomy to be retrieved 
 
 - `id` (Number) `ID` of the Taxonomy.
 - `name` (String) Name of the Taxonomy.
-
-

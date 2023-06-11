@@ -27,5 +27,3 @@ The resource `zentral_osquery_configuration_pack` manages Osquery configuration 
 ### Read-Only
 
 - `id` (Number) `ID` of the configuration pack.
-
-

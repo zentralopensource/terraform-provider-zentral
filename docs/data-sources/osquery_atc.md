@@ -28,5 +28,3 @@ The data source `zentral_osquery_atc` allows details of a Osquery automatic tabl
 - `platforms` (Set of String) Platform on which this ATC can be activated
 - `query` (String) Query used to fetch the ATC data.
 - `table_name` (String) Name of the Osquery ATC table.
-
-

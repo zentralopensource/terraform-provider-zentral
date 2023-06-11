@@ -35,5 +35,3 @@ The data source `zentral_santa_configuration` allows details of a Santa configur
 - `full_sync_interval` (Number) The max time to wait before performing a full sync with the server.
 - `remount_usb_mode` (Set of String) Array of strings for arguments to pass to `mount -o`.
 - `sync_incident_severity` (Number) If 100, 200, 300, incidents will be automatically opened and closed when the santa agent rules are out of sync.
-
-

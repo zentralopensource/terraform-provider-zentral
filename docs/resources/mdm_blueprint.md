@@ -29,5 +29,3 @@ The resource `zentral_mdm_blueprint` manages MDM blueprints.
 ### Read-Only
 
 - `id` (Number) `ID` of the blueprint.
-
-

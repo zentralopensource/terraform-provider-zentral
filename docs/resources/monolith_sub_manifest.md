@@ -27,5 +27,3 @@ The resource `zentral_monolith_sub_manifest` manages Monolith sub manifests.
 ### Read-Only
 
 - `id` (Number) `ID` of the sub manifest.
-
-

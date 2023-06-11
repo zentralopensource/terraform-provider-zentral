@@ -45,5 +45,3 @@ Read-Only:
 - `log_removed_actions` (Boolean) If `true`, remove actions should be logged. Default to `true`.
 - `pack_id` (Number) The `ID` of the pack.
 - `snapshot_mode` (Boolean) If `true`, differentials will not be stored and this query will not emulate an event stream. Defaults to `false`.
-
-

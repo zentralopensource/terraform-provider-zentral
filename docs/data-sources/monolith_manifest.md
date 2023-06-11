@@ -24,5 +24,3 @@ The data source `zentral_monolith_manifest` allows details of a Monolith manifes
 
 - `meta_business_unit_id` (Number) The `ID` of the meta business unit this manifest is attached to.
 - `version` (Number) Manifest version.
-
-

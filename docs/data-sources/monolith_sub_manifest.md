@@ -24,5 +24,3 @@ The data source `zentral_monolith_sub_manifest` allows details of a Monolith sub
 
 - `description` (String) Description of the sub manifest.
 - `meta_business_unit_id` (Number) The `ID` of the meta business unit this manifest is restricted to.
-
-

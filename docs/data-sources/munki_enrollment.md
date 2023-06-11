@@ -30,5 +30,3 @@ The data source `zentral_munki_enrollment` allows details of a Munki enrollment 
 - `tag_ids` (Set of Number) The `ID`s of the tags that the machine will get at enrollment.
 - `udids` (Set of String) The `UDID`s the enrollment is restricted to.
 - `version` (Number) Enrollment version.
-
-

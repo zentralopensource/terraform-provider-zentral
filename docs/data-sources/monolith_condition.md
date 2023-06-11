@@ -23,5 +23,3 @@ The data source `zentral_monolith_condition` allows details of a Monolith condit
 ### Read-Only
 
 - `predicate` (String) Predicate of the condition.
-
-

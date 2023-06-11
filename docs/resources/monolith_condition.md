@@ -23,5 +23,3 @@ The resource `zentral_monolith_condition` manages Monolith conditions.
 ### Read-Only
 
 - `id` (Number) `ID` of the condition.
-
-

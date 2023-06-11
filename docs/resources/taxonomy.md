@@ -22,5 +22,3 @@ The resource `zentral_taxonomy` manages taxonomies.
 ### Read-Only
 
 - `id` (Number) `ID` of the taxonomy.
-
-

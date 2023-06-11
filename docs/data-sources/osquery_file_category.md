@@ -27,5 +27,3 @@ The data source `zentral_osquery_file_category` allows details of a Osquery file
 - `exclude_paths` (Set of String) Set of paths to exclude from the Osquery file category.
 - `file_paths` (Set of String) Set of paths to include in the Osquery file category.
 - `file_paths_queries` (Set of String) Set of queries returning paths to monitor as path columns in the results.
-
-

@@ -27,5 +27,3 @@ The resource `zentral_monolith_manifest_catalog` manages Monolith manifest catal
 ### Read-Only
 
 - `id` (Number) `ID` of the manifest catalog.
-
-

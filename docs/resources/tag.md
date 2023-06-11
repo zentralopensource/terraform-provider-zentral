@@ -27,5 +27,3 @@ The resource `zentral_tag` manages tags.
 ### Read-Only
 
 - `id` (Number) `ID` of the tag.
-
-

@@ -38,5 +38,3 @@ The resource `zentral_santa_configuration` manages Santa configurations.
 ### Read-Only
 
 - `id` (Number) `ID` of the Santa configuration.
-
-

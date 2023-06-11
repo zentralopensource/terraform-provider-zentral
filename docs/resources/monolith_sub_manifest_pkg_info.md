@@ -41,5 +41,3 @@ Required:
 
 - `shard` (Number) The shard for the tag.
 - `tag_id` (Number) The `ID` of the tag.
-
-

@@ -24,5 +24,3 @@ The data source `zentral_tag` allows details of a tag to be retrieved by its `ID
 
 - `color` (String) Color of the tag.
 - `taxonomy_id` (Number) `ID` of the tag taxonomy.
-
-
