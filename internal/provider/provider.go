@@ -130,6 +130,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewMetaBusinessUnitResource,
 		NewMDMArtifactResource,
 		NewMDMBlueprintResource,
+		NewMDMBlueprintArtifactResource,
 		NewMDMProfileResource,
 		NewMonolithCatalogResource,
 		NewMonolithConditionResource,
