@@ -24,6 +24,7 @@ The resource `zentral_mdm_blueprint` manages MDM blueprints.
 - `collect_apps` (String) Possible values: `NO`, `MANAGED_ONLY`, `ALL`.
 - `collect_certificates` (String) Possible values: `NO`, `MANAGED_ONLY`, `ALL`.
 - `collect_profiles` (String) Possible values: `NO`, `MANAGED_ONLY`, `ALL`.
+- `filevault_config_id` (Number) The `ID` of the attached FileVault configuration.
 - `inventory_interval` (Number) In seconds, the minimum interval between two inventory collection. Minimum 4h, maximum 7d, default 1d.
 
 ### Read-Only

@@ -12,6 +12,7 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 	firstName := acctest.RandString(12)
 	secondName := acctest.RandString(12)
 	resourceName := "zentral_mdm_blueprint.test"
+	fcResourceName := "zentral_mdm_filevault_config.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -31,6 +32,8 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 						resourceName, "collect_certificates", "NO"),
 					resource.TestCheckResourceAttr(
 						resourceName, "collect_profiles", "NO"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "filevault_config_id"),
 				),
 			},
 			// ImportState
@@ -53,6 +56,8 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 						resourceName, "collect_certificates", "ALL"),
 					resource.TestCheckResourceAttr(
 						resourceName, "collect_profiles", "MANAGED_ONLY"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "filevault_config_id", fcResourceName, "id"),
 				),
 			},
 			// ImportState
@@ -75,12 +80,18 @@ resource "zentral_mdm_blueprint" "test" {
 
 func testAccMDMBlueprintResourceConfigFull(name string) string {
 	return fmt.Sprintf(`
+resource "zentral_mdm_filevault_config" "test" {
+  name                         = %[1]q
+  escrow_location_display_name = %[1]q
+}
+
 resource "zentral_mdm_blueprint" "test" {
   name                 = %[1]q
   inventory_interval   = 77777
   collect_apps         = "MANAGED_ONLY"
   collect_certificates = "ALL"
   collect_profiles     = "MANAGED_ONLY"
+  filevault_config_id  = zentral_mdm_filevault_config.test.id
 }
 `, name)
 }

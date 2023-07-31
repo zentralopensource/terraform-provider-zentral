@@ -61,6 +61,11 @@ func (d *MDMBlueprintDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "Possible values: `NO`, `MANAGED_ONLY`, `ALL`.",
 				Computed:            true,
 			},
+			"filevault_config_id": schema.Int64Attribute{
+				Description:         "The ID of the attached FileVault configuration.",
+				MarkdownDescription: "The `ID` of the attached FileVault configuration.",
+				Computed:            true,
+			},
 		},
 	}
 }

@@ -93,6 +93,11 @@ func (r *MDMBlueprintResource) Schema(ctx context.Context, req resource.SchemaRe
 				},
 				Default: stringdefault.StaticString("NO"),
 			},
+			"filevault_config_id": schema.Int64Attribute{
+				Description:         "The ID of the attached FileVault configuration.",
+				MarkdownDescription: "The `ID` of the attached FileVault configuration.",
+				Optional:            true,
+			},
 		},
 	}
 }

@@ -13,6 +13,7 @@ func TestAccMDMBlueprintDataSource(t *testing.T) {
 	c2Name := acctest.RandString(12)
 	c1ResourceName := "zentral_mdm_blueprint.check1"
 	c2ResourceName := "zentral_mdm_blueprint.check2"
+	fc2ResourceName := "zentral_mdm_filevault_config.check2"
 	ds1ResourceName := "data.zentral_mdm_blueprint.check1_by_name"
 	ds2ResourceName := "data.zentral_mdm_blueprint.check2_by_id"
 
@@ -36,6 +37,8 @@ func TestAccMDMBlueprintDataSource(t *testing.T) {
 						ds1ResourceName, "collect_certificates", "NO"),
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "collect_profiles", "NO"),
+					resource.TestCheckNoResourceAttr(
+						ds1ResourceName, "filevault_config_id"),
 					// Read by ID
 					resource.TestCheckResourceAttrPair(
 						ds2ResourceName, "id", c2ResourceName, "id"),
@@ -49,6 +52,8 @@ func TestAccMDMBlueprintDataSource(t *testing.T) {
 						ds2ResourceName, "collect_certificates", "ALL"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "collect_profiles", "MANAGED_ONLY"),
+					resource.TestCheckResourceAttrPair(
+						ds2ResourceName, "filevault_config_id", fc2ResourceName, "id"),
 				),
 			},
 		},
@@ -61,12 +66,18 @@ resource "zentral_mdm_blueprint" "check1" {
   name = %[1]q
 }
 
+resource "zentral_mdm_filevault_config" "check2" {
+  name                         = %[2]q
+  escrow_location_display_name = %[2]q
+}
+
 resource "zentral_mdm_blueprint" "check2" {
   name                 = %[2]q
   inventory_interval   = 77777
   collect_apps         = "MANAGED_ONLY"
   collect_certificates = "ALL"
   collect_profiles     = "MANAGED_ONLY"
+  filevault_config_id  = zentral_mdm_filevault_config.check2.id
 }
 
 data "zentral_mdm_blueprint" "check1_by_name" {
