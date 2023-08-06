@@ -98,6 +98,11 @@ func (r *MDMBlueprintResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "The `ID` of the attached FileVault configuration.",
 				Optional:            true,
 			},
+			"recovery_password_config_id": schema.Int64Attribute{
+				Description:         "The ID of the attached recovery password configuration.",
+				MarkdownDescription: "The `ID` of the attached recovery password configuration.",
+				Optional:            true,
+			},
 		},
 	}
 }

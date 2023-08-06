@@ -27,3 +27,4 @@ The data source `zentral_mdm_blueprint` allows details of a MDM blueprint to be 
 - `collect_profiles` (String) Possible values: `NO`, `MANAGED_ONLY`, `ALL`.
 - `filevault_config_id` (Number) The `ID` of the attached FileVault configuration.
 - `inventory_interval` (Number) In seconds, the minimum interval between two inventory collection. Minimum 4h, maximum 7d, default 1d.
+- `recovery_password_config_id` (Number) The `ID` of the attached recovery password configuration.
