@@ -131,6 +131,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewMDMArtifactResource,
 		NewMDMBlueprintResource,
 		NewMDMBlueprintArtifactResource,
+		NewMDMEnterpriseAppResource,
 		NewMDMFileVaultConfigResource,
 		NewMDMProfileResource,
 		NewMDMRecoveryPasswordConfigResource,
