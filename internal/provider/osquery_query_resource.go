@@ -96,6 +96,11 @@ func (r *OsqueryQueryResource) Schema(ctx context.Context, req resource.SchemaRe
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
 			},
+			"tag_id": schema.Int64Attribute{
+				Description:         "ID of the machine tag that is updated by this query.",
+				MarkdownDescription: "`ID` of the machine tag that is updated by this query.",
+				Optional:            true,
+			},
 			"scheduling": schema.SingleNestedAttribute{
 				Description:         "Attributes to link a query to a pack for scheduling.",
 				MarkdownDescription: "Attributes to link a query to a pack for scheduling.",

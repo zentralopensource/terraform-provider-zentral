@@ -20,6 +20,7 @@ The data source `zentral_osquery_query` allows details of a Osquery query to be 
 - `id` (Number) `ID` of the query.
 - `name` (String) Name of the query.
 - `scheduling` (Attributes) Attributes to link a query to a pack for scheduling. (see [below for nested schema](#nestedatt--scheduling))
+- `tag_id` (Number) `ID` of the machine tag that is updated by this query.
 
 ### Read-Only
 

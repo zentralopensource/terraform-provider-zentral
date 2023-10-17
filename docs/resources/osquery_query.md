@@ -27,6 +27,7 @@ The resource `zentral_osquery_query` manages Osquery queries.
 - `minimum_osquery_version` (String) Only run on Osquery versions greater than or equal-to this version string
 - `platforms` (Set of String) Restrict the query to some platforms, default is 'all' platforms
 - `scheduling` (Attributes) Attributes to link a query to a pack for scheduling. (see [below for nested schema](#nestedatt--scheduling))
+- `tag_id` (Number) `ID` of the machine tag that is updated by this query.
 - `value` (String) Description of the results returned by the query.
 
 ### Read-Only

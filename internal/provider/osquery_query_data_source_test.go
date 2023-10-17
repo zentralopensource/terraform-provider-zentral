@@ -11,18 +11,22 @@ import (
 func TestAccOsqueryQueryDataSource(t *testing.T) {
 	q1Name := acctest.RandString(12)
 	q2Name := acctest.RandString(12)
+	q3Name := acctest.RandString(12)
 	q1ResourceName := "zentral_osquery_query.check1"
 	q2ResourceName := "zentral_osquery_query.check2"
+	q3ResourceName := "zentral_osquery_query.check3"
 	ds1ResourceName := "data.zentral_osquery_query.check1_by_name"
 	ds2ResourceName := "data.zentral_osquery_query.check2_by_id"
+	ds3ResourceName := "data.zentral_osquery_query.check3_by_id"
 	packResourceName := "zentral_osquery_pack.check2"
+	tagResourceName := "zentral_tag.check3"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccOsqueryQueryDataSourceConfig(q1Name, q2Name),
+				Config: testAccOsqueryQueryDataSourceConfig(q1Name, q2Name, q3Name),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					// Read by name
 					resource.TestCheckResourceAttrPair(
@@ -44,8 +48,10 @@ func TestAccOsqueryQueryDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "compliance_check_enabled", "false"),
 					resource.TestCheckNoResourceAttr(
+						ds1ResourceName, "tag_id"),
+					resource.TestCheckNoResourceAttr(
 						ds1ResourceName, "scheduling"),
-					// Read by ID
+					// Read by ID CC
 					resource.TestCheckResourceAttrPair(
 						ds2ResourceName, "id", q2ResourceName, "id"),
 					resource.TestCheckResourceAttr(
@@ -66,6 +72,8 @@ func TestAccOsqueryQueryDataSource(t *testing.T) {
 						ds2ResourceName, "version", "1"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "compliance_check_enabled", "true"),
+					resource.TestCheckNoResourceAttr(
+						ds1ResourceName, "tag_id"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "scheduling.can_be_denylisted", "false"),
 					resource.TestCheckResourceAttr(
@@ -78,13 +86,22 @@ func TestAccOsqueryQueryDataSource(t *testing.T) {
 						ds2ResourceName, "scheduling.shard", "100"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "scheduling.snapshot_mode", "true"),
+					// Read by ID Tag
+					resource.TestCheckResourceAttrPair(
+						ds3ResourceName, "id", q3ResourceName, "id"),
+					resource.TestCheckResourceAttr(
+						ds3ResourceName, "name", q3Name),
+					resource.TestCheckResourceAttr(
+						ds3ResourceName, "compliance_check_enabled", "false"),
+					resource.TestCheckResourceAttrPair(
+						ds3ResourceName, "tag_id", tagResourceName, "id"),
 				),
 			},
 		},
 	})
 }
 
-func testAccOsqueryQueryDataSourceConfig(q1Name string, q2Name string) string {
+func testAccOsqueryQueryDataSourceConfig(q1Name string, q2Name string, q3Name string) string {
 	return fmt.Sprintf(`
 resource "zentral_osquery_query" "check1" {
   name = %[1]q
@@ -113,6 +130,20 @@ resource "zentral_osquery_query" "check2" {
   }
 }
 
+resource "zentral_tag" "check3" {
+  name = %[3]q
+}
+
+resource "zentral_osquery_query" "check3" {
+  name                     = %[3]q
+  sql                      = "SELECT 1;"
+  platforms                = ["darwin"]
+  minimum_osquery_version  = "0.1.0"
+  description              = "A query that always adds a tag"
+  value                    = "Not much"
+  tag_id                   = zentral_tag.check3.id
+}
+
 data "zentral_osquery_query" "check1_by_name" {
   name = zentral_osquery_query.check1.name
 }
@@ -120,5 +151,9 @@ data "zentral_osquery_query" "check1_by_name" {
 data "zentral_osquery_query" "check2_by_id" {
   id = zentral_osquery_query.check2.id
 }
-`, q1Name, q2Name)
+
+data "zentral_osquery_query" "check3_by_id" {
+  id = zentral_osquery_query.check3.id
+}
+`, q1Name, q2Name, q3Name)
 }

@@ -78,6 +78,11 @@ func (d *OsqueryQueryDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "If `true`, the query will be used as compliance check. Defaults to `false`.",
 				Computed:            true,
 			},
+			"tag_id": schema.Int64Attribute{
+				Description:         "ID of the machine tag that is updated by this query.",
+				MarkdownDescription: "`ID` of the machine tag that is updated by this query.",
+				Optional:            true,
+			},
 			"scheduling": schema.SingleNestedAttribute{
 				Description:         "Attributes to link a query to a pack for scheduling.",
 				MarkdownDescription: "Attributes to link a query to a pack for scheduling.",

@@ -16,6 +16,7 @@ type osqueryQuery struct {
 	Value                  types.String `tfsdk:"value"`
 	Version                types.Int64  `tfsdk:"version"`
 	ComplianceCheckEnabled types.Bool   `tfsdk:"compliance_check_enabled"`
+	TagID                  types.Int64  `tfsdk:"tag_id"`
 	Scheduling             types.Object `tfsdk:"scheduling"`
 }
 
@@ -39,6 +40,13 @@ func osqueryQueryForState(oq *goztl.OsqueryQuery) osqueryQuery {
 		minOsqueryVersion = types.StringValue(*oq.MinOsqueryVersion)
 	} else {
 		minOsqueryVersion = types.StringNull()
+	}
+
+	var tagID types.Int64
+	if oq.TagID != nil {
+		tagID = types.Int64Value(int64(*oq.TagID))
+	} else {
+		tagID = types.Int64Null()
 	}
 
 	var scheduling types.Object
@@ -74,6 +82,7 @@ func osqueryQueryForState(oq *goztl.OsqueryQuery) osqueryQuery {
 		Value:                  types.StringValue(oq.Value),
 		Version:                types.Int64Value(int64(oq.Version)),
 		ComplianceCheckEnabled: types.BoolValue(oq.ComplianceCheckEnabled),
+		TagID:                  tagID,
 		Scheduling:             scheduling,
 	}
 }
@@ -89,6 +98,11 @@ func osqueryQueryRequestWithState(data osqueryQuery) *goztl.OsqueryQueryRequest 
 		minOsqueryVersion = goztl.String(data.MinOsqueryVersion.ValueString())
 	}
 
+	var tagID *int
+	if !data.TagID.IsNull() {
+		tagID = goztl.Int(int(data.TagID.ValueInt64()))
+	}
+
 	req := &goztl.OsqueryQueryRequest{
 		Name:                   data.Name.ValueString(),
 		SQL:                    data.SQL.ValueString(),
@@ -97,6 +111,7 @@ func osqueryQueryRequestWithState(data osqueryQuery) *goztl.OsqueryQueryRequest 
 		Description:            data.Description.ValueString(),
 		Value:                  data.Value.ValueString(),
 		ComplianceCheckEnabled: data.ComplianceCheckEnabled.ValueBool(),
+		TagID:                  tagID,
 	}
 
 	if !data.Scheduling.IsNull() {
