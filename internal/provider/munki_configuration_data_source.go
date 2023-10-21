@@ -75,6 +75,11 @@ func (d *MunkiConfigurationDataSource) Schema(ctx context.Context, req datasourc
 				MarkdownDescription: "Interval in days between full managed installs sync. Defaults to 7 days.",
 				Computed:            true,
 			},
+			"script_checks_run_interval_seconds": schema.Int64Attribute{
+				Description:         "Interval in seconds between script checks runs. Defaults to 86400 seconds (1 day).",
+				MarkdownDescription: "Interval in seconds between script checks runs. Defaults to 86400 seconds (1 day).",
+				Computed:            true,
+			},
 			"auto_reinstall_incidents": schema.BoolAttribute{
 				Description:         "If true, incidents will be managed automatically when package reinstalls are observed. Defaults to false.",
 				MarkdownDescription: "If `true`, incidents will be managed automatically when package reinstalls are observed. Defaults to `false`.",

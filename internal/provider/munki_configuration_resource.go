@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -14,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
@@ -99,6 +101,19 @@ func (r *MunkiConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				Optional:            true,
 				Computed:            true,
 				Default:             int64default.StaticInt64(7),
+				Validators: []validator.Int64{
+					int64validator.Between(1, 90),
+				},
+			},
+			"script_checks_run_interval_seconds": schema.Int64Attribute{
+				Description:         "Interval in seconds between script checks runs. Defaults to 86400 seconds (1 day).",
+				MarkdownDescription: "Interval in seconds between script checks runs. Defaults to 86400 seconds (1 day).",
+				Optional:            true,
+				Computed:            true,
+				Default:             int64default.StaticInt64(86400),
+				Validators: []validator.Int64{
+					int64validator.Between(3600, 604800),
+				},
 			},
 			"auto_reinstall_incidents": schema.BoolAttribute{
 				Description:         "If true, incidents will be managed automatically when package reinstalls are observed. Defaults to false.",

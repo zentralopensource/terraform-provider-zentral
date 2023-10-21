@@ -36,6 +36,8 @@ func TestAccMunkiConfigurationResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "managed_installs_sync_interval_days", "7"),
 					resource.TestCheckResourceAttr(
+						resourceName, "script_checks_run_interval_seconds", "86400"),
+					resource.TestCheckResourceAttr(
 						resourceName, "auto_reinstall_incidents", "false"),
 					resource.TestCheckResourceAttr(
 						resourceName, "auto_failed_install_incidents", "false"),
@@ -78,6 +80,8 @@ func TestAccMunkiConfigurationResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "managed_installs_sync_interval_days", "3"),
 					resource.TestCheckResourceAttr(
+						resourceName, "script_checks_run_interval_seconds", "12345"),
+					resource.TestCheckResourceAttr(
 						resourceName, "auto_reinstall_incidents", "true"),
 					resource.TestCheckResourceAttr(
 						resourceName, "auto_failed_install_incidents", "true"),
@@ -113,6 +117,7 @@ resource "zentral_munki_configuration" "test" {
   principal_user_detection_domains    = ["zentral.io"]
   collected_condition_keys            = ["arch", "machine_type"]
   managed_installs_sync_interval_days = 3
+  script_checks_run_interval_seconds  = 12345
   auto_reinstall_incidents            = true
   auto_failed_install_incidents       = true
 }

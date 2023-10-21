@@ -29,6 +29,7 @@ The resource `zentral_munki_configuration` manages Munki configurations.
 - `managed_installs_sync_interval_days` (Number) Interval in days between full managed installs sync. Defaults to 7 days.
 - `principal_user_detection_domains` (Set of String) Set of principal user detection domains.
 - `principal_user_detection_sources` (List of String) List of principal user detection sources.
+- `script_checks_run_interval_seconds` (Number) Interval in seconds between script checks runs. Defaults to 86400 seconds (1 day).
 
 ### Read-Only
 
