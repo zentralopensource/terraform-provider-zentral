@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.19.0
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.29.0
-	github.com/zentralopensource/goztl v0.1.41
+	github.com/zentralopensource/goztl v0.1.42
 )
 
 require (
