@@ -27,6 +27,7 @@ The resource `zentral_mdm_blueprint` manages MDM blueprints.
 - `filevault_config_id` (Number) The `ID` of the attached FileVault configuration.
 - `inventory_interval` (Number) In seconds, the minimum interval between two inventory collection. Minimum 4h, maximum 7d, default 1d.
 - `recovery_password_config_id` (Number) The `ID` of the attached recovery password configuration.
+- `software_update_enforcement_ids` (Set of Number) The `ID`s of the software update enforcements.
 
 ### Read-Only
 

@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
 )
@@ -102,6 +103,13 @@ func (r *MDMBlueprintResource) Schema(ctx context.Context, req resource.SchemaRe
 				Description:         "The ID of the attached recovery password configuration.",
 				MarkdownDescription: "The `ID` of the attached recovery password configuration.",
 				Optional:            true,
+			},
+			"software_update_enforcement_ids": schema.SetAttribute{
+				Description:         "The IDs of the software update enforcements.",
+				MarkdownDescription: "The `ID`s of the software update enforcements.",
+				ElementType:         types.Int64Type,
+				Optional:            true,
+				Computed:            true,
 			},
 		},
 	}

@@ -1,19 +1,21 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 type mdmBlueprint struct {
-	ID                       types.Int64  `tfsdk:"id"`
-	Name                     types.String `tfsdk:"name"`
-	InventoryInterval        types.Int64  `tfsdk:"inventory_interval"`
-	CollectApps              types.String `tfsdk:"collect_apps"`
-	CollectCertificates      types.String `tfsdk:"collect_certificates"`
-	CollectProfiles          types.String `tfsdk:"collect_profiles"`
-	FileVaultConfigID        types.Int64  `tfsdk:"filevault_config_id"`
-	RecoveryPasswordConfigID types.Int64  `tfsdk:"recovery_password_config_id"`
+	ID                           types.Int64  `tfsdk:"id"`
+	Name                         types.String `tfsdk:"name"`
+	InventoryInterval            types.Int64  `tfsdk:"inventory_interval"`
+	CollectApps                  types.String `tfsdk:"collect_apps"`
+	CollectCertificates          types.String `tfsdk:"collect_certificates"`
+	CollectProfiles              types.String `tfsdk:"collect_profiles"`
+	FileVaultConfigID            types.Int64  `tfsdk:"filevault_config_id"`
+	RecoveryPasswordConfigID     types.Int64  `tfsdk:"recovery_password_config_id"`
+	SoftwareUpdateEnforcementIDs types.Set    `tfsdk:"software_update_enforcement_ids"`
 }
 
 func collectionOptForState(collectionOpt int) types.String {
@@ -51,15 +53,20 @@ func mdmBlueprintForState(mb *goztl.MDMBlueprint) mdmBlueprint {
 	} else {
 		rpCfgID = types.Int64Null()
 	}
+	sueIDs := make([]attr.Value, 0)
+	for _, sueID := range mb.SoftwareUpdateEnforcementIDs {
+		sueIDs = append(sueIDs, types.Int64Value(int64(sueID)))
+	}
 	return mdmBlueprint{
-		ID:                       types.Int64Value(int64(mb.ID)),
-		Name:                     types.StringValue(mb.Name),
-		InventoryInterval:        types.Int64Value(int64(mb.InventoryInterval)),
-		CollectApps:              collectionOptForState(mb.CollectApps),
-		CollectCertificates:      collectionOptForState(mb.CollectCertificates),
-		CollectProfiles:          collectionOptForState(mb.CollectProfiles),
-		FileVaultConfigID:        fvCfgID,
-		RecoveryPasswordConfigID: rpCfgID,
+		ID:                           types.Int64Value(int64(mb.ID)),
+		Name:                         types.StringValue(mb.Name),
+		InventoryInterval:            types.Int64Value(int64(mb.InventoryInterval)),
+		CollectApps:                  collectionOptForState(mb.CollectApps),
+		CollectCertificates:          collectionOptForState(mb.CollectCertificates),
+		CollectProfiles:              collectionOptForState(mb.CollectProfiles),
+		FileVaultConfigID:            fvCfgID,
+		RecoveryPasswordConfigID:     rpCfgID,
+		SoftwareUpdateEnforcementIDs: types.SetValueMust(types.Int64Type, sueIDs),
 	}
 }
 
@@ -72,13 +79,19 @@ func mdmBlueprintRequestWithState(data mdmBlueprint) *goztl.MDMBlueprintRequest 
 	if !data.RecoveryPasswordConfigID.IsNull() {
 		rpCfgID = goztl.Int(int(data.RecoveryPasswordConfigID.ValueInt64()))
 	}
+	sueIDs := make([]int, 0)
+	for _, sueID := range data.SoftwareUpdateEnforcementIDs.Elements() { // nil if null or unknown → no iterations
+		sueIDs = append(sueIDs, int(sueID.(types.Int64).ValueInt64()))
+	}
+
 	return &goztl.MDMBlueprintRequest{
-		Name:                     data.Name.ValueString(),
-		InventoryInterval:        int(data.InventoryInterval.ValueInt64()),
-		CollectApps:              collectionOptWithState(data.CollectApps),
-		CollectCertificates:      collectionOptWithState(data.CollectCertificates),
-		CollectProfiles:          collectionOptWithState(data.CollectProfiles),
-		FileVaultConfigID:        fvCfgID,
-		RecoveryPasswordConfigID: rpCfgID,
+		Name:                         data.Name.ValueString(),
+		InventoryInterval:            int(data.InventoryInterval.ValueInt64()),
+		CollectApps:                  collectionOptWithState(data.CollectApps),
+		CollectCertificates:          collectionOptWithState(data.CollectCertificates),
+		CollectProfiles:              collectionOptWithState(data.CollectProfiles),
+		FileVaultConfigID:            fvCfgID,
+		RecoveryPasswordConfigID:     rpCfgID,
+		SoftwareUpdateEnforcementIDs: sueIDs,
 	}
 }

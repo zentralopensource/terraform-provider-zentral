@@ -14,6 +14,7 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 	resourceName := "zentral_mdm_blueprint.test"
 	fcResourceName := "zentral_mdm_filevault_config.test"
 	rpcResourceName := "zentral_mdm_recovery_password_config.test"
+	sueResourceName := "zentral_mdm_software_update_enforcement.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -37,6 +38,8 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 						resourceName, "filevault_config_id"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "recovery_password_config_id"),
+					resource.TestCheckResourceAttr(
+						resourceName, "software_update_enforcement_ids.#", "0"),
 				),
 			},
 			// ImportState
@@ -63,6 +66,10 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 						resourceName, "filevault_config_id", fcResourceName, "id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "recovery_password_config_id", rpcResourceName, "id"),
+					resource.TestCheckResourceAttr(
+						resourceName, "software_update_enforcement_ids.#", "1"),
+					resource.TestCheckTypeSetElemAttrPair(
+						resourceName, "software_update_enforcement_ids.*", sueResourceName, "id"),
 				),
 			},
 			// ImportState
@@ -94,14 +101,20 @@ resource "zentral_mdm_recovery_password_config" "test" {
   name = %[1]q
 }
 
+resource "zentral_mdm_software_update_enforcement" "test" {
+  name           = %[1]q
+  max_os_version = "15"
+}
+
 resource "zentral_mdm_blueprint" "test" {
-  name                        = %[1]q
-  inventory_interval          = 77777
-  collect_apps                = "MANAGED_ONLY"
-  collect_certificates        = "ALL"
-  collect_profiles            = "MANAGED_ONLY"
-  filevault_config_id         = zentral_mdm_filevault_config.test.id
-  recovery_password_config_id = zentral_mdm_recovery_password_config.test.id
+  name                            = %[1]q
+  inventory_interval              = 77777
+  collect_apps                    = "MANAGED_ONLY"
+  collect_certificates            = "ALL"
+  collect_profiles                = "MANAGED_ONLY"
+  filevault_config_id             = zentral_mdm_filevault_config.test.id
+  recovery_password_config_id     = zentral_mdm_recovery_password_config.test.id
+  software_update_enforcement_ids = [zentral_mdm_software_update_enforcement.test.id]
 }
 `, name)
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
@@ -69,6 +70,12 @@ func (d *MDMBlueprintDataSource) Schema(ctx context.Context, req datasource.Sche
 			"recovery_password_config_id": schema.Int64Attribute{
 				Description:         "The ID of the attached recovery password configuration.",
 				MarkdownDescription: "The `ID` of the attached recovery password configuration.",
+				Computed:            true,
+			},
+			"software_update_enforcement_ids": schema.SetAttribute{
+				Description:         "The IDs of the software update enforcements.",
+				MarkdownDescription: "The `ID`s of the software update enforcements.",
+				ElementType:         types.Int64Type,
 				Computed:            true,
 			},
 		},
