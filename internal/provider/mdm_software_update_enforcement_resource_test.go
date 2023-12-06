@@ -27,6 +27,10 @@ func TestAccMDMSoftwareUpdateEnforcementResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "details_url", ""),
 					resource.TestCheckResourceAttr(
+						resourceName, "platforms.#", "1"),
+					resource.TestCheckTypeSetElemAttr(
+						resourceName, "platforms.*", "iOS"),
+					resource.TestCheckResourceAttr(
 						resourceName, "tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
 						resourceName, "os_version", ""),
@@ -56,6 +60,10 @@ func TestAccMDMSoftwareUpdateEnforcementResource(t *testing.T) {
 						resourceName, "name", secondName),
 					resource.TestCheckResourceAttr(
 						resourceName, "details_url", "https://www.example.com"),
+					resource.TestCheckResourceAttr(
+						resourceName, "platforms.#", "1"),
+					resource.TestCheckTypeSetElemAttr(
+						resourceName, "platforms.*", "macOS"),
 					resource.TestCheckResourceAttr(
 						resourceName, "tag_ids.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
@@ -88,6 +96,7 @@ func testAccMDMSoftwareUpdateEnforcementResourceConfigLatest(name string) string
 	return fmt.Sprintf(`
 resource "zentral_mdm_software_update_enforcement" "test" {
   name           = %[1]q
+  platforms      = ["iOS"]
   max_os_version = "15"
 }
 `, name)
@@ -102,6 +111,7 @@ resource "zentral_tag" "test" {
 resource "zentral_mdm_software_update_enforcement" "test" {
   name           = %[1]q
   details_url    = "https://www.example.com"
+  platforms      = ["macOS"]
   tag_ids        = [zentral_tag.test.id]
   os_version     = "14.1"
   build_version  = "23B74"

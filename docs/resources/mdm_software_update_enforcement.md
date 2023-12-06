@@ -18,6 +18,7 @@ The resource `zentral_mdm_software_update_enforcement` manages MDM software upda
 ### Required
 
 - `name` (String) Name of the software update enforcement.
+- `platforms` (Set of String) Restrict the software update enforcement to some platforms.
 
 ### Optional
 

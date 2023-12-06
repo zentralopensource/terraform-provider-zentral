@@ -29,4 +29,5 @@ The data source `zentral_mdm_software_update_enforcement` allows details of a MD
 - `local_time` (String) The local time value that specifies when to force install the software update.
 - `max_os_version` (String) The maximum (excluded) target OS version to update the device to by the appropriate time.
 - `os_version` (String) The target OS version to update the device to by the appropriate time.
+- `platforms` (Set of String) The platforms this software update enforcement is scoped to.
 - `tag_ids` (Set of Number) The `ID`s of the tags used to scope the software update enforcement.

@@ -47,6 +47,12 @@ func (d *MDMSoftwareUpdateEnforcementDataSource) Schema(ctx context.Context, req
 				MarkdownDescription: "The URL of a web page that shows details that the organization provides about the enforced update.",
 				Computed:            true,
 			},
+			"platforms": schema.SetAttribute{
+				Description:         "The platforms this software update enforcement is scoped to.",
+				MarkdownDescription: "The platforms this software update enforcement is scoped to.",
+				ElementType:         types.StringType,
+				Computed:            true,
+			},
 			"tag_ids": schema.SetAttribute{
 				Description:         "The IDs of the tags used to scope the software update enforcement.",
 				MarkdownDescription: "The `ID`s of the tags used to scope the software update enforcement.",

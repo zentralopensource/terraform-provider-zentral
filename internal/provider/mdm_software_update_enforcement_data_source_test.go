@@ -30,6 +30,12 @@ func TestAccMDMSoftwareUpdateEnforcementDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "details_url", ""),
 					resource.TestCheckResourceAttr(
+						ds1ResourceName, "platforms.#", "2"),
+					resource.TestCheckTypeSetElemAttr(
+						ds1ResourceName, "platforms.*", "iOS"),
+					resource.TestCheckTypeSetElemAttr(
+						ds1ResourceName, "platforms.*", "iPadOS"),
+					resource.TestCheckResourceAttr(
 						ds1ResourceName, "tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "os_version", ""),
@@ -48,6 +54,10 @@ func TestAccMDMSoftwareUpdateEnforcementDataSource(t *testing.T) {
 						ds2ResourceName, "id", c2ResourceName, "id"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "details_url", "https://www.example.com"),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "platforms.#", "1"),
+					resource.TestCheckTypeSetElemAttr(
+						ds2ResourceName, "platforms.*", "macOS"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "tag_ids.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
@@ -74,6 +84,7 @@ func testAccMDMSoftwareUpdateEnforcementDataSourceConfig(c1Name string, c2Name s
 	return fmt.Sprintf(`
 resource "zentral_mdm_software_update_enforcement" "check1" {
   name           = %[1]q
+  platforms      = ["iPadOS", "iOS"]
   max_os_version = "15"
   delay_days     = 3
   local_time     = "04:05:06"
@@ -86,6 +97,7 @@ resource "zentral_tag" "check2" {
 resource "zentral_mdm_software_update_enforcement" "check2" {
   name           = %[2]q
   details_url    = "https://www.example.com"
+  platforms      = ["macOS"]
   tag_ids        = [zentral_tag.check2.id]
   os_version     = "14.1"
   build_version  = "23B74"

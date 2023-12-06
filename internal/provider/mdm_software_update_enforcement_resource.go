@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
@@ -58,6 +60,16 @@ func (r *MDMSoftwareUpdateEnforcementResource) Schema(ctx context.Context, req r
 				Optional:            true,
 				Computed:            true,
 				Default:             stringdefault.StaticString(""),
+			},
+			"platforms": schema.SetAttribute{
+				Description:         "Restrict the software update enforcement to some platforms.",
+				MarkdownDescription: "Restrict the software update enforcement to some platforms.",
+				ElementType:         types.StringType,
+				Required:            true,
+				Validators: []validator.Set{
+					setvalidator.ValueStringsAre(stringvalidator.OneOf([]string{"macOS", "iOS", "iPadOS", "tvOS"}...)),
+					setvalidator.SizeAtLeast(1),
+				},
 			},
 			"tag_ids": schema.SetAttribute{
 				Description:         "The IDs of the tags used to scope the software update enforcement.",

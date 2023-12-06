@@ -10,6 +10,7 @@ type mdmSoftwareUpdateEnforcement struct {
 	ID            types.Int64  `tfsdk:"id"`
 	Name          types.String `tfsdk:"name"`
 	DetailsURL    types.String `tfsdk:"details_url"`
+	Platforms     types.Set    `tfsdk:"platforms"`
 	TagIDs        types.Set    `tfsdk:"tag_ids"`
 	OSVersion     types.String `tfsdk:"os_version"`
 	BuildVersion  types.String `tfsdk:"build_version"`
@@ -20,6 +21,11 @@ type mdmSoftwareUpdateEnforcement struct {
 }
 
 func mdmSoftwareUpdateEnforcementForState(msue *goztl.MDMSoftwareUpdateEnforcement) mdmSoftwareUpdateEnforcement {
+	platforms := make([]attr.Value, 0)
+	for _, platform := range msue.Platforms {
+		platforms = append(platforms, types.StringValue(platform))
+	}
+
 	tagIDs := make([]attr.Value, 0)
 	for _, tagID := range msue.TagIDs {
 		tagIDs = append(tagIDs, types.Int64Value(int64(tagID)))
@@ -50,6 +56,7 @@ func mdmSoftwareUpdateEnforcementForState(msue *goztl.MDMSoftwareUpdateEnforceme
 		ID:            types.Int64Value(int64(msue.ID)),
 		Name:          types.StringValue(msue.Name),
 		DetailsURL:    types.StringValue(msue.DetailsURL),
+		Platforms:     types.SetValueMust(types.StringType, platforms),
 		TagIDs:        types.SetValueMust(types.Int64Type, tagIDs),
 		OSVersion:     types.StringValue(msue.OSVersion),
 		BuildVersion:  types.StringValue(msue.BuildVersion),
@@ -61,6 +68,11 @@ func mdmSoftwareUpdateEnforcementForState(msue *goztl.MDMSoftwareUpdateEnforceme
 }
 
 func mdmSoftwareUpdateEnforcementRequestWithState(data mdmSoftwareUpdateEnforcement) *goztl.MDMSoftwareUpdateEnforcementRequest {
+	platforms := make([]string, 0)
+	for _, platform := range data.Platforms.Elements() { // nil if null or unknown → no iterations
+		platforms = append(platforms, platform.(types.String).ValueString())
+	}
+
 	tagIDs := make([]int, 0)
 	for _, tagID := range data.TagIDs.Elements() { // nil if null or unknown → no iterations
 		tagIDs = append(tagIDs, int(tagID.(types.Int64).ValueInt64()))
@@ -92,6 +104,7 @@ func mdmSoftwareUpdateEnforcementRequestWithState(data mdmSoftwareUpdateEnforcem
 	return &goztl.MDMSoftwareUpdateEnforcementRequest{
 		Name:          data.Name.ValueString(),
 		DetailsURL:    data.DetailsURL.ValueString(),
+		Platforms:     platforms,
 		TagIDs:        tagIDs,
 		OSVersion:     data.OSVersion.ValueString(),
 		BuildVersion:  data.BuildVersion.ValueString(),

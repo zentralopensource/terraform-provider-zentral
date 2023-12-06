@@ -103,6 +103,7 @@ resource "zentral_mdm_recovery_password_config" "test" {
 
 resource "zentral_mdm_software_update_enforcement" "test" {
   name           = %[1]q
+  platforms      = ["macOS"]
   max_os_version = "15"
 }
 
