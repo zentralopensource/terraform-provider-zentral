@@ -26,6 +26,7 @@ The resource `zentral_munki_script_check` manages Munki script checks.
 - `arch_amd64` (Boolean) If `true`, this Munki script check will be scheduled on Intel machines. Defaults to `true`.
 - `arch_arm64` (Boolean) If `true`, this Munki script check will be scheduled on Apple Silicon machines. Defaults to `true`.
 - `description` (String) Description of the Munki script check.
+- `excluded_tag_ids` (Set of Number) The IDs of the tags this Munki script check is not scoped to.
 - `max_os_version` (String) This Munki script check will be scheduled on machines with an OS version lower than this value.
 - `min_os_version` (String) This Munki script check will be scheduled on machines with an OS version higher or equal to this value.
 - `tag_ids` (Set of Number) The IDs of the tags this Munki script check is restricted to.

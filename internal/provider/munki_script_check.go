@@ -18,6 +18,7 @@ type munkiScriptCheck struct {
 	MinOSVersion   types.String `tfsdk:"min_os_version"`
 	MaxOSVersion   types.String `tfsdk:"max_os_version"`
 	TagIDs         types.Set    `tfsdk:"tag_ids"`
+	ExcludedTagIDs types.Set    `tfsdk:"excluded_tag_ids"`
 	Version        types.Int64  `tfsdk:"version"`
 }
 
@@ -25,6 +26,11 @@ func munkiScriptCheckForState(msc *goztl.MunkiScriptCheck) munkiScriptCheck {
 	tagIDs := make([]attr.Value, 0)
 	for _, tv := range msc.TagIDs {
 		tagIDs = append(tagIDs, types.Int64Value(int64(tv)))
+	}
+
+	excludedTagIDs := make([]attr.Value, 0)
+	for _, tv := range msc.ExcludedTagIDs {
+		excludedTagIDs = append(excludedTagIDs, types.Int64Value(int64(tv)))
 	}
 
 	return munkiScriptCheck{
@@ -39,6 +45,7 @@ func munkiScriptCheckForState(msc *goztl.MunkiScriptCheck) munkiScriptCheck {
 		MinOSVersion:   types.StringValue(msc.MinOSVersion),
 		MaxOSVersion:   types.StringValue(msc.MaxOSVersion),
 		TagIDs:         types.SetValueMust(types.Int64Type, tagIDs),
+		ExcludedTagIDs: types.SetValueMust(types.Int64Type, excludedTagIDs),
 		Version:        types.Int64Value(int64(msc.Version)),
 	}
 }
@@ -47,6 +54,11 @@ func munkiScriptCheckRequestWithState(data munkiScriptCheck) *goztl.MunkiScriptC
 	tagIDs := make([]int, 0)
 	for _, tagID := range data.TagIDs.Elements() { // nil if null or unknown → no iterations
 		tagIDs = append(tagIDs, int(tagID.(types.Int64).ValueInt64()))
+	}
+
+	excludedTagIDs := make([]int, 0)
+	for _, tagID := range data.ExcludedTagIDs.Elements() { // nil if null or unknown → no iterations
+		excludedTagIDs = append(excludedTagIDs, int(tagID.(types.Int64).ValueInt64()))
 	}
 
 	return &goztl.MunkiScriptCheckRequest{
@@ -60,5 +72,6 @@ func munkiScriptCheckRequestWithState(data munkiScriptCheck) *goztl.MunkiScriptC
 		MinOSVersion:   data.MinOSVersion.ValueString(),
 		MaxOSVersion:   data.MaxOSVersion.ValueString(),
 		TagIDs:         tagIDs,
+		ExcludedTagIDs: excludedTagIDs,
 	}
 }

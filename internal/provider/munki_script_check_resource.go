@@ -115,6 +115,13 @@ func (r *MunkiScriptCheckResource) Schema(ctx context.Context, req resource.Sche
 				Optional:            true,
 				Computed:            true,
 			},
+			"excluded_tag_ids": schema.SetAttribute{
+				Description:         "The IDs of the tags this Munki script check is not scoped to.",
+				MarkdownDescription: "The IDs of the tags this Munki script check is not scoped to.",
+				ElementType:         types.Int64Type,
+				Optional:            true,
+				Computed:            true,
+			},
 			"version": schema.Int64Attribute{
 				Description:         "Version of the Munki script check.",
 				MarkdownDescription: "Version of the Munki script check.",

@@ -16,6 +16,7 @@ func TestAccMunkiScriptCheckDataSource(t *testing.T) {
 	ds1ResourceName := "data.zentral_munki_script_check.check1_by_name"
 	ds2ResourceName := "data.zentral_munki_script_check.check2_by_id"
 	tagResourceName := "zentral_tag.test"
+	excludedTagResourceName := "zentral_tag.test-excluded"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -48,6 +49,8 @@ func TestAccMunkiScriptCheckDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
+						ds1ResourceName, "excluded_tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
 						ds1ResourceName, "version", "1"),
 					// Read by ID, no platforms, no tags
 					resource.TestCheckResourceAttrPair(
@@ -75,6 +78,10 @@ func TestAccMunkiScriptCheckDataSource(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair(
 						ds2ResourceName, "tag_ids.*", tagResourceName, "id"),
 					resource.TestCheckResourceAttr(
+						ds2ResourceName, "excluded_tag_ids.#", "1"),
+					resource.TestCheckTypeSetElemAttrPair(
+						ds2ResourceName, "excluded_tag_ids.*", excludedTagResourceName, "id"),
+					resource.TestCheckResourceAttr(
 						ds2ResourceName, "version", "1"),
 				),
 			},
@@ -94,17 +101,22 @@ resource "zentral_tag" "test" {
   name = %[2]q
 }
 
+resource "zentral_tag" "test-excluded" {
+  name = "%[2]s-excluded"
+}
+
 resource "zentral_munki_script_check" "check2" {
-  name            = %[2]q
-  description     = "Description"
-  type            = "ZSH_BOOL"
-  source          = "echo true"
-  expected_result = "true"
-  arch_amd64      = false
-  arch_arm64      = true
-  min_os_version  = "14"
-  max_os_version  = "15"
-  tag_ids         = [zentral_tag.test.id]
+  name             = %[2]q
+  description      = "Description"
+  type             = "ZSH_BOOL"
+  source           = "echo true"
+  expected_result  = "true"
+  arch_amd64       = false
+  arch_arm64       = true
+  min_os_version   = "14"
+  max_os_version   = "15"
+  tag_ids          = [zentral_tag.test.id]
+  excluded_tag_ids = [zentral_tag.test-excluded.id]
 }
 
 data "zentral_munki_script_check" "check1_by_name" {

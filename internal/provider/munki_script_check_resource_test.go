@@ -13,6 +13,7 @@ func TestAccMunkiScriptCheckResource(t *testing.T) {
 	secondName := acctest.RandString(12)
 	resourceName := "zentral_munki_script_check.test"
 	tagResourceName := "zentral_tag.test"
+	excludedTagResourceName := "zentral_tag.test-excluded"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -42,6 +43,8 @@ func TestAccMunkiScriptCheckResource(t *testing.T) {
 						resourceName, "max_os_version", ""),
 					resource.TestCheckResourceAttr(
 						resourceName, "tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "excluded_tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
 						resourceName, "version", "1"),
 				),
@@ -79,6 +82,10 @@ func TestAccMunkiScriptCheckResource(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair(
 						resourceName, "tag_ids.*", tagResourceName, "id"),
 					resource.TestCheckResourceAttr(
+						resourceName, "excluded_tag_ids.#", "1"),
+					resource.TestCheckTypeSetElemAttrPair(
+						resourceName, "excluded_tag_ids.*", excludedTagResourceName, "id"),
+					resource.TestCheckResourceAttr(
 						resourceName, "version", "2"),
 				),
 			},
@@ -108,17 +115,22 @@ resource "zentral_tag" "test" {
   name = %[1]q
 }
 
+resource "zentral_tag" "test-excluded" {
+  name = "%[1]s-excluded"
+}
+
 resource "zentral_munki_script_check" "test" {
-  name            = %[1]q
-  description     = "Description"
-  type            = "ZSH_INT"
-  source          = "echo 10"
-  expected_result = "10"
-  arch_amd64      = false
-  arch_arm64      = true
-  min_os_version  = "14"
-  max_os_version  = "15"
-  tag_ids         = [zentral_tag.test.id]
+  name             = %[1]q
+  description      = "Description"
+  type             = "ZSH_INT"
+  source           = "echo 10"
+  expected_result  = "10"
+  arch_amd64       = false
+  arch_arm64       = true
+  min_os_version   = "14"
+  max_os_version   = "15"
+  tag_ids          = [zentral_tag.test.id]
+  excluded_tag_ids = [zentral_tag.test-excluded.id]
 }
 `, name)
 }
