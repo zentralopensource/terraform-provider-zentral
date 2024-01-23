@@ -140,6 +140,7 @@ func (r *MonolithRepositoryResource) Schema(ctx context.Context, req resource.Sc
 					"cloudfront_privkey_pem": schema.StringAttribute{
 						Description:         "Cloudfront private key in PEM form.",
 						MarkdownDescription: "Cloudfront private key in PEM form.",
+						Sensitive:           true,
 						Optional:            true,
 						Computed:            true,
 						Default:             stringdefault.StaticString(""),
