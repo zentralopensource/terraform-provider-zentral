@@ -23,4 +23,4 @@ The data source `zentral_monolith_sub_manifest` allows details of a Monolith sub
 ### Read-Only
 
 - `description` (String) Description of the sub manifest.
-- `meta_business_unit_id` (Number) The `ID` of the meta business unit this manifest is restricted to.
+- `meta_business_unit_id` (Number) The `ID` of the meta business unit this sub manifest is restricted to.

@@ -47,8 +47,8 @@ func (d *MonolithSubManifestDataSource) Schema(ctx context.Context, req datasour
 				Computed:            true,
 			},
 			"meta_business_unit_id": schema.Int64Attribute{
-				Description:         "The ID of the meta business unit this manifest is restricted to.",
-				MarkdownDescription: "The `ID` of the meta business unit this manifest is restricted to.",
+				Description:         "The ID of the meta business unit this sub manifest is restricted to.",
+				MarkdownDescription: "The `ID` of the meta business unit this sub manifest is restricted to.",
 				Computed:            true,
 			},
 		},
@@ -99,7 +99,7 @@ func (d *MonolithSubManifestDataSource) ValidateConfig(ctx context.Context, req 
 func (d *MonolithSubManifestDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data monolithSubManifest
 
-	// Read Terraform manifest data into the model
+	// Read Terraform sub manifest data into the model
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
