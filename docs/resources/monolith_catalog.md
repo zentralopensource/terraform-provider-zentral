@@ -18,10 +18,7 @@ The resource `zentral_monolith_catalog` manages Monolith catalogs.
 ### Required
 
 - `name` (String) Name of the catalog.
-
-### Optional
-
-- `priority` (Number) Priority of the catalog.
+- `repository_id` (Number) `ID` of the Monolith repository.
 
 ### Read-Only
 

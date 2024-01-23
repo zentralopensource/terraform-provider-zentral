@@ -6,22 +6,22 @@ import (
 )
 
 type monolithCatalog struct {
-	ID       types.Int64  `tfsdk:"id"`
-	Name     types.String `tfsdk:"name"`
-	Priority types.Int64  `tfsdk:"priority"`
+	ID           types.Int64  `tfsdk:"id"`
+	RepositoryID types.Int64  `tfsdk:"repository_id"`
+	Name         types.String `tfsdk:"name"`
 }
 
 func monolithCatalogForState(mc *goztl.MonolithCatalog) monolithCatalog {
 	return monolithCatalog{
-		ID:       types.Int64Value(int64(mc.ID)),
-		Name:     types.StringValue(mc.Name),
-		Priority: types.Int64Value(int64(mc.Priority)),
+		ID:           types.Int64Value(int64(mc.ID)),
+		RepositoryID: types.Int64Value(int64(mc.RepositoryID)),
+		Name:         types.StringValue(mc.Name),
 	}
 }
 
 func monolithCatalogRequestWithState(data monolithCatalog) *goztl.MonolithCatalogRequest {
 	return &goztl.MonolithCatalogRequest{
-		Name:     data.Name.ValueString(),
-		Priority: int(data.Priority.ValueInt64()),
+		RepositoryID: int(data.RepositoryID.ValueInt64()),
+		Name:         data.Name.ValueString(),
 	}
 }

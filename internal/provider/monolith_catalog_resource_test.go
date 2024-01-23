@@ -12,6 +12,7 @@ func TestAccMonolithCatalogResource(t *testing.T) {
 	firstName := acctest.RandString(12)
 	secondName := acctest.RandString(12)
 	resourceName := "zentral_monolith_catalog.test"
+	rResourceName := "zentral_monolith_repository.test"
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -21,10 +22,10 @@ func TestAccMonolithCatalogResource(t *testing.T) {
 			{
 				Config: testAccMonolithCatalogResourceConfigBare(firstName),
 				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair(
+						resourceName, "repository_id", rResourceName, "id"),
 					resource.TestCheckResourceAttr(
 						resourceName, "name", firstName),
-					resource.TestCheckResourceAttr(
-						resourceName, "priority", "0"),
 				),
 			},
 			// ImportState
@@ -37,10 +38,10 @@ func TestAccMonolithCatalogResource(t *testing.T) {
 			{
 				Config: testAccMonolithCatalogResourceConfigFull(secondName),
 				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrPair(
+						resourceName, "repository_id", rResourceName, "id"),
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
-					resource.TestCheckResourceAttr(
-						resourceName, "priority", "17"),
 				),
 			},
 			// ImportState
@@ -55,17 +56,28 @@ func TestAccMonolithCatalogResource(t *testing.T) {
 
 func testAccMonolithCatalogResourceConfigBare(name string) string {
 	return fmt.Sprintf(`
+resource "zentral_monolith_repository" "test" {
+  name    = %[1]q
+  backend = "VIRTUAL"
+}
+
 resource "zentral_monolith_catalog" "test" {
-  name = %[1]q
+  repository_id = zentral_monolith_repository.test.id
+  name          = %[1]q
 }
 `, name)
 }
 
 func testAccMonolithCatalogResourceConfigFull(name string) string {
 	return fmt.Sprintf(`
+resource "zentral_monolith_repository" "test" {
+  name    = %[1]q
+  backend = "VIRTUAL"
+}
+
 resource "zentral_monolith_catalog" "test" {
+  repository_id = zentral_monolith_repository.test.id
   name     = %[1]q
-  priority = 17
 }
 `, name)
 }

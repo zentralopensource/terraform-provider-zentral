@@ -72,8 +72,15 @@ resource "zentral_monolith_manifest" "test" {
   meta_business_unit_id = zentral_meta_business_unit.test.id
 }
 
+resource "zentral_monolith_repository" "test" {
+  name                  = %[1]q
+  meta_business_unit_id = zentral_meta_business_unit.test.id
+  backend               = "VIRTUAL"
+}
+
 resource "zentral_monolith_catalog" "test" {
-  name = %[1]q
+  repository_id = zentral_monolith_repository.test.id
+  name          = %[1]q
 }
 
 resource "zentral_monolith_manifest_catalog" "test" {
@@ -94,8 +101,15 @@ resource "zentral_monolith_manifest" "test" {
   meta_business_unit_id = zentral_meta_business_unit.test.id
 }
 
+resource "zentral_monolith_repository" "test" {
+  name                  = %[1]q
+  meta_business_unit_id = zentral_meta_business_unit.test.id
+  backend               = "VIRTUAL"
+}
+
 resource "zentral_monolith_catalog" "test" {
-  name = %[1]q
+  repository_id = zentral_monolith_repository.test.id
+  name          = %[1]q
 }
 
 resource "zentral_tag" "test" {

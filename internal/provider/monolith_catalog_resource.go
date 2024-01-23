@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -44,17 +43,15 @@ func (r *MonolithCatalogResource) Schema(ctx context.Context, req resource.Schem
 					int64planmodifier.UseStateForUnknown(),
 				},
 			},
+			"repository_id": schema.Int64Attribute{
+				Description:         "ID of the Monolith repository.",
+				MarkdownDescription: "`ID` of the Monolith repository.",
+				Required:            true,
+			},
 			"name": schema.StringAttribute{
 				Description:         "Name of the catalog.",
 				MarkdownDescription: "Name of the catalog.",
 				Required:            true,
-			},
-			"priority": schema.Int64Attribute{
-				Description:         "Priority of the catalog.",
-				MarkdownDescription: "Priority of the catalog.",
-				Optional:            true,
-				Computed:            true,
-				Default:             int64default.StaticInt64(0),
 			},
 		},
 	}

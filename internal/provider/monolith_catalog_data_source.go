@@ -36,15 +36,15 @@ func (d *MonolithCatalogDataSource) Schema(ctx context.Context, req datasource.S
 				MarkdownDescription: "`ID` of the Monolith catalog.",
 				Optional:            true,
 			},
+			"repository_id": schema.Int64Attribute{
+				Description:         "ID of the Monolith repository.",
+				MarkdownDescription: "`ID` of the Monolith repository.",
+				Computed:            true,
+			},
 			"name": schema.StringAttribute{
 				Description:         "Name of the catalog.",
 				MarkdownDescription: "Name of the catalog.",
 				Optional:            true,
-			},
-			"priority": schema.Int64Attribute{
-				Description:         "Priority of the catalog.",
-				MarkdownDescription: "Priority of the catalog.",
-				Computed:            true,
 			},
 		},
 	}
