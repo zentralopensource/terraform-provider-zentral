@@ -36,7 +36,7 @@ Read-Only:
 - `bucket` (String) Name of the S3 bucket.
 - `cloudfront_domain` (String) Cloudfront domain.
 - `cloudfront_key_id` (String) Cloudfront key ID.
-- `cloudfront_privkey_pem` (String) Cloudfront private key in PEM form.
+- `cloudfront_privkey_pem` (String, Sensitive) Cloudfront private key in PEM form.
 - `endpoint_url` (String) S3 endpoint URL.
 - `prefix` (String) Prefix of the Munki repository in the S3 bucket.
 - `region_name` (String) Name of the S3 bucket region.
