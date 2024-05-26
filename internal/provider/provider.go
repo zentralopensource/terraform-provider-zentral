@@ -141,6 +141,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewMonolithEnrollmentResource,
 		NewMonolithManifestResource,
 		NewMonolithManifestCatalogResource,
+		NewMonolithManifestEnrollmentPackageResource,
 		NewMonolithManifestSubManifestResource,
 		NewMonolithRepositoryResource,
 		NewMonolithSubManifestResource,
