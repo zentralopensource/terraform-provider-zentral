@@ -31,9 +31,9 @@ func TestAccSantaRuleDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						dataSourceName, "policy", "BLOCKLIST"),
 					resource.TestCheckResourceAttr(
-						dataSourceName, "target_type", "CERTIFICATE"),
+						dataSourceName, "target_type", "CDHASH"),
 					resource.TestCheckResourceAttr(
-						dataSourceName, "target_identifier", "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409a785e0c65409e3bef9ad8887"),
+						dataSourceName, "target_identifier", "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409"),
 					resource.TestCheckResourceAttr(
 						dataSourceName, "description", "description"),
 					resource.TestCheckResourceAttr(
@@ -109,8 +109,8 @@ resource "zentral_tag" "test2" {
 resource "zentral_santa_rule" "test" {
   configuration_id        = zentral_santa_configuration.test.id
   policy                  = "BLOCKLIST"
-  target_type             = "CERTIFICATE"
-  target_identifier       = "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409a785e0c65409e3bef9ad8887"
+  target_type             = "CDHASH"
+  target_identifier       = "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409"
   description             = "description"
   custom_message          = "custom message"
   primary_users           = ["un", "deux"]

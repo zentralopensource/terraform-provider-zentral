@@ -30,9 +30,9 @@ func TestAccSantaRuleResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "policy", "ALLOWLIST"),
 					resource.TestCheckResourceAttr(
-						resourceName, "target_type", "BINARY"),
+						resourceName, "target_type", "CDHASH"),
 					resource.TestCheckResourceAttr(
-						resourceName, "target_identifier", "9f3e7b21a0a745297dd906dad4a4a4637bdec066cdf331b457230aa32fe68b4b"),
+						resourceName, "target_identifier", "9f3e7b21a0a745297dd906dad4a4a4637bdec066"),
 					resource.TestCheckResourceAttr(
 						resourceName, "description", ""),
 					resource.TestCheckResourceAttr(
@@ -134,8 +134,8 @@ resource "zentral_santa_configuration" "test" {
 resource "zentral_santa_rule" "test" {
   configuration_id  = zentral_santa_configuration.test.id
   policy            = "ALLOWLIST"
-  target_type       = "BINARY"
-  target_identifier = "9f3e7b21a0a745297dd906dad4a4a4637bdec066cdf331b457230aa32fe68b4b"
+  target_type       = "CDHASH"
+  target_identifier = "9f3e7b21a0a745297dd906dad4a4a4637bdec066"
 }
 `, name)
 }
