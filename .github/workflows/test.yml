@@ -1,3 +1,4 @@
+---
 # Terraform Provider testing workflow.
 name: Tests
 
