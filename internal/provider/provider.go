@@ -173,6 +173,7 @@ func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewMDMFileVaultConfigDataSource,
 		NewMDMPushCertificateDataSource,
 		NewMDMRecoveryPasswordConfigDataSource,
+		NewMDMSCEPConfigDataSource,
 		NewMDMSoftwareUpdateEnforcementDataSource,
 		NewMonolithCatalogDataSource,
 		NewMonolithConditionDataSource,
