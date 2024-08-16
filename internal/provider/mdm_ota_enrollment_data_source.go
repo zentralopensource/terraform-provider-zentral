@@ -57,9 +57,9 @@ func (d *MDMOTAEnrollmentDataSource) Schema(ctx context.Context, req datasource.
 				MarkdownDescription: "`ID` of the MDM push certificate linked to the OTA enrollment.",
 				Computed:            true,
 			},
-			"realm_id": schema.Int64Attribute{
-				Description:         "ID of the identity realm linked to the OTA enrollment.",
-				MarkdownDescription: "`ID` of the identity realm linked to the OTA enrollment.",
+			"realm_uuid": schema.StringAttribute{
+				Description:         "UUID of the identity realm linked to the OTA enrollment.",
+				MarkdownDescription: "`UUID` of the identity realm linked to the OTA enrollment.",
 				Computed:            true,
 			},
 			"scep_config_id": schema.Int64Attribute{

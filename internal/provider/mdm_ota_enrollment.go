@@ -12,7 +12,7 @@ type mdmOTAEnrollment struct {
 	DisplayName       types.String `tfsdk:"display_name"`
 	BlueprintID       types.Int64  `tfsdk:"blueprint_id"`
 	PushCertificateID types.Int64  `tfsdk:"push_certificate_id"`
-	RealmID           types.Int64  `tfsdk:"realm_id"`
+	RealmUUID         types.String `tfsdk:"realm_uuid"`
 	SCEPConfigID      types.Int64  `tfsdk:"scep_config_id"`
 	SCEPVerification  types.Bool   `tfsdk:"scep_verification"`
 	// enrollment secret
@@ -32,11 +32,11 @@ func mdmOTAEnrollmentForState(moe *goztl.MDMOTAEnrollment) mdmOTAEnrollment {
 		blueprintID = types.Int64Null()
 	}
 
-	var realmID types.Int64
-	if moe.RealmID != nil {
-		realmID = types.Int64Value(int64(*moe.RealmID))
+	var realmUUID types.String
+	if moe.RealmUUID != nil {
+		realmUUID = types.StringValue(*moe.RealmUUID)
 	} else {
-		realmID = types.Int64Null()
+		realmUUID = types.StringNull()
 	}
 
 	tagIDs := make([]attr.Value, 0)
@@ -67,7 +67,7 @@ func mdmOTAEnrollmentForState(moe *goztl.MDMOTAEnrollment) mdmOTAEnrollment {
 		DisplayName:       types.StringValue(moe.DisplayName),
 		BlueprintID:       blueprintID,
 		PushCertificateID: types.Int64Value(int64(moe.PushCertificateID)),
-		RealmID:           realmID,
+		RealmUUID:         realmUUID,
 		SCEPConfigID:      types.Int64Value(int64(moe.SCEPConfigID)),
 		SCEPVerification:  types.BoolValue(moe.SCEPVerification),
 		// enrollment secret
@@ -86,9 +86,9 @@ func mdmOTAEnrollmentRequestWithState(data mdmOTAEnrollment) *goztl.MDMOTAEnroll
 		bpID = goztl.Int(int(data.BlueprintID.ValueInt64()))
 	}
 
-	var rID *int
-	if !data.RealmID.IsNull() {
-		rID = goztl.Int(int(data.RealmID.ValueInt64()))
+	var rUUID *string
+	if !data.RealmUUID.IsNull() {
+		rUUID = goztl.String(data.RealmUUID.ValueString())
 	}
 
 	var dn *string
@@ -116,7 +116,7 @@ func mdmOTAEnrollmentRequestWithState(data mdmOTAEnrollment) *goztl.MDMOTAEnroll
 		DisplayName:       dn,
 		BlueprintID:       bpID,
 		PushCertificateID: int(data.PushCertificateID.ValueInt64()),
-		RealmID:           rID,
+		RealmUUID:         rUUID,
 		SCEPConfigID:      int(data.SCEPConfigID.ValueInt64()),
 		SCEPVerification:  data.SCEPVerification.ValueBool(),
 		Secret: goztl.EnrollmentSecretRequest{

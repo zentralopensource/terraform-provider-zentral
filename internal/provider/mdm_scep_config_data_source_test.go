@@ -57,7 +57,7 @@ func TestAccMDMSCEPConfigDataSource(t *testing.T) {
 	})
 }
 
-// TODO: hard coded values of a provisioned push certificate
+// TODO: hard coded values of a provisioned MDM SCEP config
 // on the server used for the integration tests
 func testAccMDMSCEPConfigDataSourceConfig() string {
 	return `

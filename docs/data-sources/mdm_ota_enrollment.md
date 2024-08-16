@@ -27,7 +27,7 @@ The data source `zentral_mdm_ota_enrollment` allows details of a MDM OTA enrollm
 - `meta_business_unit_id` (Number) The `ID` of the meta business unit the machine will be assigned to at enrollment.
 - `push_certificate_id` (Number) `ID` of the MDM push certificate linked to the OTA enrollment.
 - `quota` (Number) The number of time the enrollment can be used.
-- `realm_id` (Number) `ID` of the identity realm linked to the OTA enrollment.
+- `realm_uuid` (String) `UUID` of the identity realm linked to the OTA enrollment.
 - `scep_config_id` (Number) `ID` of the MDM SCEP configuration linked to the OTA enrollment.
 - `scep_verification` (Boolean) Indicates if a SCEP verification is expected during the enrollment.
 - `secret` (String) Enrollment secret.

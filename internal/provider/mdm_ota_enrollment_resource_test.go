@@ -14,6 +14,7 @@ func TestAccMDMOTAEnrollmentResource(t *testing.T) {
 	resourceName := "zentral_mdm_ota_enrollment.test"
 	bpResourceName := "zentral_mdm_blueprint.test"
 	pcResourceName := "data.zentral_mdm_push_certificate.test"
+	rResourceName := "data.zentral_realm.test"
 	scResouceName := "data.zentral_mdm_scep_config.test"
 	mbuResourceName := "zentral_meta_business_unit.test"
 	tagResourceName := "zentral_tag.test"
@@ -35,7 +36,7 @@ func TestAccMDMOTAEnrollmentResource(t *testing.T) {
 					resource.TestCheckResourceAttrPair(
 						resourceName, "push_certificate_id", pcResourceName, "id"),
 					resource.TestCheckNoResourceAttr(
-						resourceName, "realm_id"),
+						resourceName, "realm_uuid"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "scep_config_id", scResouceName, "id"),
 					resource.TestCheckResourceAttr(
@@ -70,8 +71,8 @@ func TestAccMDMOTAEnrollmentResource(t *testing.T) {
 						resourceName, "blueprint_id", bpResourceName, "id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "push_certificate_id", pcResourceName, "id"),
-					resource.TestCheckNoResourceAttr(
-						resourceName, "realm_id"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "realm_uuid", rResourceName, "uuid"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "scep_config_id", scResouceName, "id"),
 					resource.TestCheckResourceAttr(
@@ -149,6 +150,11 @@ data "zentral_mdm_push_certificate" "test" {
 }
 
 # provisioned resource on the integration server
+data "zentral_realm" "test" {
+  name = "TF provider GitHub"
+}
+
+# provisioned resource on the integration server
 data "zentral_mdm_scep_config" "test" {
   name = "TF provider GitHub"
 }
@@ -167,7 +173,7 @@ resource "zentral_mdm_ota_enrollment" "test" {
   display_name          = %[1]q
   blueprint_id          = zentral_mdm_blueprint.test.id
   push_certificate_id   = data.zentral_mdm_push_certificate.test.id
-  # TODO Add realm_id when implemented
+  realm_uuid            = data.zentral_realm.test.uuid
   scep_config_id        = data.zentral_mdm_scep_config.test.id
   scep_verification     = true
   meta_business_unit_id = zentral_meta_business_unit.test.id

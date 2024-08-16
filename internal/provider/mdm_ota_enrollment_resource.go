@@ -69,9 +69,9 @@ func (r *MDMOTAEnrollmentResource) Schema(ctx context.Context, req resource.Sche
 				MarkdownDescription: "`ID` of the MDM push certificate linked to the OTA enrollment.",
 				Required:            true,
 			},
-			"realm_id": schema.Int64Attribute{
-				Description:         "ID of the identity realm linked to the OTA enrollment.",
-				MarkdownDescription: "`ID` of the identity realm linked to the OTA enrollment.",
+			"realm_uuid": schema.StringAttribute{
+				Description:         "UUID of the identity realm linked to the OTA enrollment.",
+				MarkdownDescription: "`UUID` of the identity realm linked to the OTA enrollment.",
 				Optional:            true,
 				// not Computed, because it triggers a foreign key error on the server with PK = 0
 			},

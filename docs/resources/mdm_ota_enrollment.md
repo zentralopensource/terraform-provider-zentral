@@ -27,7 +27,7 @@ The resource `zentral_mdm_ota_enrollment` manages MDM OTA enrollments.
 - `blueprint_id` (Number) `ID` of the MDM blueprint linked to the OTA enrollment.
 - `display_name` (String) Name of the MDM OTA enrollment as displayed on the device.
 - `quota` (Number) The number of time the enrollment can be used.
-- `realm_id` (Number) `ID` of the identity realm linked to the OTA enrollment.
+- `realm_uuid` (String) `UUID` of the identity realm linked to the OTA enrollment.
 - `scep_verification` (Boolean) Indicates if a SCEP verification is expected during the enrollment.
 - `serial_numbers` (Set of String) The serial numbers the enrollment is restricted to.
 - `tag_ids` (Set of Number) The `ID`s of the tags that the machine will get at enrollment.
