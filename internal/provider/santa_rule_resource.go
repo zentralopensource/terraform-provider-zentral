@@ -63,16 +63,16 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				},
 			},
 			"target_type": schema.StringAttribute{
-				Description:         "Target type. Valid values are BINARY, BUNDLE, CDHASH, CERTIFICATE, SIGNINGID and TEAMID.",
-				MarkdownDescription: "Target type. Valid values are `BINARY`, `BUNDLE`, `CDHASH`, `CERTIFICATE`, `SIGNINGID` and `TEAMID`.",
+				Description:         "Target type. Valid values are BINARY, CDHASH, CERTIFICATE, SIGNINGID and TEAMID.",
+				MarkdownDescription: "Target type. Valid values are `BINARY`, `CDHASH`, `CERTIFICATE`, `SIGNINGID` and `TEAMID`.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{"BINARY", "BUNDLE", "CDHASH", "CERTIFICATE", "SIGNINGID", "TEAMID"}...),
+					stringvalidator.OneOf([]string{"BINARY", "CDHASH", "CERTIFICATE", "SIGNINGID", "TEAMID"}...),
 				},
 			},
 			"target_identifier": schema.StringAttribute{
-				Description:         "Target identifier: binary, bundle, certificate sha256 or team ID.",
-				MarkdownDescription: "Target identifier: binary, bundle, certificate sha256 or team ID.",
+				Description:         "Target identifier: binary, certificate sha256, signing ID or team ID.",
+				MarkdownDescription: "Target identifier: binary, certificate sha256, signing ID or team ID.",
 				Required:            true,
 			},
 			"description": schema.StringAttribute{

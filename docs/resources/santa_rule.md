@@ -19,8 +19,8 @@ The resource `zentral_santa_rule` manages Santa rules.
 
 - `configuration_id` (Number) `ID` of the Santa configuration.
 - `policy` (String) Policy. Valid values are `ALLOWLIST`, `BLOCKLIST`, `SILENT_BLOCKLIST` and `ALLOWLIST_COMPILER`.
-- `target_identifier` (String) Target identifier: binary, bundle, certificate sha256 or team ID.
-- `target_type` (String) Target type. Valid values are `BINARY`, `BUNDLE`, `CDHASH`, `CERTIFICATE`, `SIGNINGID` and `TEAMID`.
+- `target_identifier` (String) Target identifier: binary, certificate sha256, signing ID or team ID.
+- `target_type` (String) Target type. Valid values are `BINARY`, `CDHASH`, `CERTIFICATE`, `SIGNINGID` and `TEAMID`.
 
 ### Optional
 
