@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	tfMonolithS3Backend      string = "S3"
+	tfMonolithAzureBackend   string = "AZURE"
+	tfMonolithS3Backend             = "S3"
 	tfMonolithVirtualBackend        = "VIRTUAL"
 )
 
@@ -16,7 +17,17 @@ type monolithRepository struct {
 	Name               types.String `tfsdk:"name"`
 	MetaBusinessUnitID types.Int64  `tfsdk:"meta_business_unit_id"`
 	Backend            types.String `tfsdk:"backend"`
+	Azure              types.Object `tfsdk:"azure"`
 	S3                 types.Object `tfsdk:"s3"`
+}
+
+var azureAttrTypes = map[string]attr.Type{
+	"storage_account": types.StringType,
+	"container":       types.StringType,
+	"prefix":          types.StringType,
+	"client_id":       types.StringType,
+	"tenant_id":       types.StringType,
+	"client_secret":   types.StringType,
 }
 
 var s3AttrTypes = map[string]attr.Type{
@@ -39,6 +50,23 @@ func monolithRepositoryForState(mr *goztl.MonolithRepository) monolithRepository
 		mbu = types.Int64Value(int64(*mr.MetaBusinessUnitID))
 	} else {
 		mbu = types.Int64Null()
+	}
+
+	var az types.Object
+	if mr.Azure != nil {
+		az = types.ObjectValueMust(
+			azureAttrTypes,
+			map[string]attr.Value{
+				"storage_account": types.StringValue(mr.Azure.StorageAccount),
+				"container":       types.StringValue(mr.Azure.Container),
+				"prefix":          types.StringValue(mr.Azure.Prefix),
+				"client_id":       types.StringValue(mr.Azure.ClientID),
+				"tenant_id":       types.StringValue(mr.Azure.TenantID),
+				"client_secret":   types.StringValue(mr.Azure.ClientSecret),
+			},
+		)
+	} else {
+		az = types.ObjectNull(azureAttrTypes)
 	}
 
 	var s3 types.Object
@@ -68,6 +96,7 @@ func monolithRepositoryForState(mr *goztl.MonolithRepository) monolithRepository
 		Name:               types.StringValue(mr.Name),
 		MetaBusinessUnitID: mbu,
 		Backend:            types.StringValue(mr.Backend),
+		Azure:              az,
 		S3:                 s3,
 	}
 }
@@ -82,6 +111,21 @@ func monolithRepositoryRequestWithState(data monolithRepository) *goztl.Monolith
 		Name:               data.Name.ValueString(),
 		MetaBusinessUnitID: mbu,
 		Backend:            data.Backend.ValueString(),
+	}
+
+	if !data.Azure.IsNull() {
+		azMap := data.Azure.Attributes()
+		if azMap != nil {
+			azBackend := &goztl.MonolithAzureBackend{
+				StorageAccount: azMap["storage_account"].(types.String).ValueString(),
+				Container:      azMap["container"].(types.String).ValueString(),
+				Prefix:         azMap["prefix"].(types.String).ValueString(),
+				ClientID:       azMap["client_id"].(types.String).ValueString(),
+				TenantID:       azMap["tenant_id"].(types.String).ValueString(),
+				ClientSecret:   azMap["client_secret"].(types.String).ValueString(),
+			}
+			req.Azure = azBackend
+		}
 	}
 
 	if !data.S3.IsNull() {

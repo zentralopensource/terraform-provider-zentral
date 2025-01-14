@@ -61,8 +61,54 @@ func (r *MonolithRepositoryResource) Schema(ctx context.Context, req resource.Sc
 				MarkdownDescription: "Repository backend.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{tfMonolithS3Backend, tfMonolithVirtualBackend}...),
+					stringvalidator.OneOf([]string{tfMonolithAzureBackend, tfMonolithS3Backend, tfMonolithVirtualBackend}...),
 				},
+			},
+			"azure": schema.SingleNestedAttribute{
+				Description:         "Azure Blob Storage backend parameters.",
+				MarkdownDescription: "Azure Blob Storage backend parameters.",
+				Attributes: map[string]schema.Attribute{
+					"storage_account": schema.StringAttribute{
+						Description:         "Name of the storage account.",
+						MarkdownDescription: "Name of the storage account.",
+						Required:            true,
+					},
+					"container": schema.StringAttribute{
+						Description:         "Name of the blob container.",
+						MarkdownDescription: "Name of the blob container.",
+						Required:            true,
+					},
+					"prefix": schema.StringAttribute{
+						Description:         "Prefix of the Munki repository in the container.",
+						MarkdownDescription: "Prefix of the Munki repository in the container.",
+						Optional:            true,
+						Computed:            true,
+						Default:             stringdefault.StaticString(""),
+					},
+					"client_id": schema.StringAttribute{
+						Description:         "Client ID of the Azure app registration.",
+						MarkdownDescription: "Client ID of the Azure app registration.",
+						Optional:            true,
+						Computed:            true,
+						Default:             stringdefault.StaticString(""),
+					},
+					"tenant_id": schema.StringAttribute{
+						Description:         "Azure tenant ID.",
+						MarkdownDescription: "Azure tenant ID.",
+						Optional:            true,
+						Computed:            true,
+						Default:             stringdefault.StaticString(""),
+					},
+					"client_secret": schema.StringAttribute{
+						Description:         "Client secret of the Azure app registration.",
+						MarkdownDescription: "Client secret of the Azure app registration.",
+						Sensitive:           true,
+						Optional:            true,
+						Computed:            true,
+						Default:             stringdefault.StaticString(""),
+					},
+				},
+				Optional: true,
 			},
 			"s3": schema.SingleNestedAttribute{
 				Description:         "S3 backend parameters.",

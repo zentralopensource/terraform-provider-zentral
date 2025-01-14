@@ -51,6 +51,43 @@ func (d *MonolithRepositoryDataSource) Schema(ctx context.Context, req datasourc
 				MarkdownDescription: "Repository backend.",
 				Computed:            true,
 			},
+			"azure": schema.SingleNestedAttribute{
+				Description:         "Azure Blob Storage backend parameters.",
+				MarkdownDescription: "Azure Blob Storage backend parameters.",
+				Attributes: map[string]schema.Attribute{
+					"storage_account": schema.StringAttribute{
+						Description:         "Name of the storage account.",
+						MarkdownDescription: "Name of the storage account.",
+						Computed:            true,
+					},
+					"container": schema.StringAttribute{
+						Description:         "Name of the blob container.",
+						MarkdownDescription: "Name of the blob container.",
+						Computed:            true,
+					},
+					"prefix": schema.StringAttribute{
+						Description:         "Prefix of the Munki repository in the container.",
+						MarkdownDescription: "Prefix of the Munki repository in the container.",
+						Computed:            true,
+					},
+					"client_id": schema.StringAttribute{
+						Description:         "Client ID of the Azure app registration.",
+						MarkdownDescription: "Client ID of the Azure app registration.",
+						Computed:            true,
+					},
+					"tenant_id": schema.StringAttribute{
+						Description:         "Azure tenant ID.",
+						MarkdownDescription: "Azure tenant ID.",
+						Computed:            true,
+					},
+					"client_secret": schema.StringAttribute{
+						Description:         "Client secret of the Azure app registration.",
+						MarkdownDescription: "Client secret of the Azure app registration.",
+						Computed:            true,
+					},
+				},
+				Optional: true,
+			},
 			"s3": schema.SingleNestedAttribute{
 				Description:         "S3 backend parameters.",
 				MarkdownDescription: "S3 backend parameters.",

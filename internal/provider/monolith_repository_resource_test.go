@@ -52,7 +52,37 @@ func TestAccMonolithRepositoryResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccMonolithRepositoryResourceConfigFull(secondName),
+				Config: testAccMonolithRepositoryResourceConfigAzure(secondName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "name", secondName),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "meta_business_unit_id", mbuResourceName, "id"),
+					resource.TestCheckResourceAttr(
+						resourceName, "backend", "AZURE"),
+					resource.TestCheckResourceAttr(
+						resourceName, "azure.storage_account", "yolo"),
+					resource.TestCheckResourceAttr(
+						resourceName, "azure.container", "fomo"),
+					resource.TestCheckResourceAttr(
+						resourceName, "azure.prefix", "prefix"),
+					resource.TestCheckResourceAttr(
+						resourceName, "azure.client_id", "de094c71-61cb-4646-a8f7-bc4900a7040a"),
+					resource.TestCheckResourceAttr(
+						resourceName, "azure.tenant_id", "5237b576-d8b2-447a-a84b-c67b9c659928"),
+					resource.TestCheckResourceAttr(
+						resourceName, "azure.client_secret", "1da65ea6bf7d397c0776fbea04aca2cb"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update and Read
+			{
+				Config: testAccMonolithRepositoryResourceConfigS3(secondName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -103,7 +133,29 @@ resource "zentral_monolith_repository" "test" {
 `, name)
 }
 
-func testAccMonolithRepositoryResourceConfigFull(name string) string {
+func testAccMonolithRepositoryResourceConfigAzure(name string) string {
+	return fmt.Sprintf(`
+resource "zentral_meta_business_unit" "test" {
+  name = %[1]q
+}
+
+resource "zentral_monolith_repository" "test" {
+  name                  = %[1]q
+  meta_business_unit_id = zentral_meta_business_unit.test.id
+  backend               = "AZURE"
+  azure = {
+    storage_account = "yolo",
+    container       = "fomo",
+    prefix          = "prefix",
+    client_id       = "de094c71-61cb-4646-a8f7-bc4900a7040a",
+    tenant_id       = "5237b576-d8b2-447a-a84b-c67b9c659928",
+    client_secret   = "1da65ea6bf7d397c0776fbea04aca2cb",
+  }
+}
+`, name)
+}
+
+func testAccMonolithRepositoryResourceConfigS3(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_meta_business_unit" "test" {
   name = %[1]q

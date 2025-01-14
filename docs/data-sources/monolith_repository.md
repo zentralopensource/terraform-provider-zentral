@@ -17,6 +17,7 @@ The data source `zentral_monolith_repository` allows details of a Monolith repos
 
 ### Optional
 
+- `azure` (Attributes) Azure Blob Storage backend parameters. (see [below for nested schema](#nestedatt--azure))
 - `id` (Number) `ID` of the repository.
 - `name` (String) Name of the repository.
 
@@ -25,6 +26,19 @@ The data source `zentral_monolith_repository` allows details of a Monolith repos
 - `backend` (String) Repository backend.
 - `meta_business_unit_id` (Number) The `ID` of the meta business unit this repository is restricted to.
 - `s3` (Attributes) S3 backend parameters. (see [below for nested schema](#nestedatt--s3))
+
+<a id="nestedatt--azure"></a>
+### Nested Schema for `azure`
+
+Read-Only:
+
+- `client_id` (String) Client ID of the Azure app registration.
+- `client_secret` (String) Client secret of the Azure app registration.
+- `container` (String) Name of the blob container.
+- `prefix` (String) Prefix of the Munki repository in the container.
+- `storage_account` (String) Name of the storage account.
+- `tenant_id` (String) Azure tenant ID.
+
 
 <a id="nestedatt--s3"></a>
 ### Nested Schema for `s3`
