@@ -61,7 +61,16 @@ func (r *MDMArtifactResource) Schema(ctx context.Context, req resource.SchemaReq
 				MarkdownDescription: "Type of the artifact.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{"Enterprise App", "Profile", "Store App"}...),
+					stringvalidator.OneOf([]string{
+						"Activation",
+						"Asset",
+						"Configuration",
+						"Data Asset",
+						"Enterprise App",
+						"Configuration (manual)",
+						"Profile",
+						"Store App",
+					}...),
 				},
 			},
 			"channel": schema.StringAttribute{
