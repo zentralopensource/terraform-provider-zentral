@@ -55,12 +55,19 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				Required:            true,
 			},
 			"policy": schema.StringAttribute{
-				Description:         "Policy. Valid values are ALLOWLIST, BLOCKLIST, SILENT_BLOCKLIST and ALLOWLIST_COMPILER.",
-				MarkdownDescription: "Policy. Valid values are `ALLOWLIST`, `BLOCKLIST`, `SILENT_BLOCKLIST` and `ALLOWLIST_COMPILER`.",
+				Description:         "Policy. Valid values are ALLOWLIST, ALLOWLIST_COMPILER, BLOCKLIST, CEL, and SILENT_BLOCKLIST.",
+				MarkdownDescription: "Policy. Valid values are `ALLOWLIST`, `ALLOWLIST_COMPILER`, `BLOCKLIST`, `CEL`, and `SILENT_BLOCKLIST`.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{tfSantaAllowlist, tfSantaBlocklist, tfSantaSilentBlocklist, tfSantaAllowlistCompiler}...),
+					stringvalidator.OneOf([]string{tfSantaAllowlist, tfSantaAllowlistCompiler, tfSantaCEL, tfSantaBlocklist, tfSantaSilentBlocklist}...),
 				},
+			},
+			"cel_expr": schema.StringAttribute{
+				Description:         "CEL expression. Only valid for `CEL` policy rule.",
+				MarkdownDescription: "CEL expression. Only valid for `CEL` policy rule.",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString(""),
 			},
 			"target_type": schema.StringAttribute{
 				Description:         "Target type. Valid values are BINARY, CDHASH, CERTIFICATE, SIGNINGID and TEAMID.",

@@ -11,16 +11,19 @@ const (
 	ztlSantaBlocklist                = 2
 	ztlSantaSilentBlocklist          = 3
 	ztlSantaAllowlistCompiler        = 5
+	ztlSantaCEL                      = 9
 	tfSantaAllowlist          string = "ALLOWLIST"
 	tfSantaBlocklist                 = "BLOCKLIST"
 	tfSantaSilentBlocklist           = "SILENT_BLOCKLIST"
 	tfSantaAllowlistCompiler         = "ALLOWLIST_COMPILER"
+	tfSantaCEL                       = "CEL"
 )
 
 type santaRule struct {
 	ID                    types.Int64  `tfsdk:"id"`
 	ConfigurationID       types.Int64  `tfsdk:"configuration_id"`
 	Policy                types.String `tfsdk:"policy"`
+	CELExpr               types.String `tfsdk:"cel_expr"`
 	TargetType            types.String `tfsdk:"target_type"`
 	TargetIdentifier      types.String `tfsdk:"target_identifier"`
 	Description           types.String `tfsdk:"description"`
@@ -46,6 +49,8 @@ func santaRuleForState(sr *goztl.SantaRule) santaRule {
 		policy = tfSantaSilentBlocklist
 	case ztlSantaAllowlistCompiler:
 		policy = tfSantaAllowlistCompiler
+	case ztlSantaCEL:
+		policy = tfSantaCEL
 	default:
 		panic("Unknown Santa rule policy")
 	}
@@ -91,6 +96,7 @@ func santaRuleForState(sr *goztl.SantaRule) santaRule {
 		ID:                    types.Int64Value(int64(sr.ID)),
 		ConfigurationID:       types.Int64Value(int64(sr.ConfigurationID)),
 		Policy:                types.StringValue(policy),
+		CELExpr:               types.StringValue(sr.CELExpr),
 		TargetType:            types.StringValue(sr.TargetType),
 		TargetIdentifier:      types.StringValue(sr.TargetIdentifier),
 		Description:           types.StringValue(sr.Description),
@@ -117,6 +123,8 @@ func santaRuleRequestWithState(data santaRule) *goztl.SantaRuleRequest {
 		policy = ztlSantaSilentBlocklist
 	case types.StringValue(tfSantaAllowlistCompiler):
 		policy = ztlSantaAllowlistCompiler
+	case types.StringValue(tfSantaCEL):
+		policy = ztlSantaCEL
 	default:
 		panic("Unknown Santa rule policy")
 	}
@@ -154,6 +162,7 @@ func santaRuleRequestWithState(data santaRule) *goztl.SantaRuleRequest {
 	return &goztl.SantaRuleRequest{
 		ConfigurationID:       int(data.ConfigurationID.ValueInt64()),
 		Policy:                policy,
+		CELExpr:               data.CELExpr.ValueString(),
 		TargetType:            data.TargetType.ValueString(),
 		TargetIdentifier:      data.TargetIdentifier.ValueString(),
 		Description:           data.Description.ValueString(),

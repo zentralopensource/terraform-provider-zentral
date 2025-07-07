@@ -21,6 +21,7 @@ The data source `zentral_santa_rule` allows details of a Santa rule to be retrie
 
 ### Read-Only
 
+- `cel_expr` (String) CEL expression.
 - `configuration_id` (Number) `ID` of the Santa configuration.
 - `custom_message` (String) Custom message displayed in the popover when a binary is blocked.
 - `description` (String) Description of the rule. Only displayed in the Zentral GUI.

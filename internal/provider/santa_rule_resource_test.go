@@ -30,6 +30,8 @@ func TestAccSantaRuleResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "policy", "ALLOWLIST"),
 					resource.TestCheckResourceAttr(
+						resourceName, "cel_expr", ""),
+					resource.TestCheckResourceAttr(
 						resourceName, "target_type", "CDHASH"),
 					resource.TestCheckResourceAttr(
 						resourceName, "target_identifier", "9f3e7b21a0a745297dd906dad4a4a4637bdec066"),
@@ -68,7 +70,9 @@ func TestAccSantaRuleResource(t *testing.T) {
 					resource.TestCheckResourceAttrPair(
 						resourceName, "configuration_id", cfgResourceName, "id"),
 					resource.TestCheckResourceAttr(
-						resourceName, "policy", "BLOCKLIST"),
+						resourceName, "policy", "CEL"),
+					resource.TestCheckResourceAttr(
+						resourceName, "cel_expr", "target.signing_time >= timestamp('2025-05-31T00:00:00Z')"),
 					resource.TestCheckResourceAttr(
 						resourceName, "target_type", "SIGNINGID"),
 					resource.TestCheckResourceAttr(
@@ -162,7 +166,8 @@ resource "zentral_tag" "test2" {
 
 resource "zentral_santa_rule" "test" {
   configuration_id        = zentral_santa_configuration.test.id
-  policy                  = "BLOCKLIST"
+  policy                  = "CEL"
+  cel_expr                = "target.signing_time >= timestamp('2025-05-31T00:00:00Z')"
   target_type             = "SIGNINGID"
   target_identifier       = "platform:com.apple.curl"
   description             = "description"

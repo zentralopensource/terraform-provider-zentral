@@ -29,7 +29,9 @@ func TestAccSantaRuleDataSource(t *testing.T) {
 					resource.TestCheckResourceAttrPair(
 						dataSourceName, "configuration_id", cfgResourceName, "id"),
 					resource.TestCheckResourceAttr(
-						dataSourceName, "policy", "BLOCKLIST"),
+						dataSourceName, "policy", "CEL"),
+					resource.TestCheckResourceAttr(
+						dataSourceName, "cel_expr", "target.signing_time >= timestamp('2025-05-31T00:00:00Z')"),
 					resource.TestCheckResourceAttr(
 						dataSourceName, "target_type", "CDHASH"),
 					resource.TestCheckResourceAttr(
@@ -108,7 +110,8 @@ resource "zentral_tag" "test2" {
 
 resource "zentral_santa_rule" "test" {
   configuration_id        = zentral_santa_configuration.test.id
-  policy                  = "BLOCKLIST"
+  policy                  = "CEL"
+  cel_expr                = "target.signing_time >= timestamp('2025-05-31T00:00:00Z')"
   target_type             = "CDHASH"
   target_identifier       = "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409"
   description             = "description"

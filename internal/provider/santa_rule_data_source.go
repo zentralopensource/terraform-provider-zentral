@@ -47,6 +47,11 @@ func (d *SantaRuleDataSource) Schema(ctx context.Context, req datasource.SchemaR
 				MarkdownDescription: "Policy. Valid values are `ALLOWLIST`, `BLOCKLIST`, `SILENT_BLOCKLIST` and `ALLOWLIST_COMPILER`.",
 				Computed:            true,
 			},
+			"cel_expr": schema.StringAttribute{
+				Description:         "CEL expression.",
+				MarkdownDescription: "CEL expression.",
+				Computed:            true,
+			},
 			"target_type": schema.StringAttribute{
 				Description:         "Target type. Valid values are BINARY, CDHASH, CERTIFICATE, SIGNINGID and TEAMID.",
 				MarkdownDescription: "Target type. Valid values are `BINARY`, `CDHASH`, `CERTIFICATE`, `SIGNINGID` and `TEAMID`.",
