@@ -39,38 +39,13 @@ var probeActionSlackIncomingWebhookAttrTypes = map[string]attr.Type{
 func probeActionForState(pa *goztl.ProbeAction) probeAction {
 	var hp types.Object
 	if pa.HTTPPost != nil {
-		// optional username
-		var hpu types.String
-		if pa.HTTPPost.Username != nil {
-			hpu = types.StringValue(*pa.HTTPPost.Username)
-		} else {
-			hpu = types.StringNull()
-		}
-		// optional password
-		var hpp types.String
-		if pa.HTTPPost.Password != nil {
-			hpp = types.StringValue(*pa.HTTPPost.Password)
-		} else {
-			hpp = types.StringNull()
-		}
-		// optional headers
-		hphs := make([]attr.Value, 0)
-		for _, h := range pa.HTTPPost.Headers {
-			hphs = append(hphs, types.ObjectValueMust(
-				probeActionHTTPPostHeaderAttrTypes,
-				map[string]attr.Value{
-					"name":  types.StringValue(h.Name),
-					"value": types.StringValue(h.Value),
-				},
-			))
-		}
 		hp = types.ObjectValueMust(
 			probeActionHTTPPostAttrTypes,
 			map[string]attr.Value{
 				"url":      types.StringValue(pa.HTTPPost.URL),
-				"username": hpu,
-				"password": hpp,
-				"headers":  types.SetValueMust(types.ObjectType{AttrTypes: probeActionHTTPPostHeaderAttrTypes}, hphs),
+				"username": optionalStringForState(pa.HTTPPost.Username),
+				"password": optionalStringForState(pa.HTTPPost.Password),
+				"headers":  headersForState(pa.HTTPPost.Headers),
 			},
 		)
 	} else {
@@ -109,40 +84,21 @@ func probeActionRequestWithState(data probeAction) *goztl.ProbeActionRequest {
 	if !data.HTTPPost.IsNull() {
 		hpMap := data.HTTPPost.Attributes()
 		if hpMap != nil {
-			hpBackend := &goztl.ProbeActionHTTPPost{
-				URL: hpMap["url"].(types.String).ValueString(),
+			req.HTTPPost = &goztl.ProbeActionHTTPPost{
+				URL:      hpMap["url"].(types.String).ValueString(),
+				Username: optionalStringWithState(hpMap["username"].(types.String)),
+				Password: optionalStringWithState(hpMap["password"].(types.String)),
+				Headers:  headersWithState(hpMap["headers"].(types.Set)),
 			}
-			// optional username
-			hpMapU := hpMap["username"].(types.String)
-			if !hpMapU.IsNull() {
-				hpBackend.Username = goztl.String(hpMapU.ValueString())
-			}
-			// optional password
-			hpMapP := hpMap["password"].(types.String)
-			if !hpMapP.IsNull() {
-				hpBackend.Password = goztl.String(hpMapP.ValueString())
-			}
-			// optional headers
-			headers := make([]goztl.ProbeActionHTTPPostHeader, 0)
-			for _, hpMapH := range hpMap["headers"].(types.Set).Elements() {
-				hpMapHAttrs := hpMapH.(types.Object).Attributes()
-				headers = append(headers, goztl.ProbeActionHTTPPostHeader{
-					Name:  hpMapHAttrs["name"].(types.String).ValueString(),
-					Value: hpMapHAttrs["value"].(types.String).ValueString(),
-				})
-			}
-			hpBackend.Headers = headers
-			req.HTTPPost = hpBackend
 		}
 	}
 
 	if !data.SlackIncomingWebhook.IsNull() {
 		siwMap := data.SlackIncomingWebhook.Attributes()
 		if siwMap != nil {
-			siwBackend := &goztl.ProbeActionSlackIncomingWebhook{
+			req.SlackIncomingWebhook = &goztl.ProbeActionSlackIncomingWebhook{
 				URL: siwMap["url"].(types.String).ValueString(),
 			}
-			req.SlackIncomingWebhook = siwBackend
 		}
 	}
 
