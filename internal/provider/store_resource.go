@@ -160,7 +160,7 @@ var splunkBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttrib
 		"hec_token": schema.StringAttribute{
 			Description:         "HEC token.",
 			MarkdownDescription: "HEC token.",
-			Optional:            true,
+			Required:            true,
 			Sensitive:           true,
 		},
 		"hec_extra_headers": makeHTTPHeadersSchema("HEC"),

@@ -94,6 +94,7 @@ Required:
 
 Required:
 
+- `hec_token` (String, Sensitive) HEC token.
 - `hec_url` (String) HEC endpoint URL.
 
 Optional:
@@ -105,7 +106,6 @@ Optional:
 - `hec_index` (String) HEC index. Usually enforced in the HEC configuration.
 - `hec_request_timeout` (Number) HEC request timeout in seconds. Defaults to `300` seconds.
 - `hec_source` (String) HEC source. Usually enforced in the HEC configuration.
-- `hec_token` (String, Sensitive) HEC token.
 - `search_app_url` (String) Base URL of the Splunk search application. Used to build the links to the Splunk instance displayed when browsing the events in the Zentral admin console.
 - `search_extra_headers` (Attributes Set) A set of additional HTTP headers to add to the search API requests. (see [below for nested schema](#nestedatt--splunk--search_extra_headers))
 - `search_index` (String) Index to use with the Search API.
