@@ -29,7 +29,9 @@ func TestAccOsqueryPackResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "description", ""),
 					resource.TestCheckResourceAttr(
-						resourceName, "discovery_queries.#", "0"),
+						resourceName, "discovery_queries.#", "1"),
+					resource.TestCheckTypeSetElemAttr(
+						resourceName, "discovery_queries.*", "SELECT pid FROM processes WHERE name = 'ldap';"),
 					resource.TestCheckResourceAttr(
 						resourceName, "shard", "50"),
 					resource.TestCheckResourceAttr(
@@ -53,9 +55,7 @@ func TestAccOsqueryPackResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(
-						resourceName, "discovery_queries.#", "1"),
-					resource.TestCheckTypeSetElemAttr(
-						resourceName, "discovery_queries.*", "SELECT pid FROM processes WHERE name = 'ldap';"),
+						resourceName, "discovery_queries.#", "0"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "shard"),
 					resource.TestCheckResourceAttr(
@@ -76,6 +76,7 @@ func testAccOsqueryPackResourceConfigBare(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_osquery_pack" "test" {
   name = %[1]q
+  discovery_queries = ["SELECT pid FROM processes WHERE name = 'ldap';"]
   shard = 50
 }
 `, name)
@@ -86,7 +87,6 @@ func testAccOsqueryPackResourceConfigFull(name string) string {
 resource "zentral_osquery_pack" "test" {
   name              = %[1]q
   description       = "description"
-  discovery_queries = ["SELECT pid FROM processes WHERE name = 'ldap';"]
   event_routing_key = "important"
 }
 `, name)
