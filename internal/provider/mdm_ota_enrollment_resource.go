@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -75,17 +74,16 @@ func (r *MDMOTAEnrollmentResource) Schema(ctx context.Context, req resource.Sche
 				Optional:            true,
 				// not Computed, because it triggers a foreign key error on the server with PK = 0
 			},
-			"scep_config_id": schema.Int64Attribute{
-				Description:         "ID of the MDM SCEP configuration linked to the OTA enrollment.",
-				MarkdownDescription: "`ID` of the MDM SCEP configuration linked to the OTA enrollment.",
-				Required:            true,
-			},
-			"scep_verification": schema.BoolAttribute{
-				Description:         "Indicates if a SCEP verification is expected during the enrollment.",
-				MarkdownDescription: "Indicates if a SCEP verification is expected during the enrollment.",
+			"acme_issuer_id": schema.StringAttribute{
+				Description:         "ID of the optional MDM ACME issuer linked to the OTA enrollment.",
+				MarkdownDescription: "`ID` of the optional MDM ACME issuer linked to the OTA enrollment.",
 				Optional:            true,
-				Computed:            true,
-				Default:             booldefault.StaticBool(false),
+				// not Computed, because it triggers a foreign key error on the server with PK = 0
+			},
+			"scep_issuer_id": schema.StringAttribute{
+				Description:         "ID of the MDM SCEP issuer linked to the OTA enrollment.",
+				MarkdownDescription: "`ID` of the MDM SCEP issuer linked to the OTA enrollment.",
+				Required:            true,
 			},
 			"secret": schema.StringAttribute{
 				Description:         "Enrollment secret.",

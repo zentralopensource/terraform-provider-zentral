@@ -6,6 +6,26 @@ import (
 	"github.com/zentralopensource/goztl"
 )
 
+// Int64 (optional)
+
+func optionalInt64ForState(i *int) types.Int64 {
+	var ifs types.Int64
+	if i != nil {
+		ifs = types.Int64Value(int64(*i))
+	} else {
+		ifs = types.Int64Null()
+	}
+	return ifs
+}
+
+func optionalIntWithState(i types.Int64) *int {
+	var iws *int
+	if !i.IsNull() {
+		iws = goztl.Int(int(i.ValueInt64()))
+	}
+	return iws
+}
+
 // String (optional)
 
 func optionalStringForState(s *string) types.String {

@@ -62,14 +62,14 @@ func (d *MDMOTAEnrollmentDataSource) Schema(ctx context.Context, req datasource.
 				MarkdownDescription: "`UUID` of the identity realm linked to the OTA enrollment.",
 				Computed:            true,
 			},
-			"scep_config_id": schema.Int64Attribute{
-				Description:         "ID of the MDM SCEP configuration linked to the OTA enrollment.",
-				MarkdownDescription: "`ID` of the MDM SCEP configuration linked to the OTA enrollment.",
+			"acme_issuer_id": schema.StringAttribute{
+				Description:         "ID of the optional MDM ACME issuer linked to the OTA enrollment.",
+				MarkdownDescription: "`ID` of the optional MDM ACME issuer linked to the OTA enrollment.",
 				Computed:            true,
 			},
-			"scep_verification": schema.BoolAttribute{
-				Description:         "Indicates if a SCEP verification is expected during the enrollment.",
-				MarkdownDescription: "Indicates if a SCEP verification is expected during the enrollment.",
+			"scep_issuer_id": schema.StringAttribute{
+				Description:         "ID of the MDM SCEP issuer linked to the OTA enrollment.",
+				MarkdownDescription: "`ID` of the MDM SCEP issuer linked to the OTA enrollment.",
 				Computed:            true,
 			},
 			"secret": schema.StringAttribute{

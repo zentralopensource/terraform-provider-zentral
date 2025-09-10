@@ -22,14 +22,14 @@ The data source `zentral_mdm_ota_enrollment` allows details of a MDM OTA enrollm
 
 ### Read-Only
 
+- `acme_issuer_id` (String) `ID` of the optional MDM ACME issuer linked to the OTA enrollment.
 - `blueprint_id` (Number) `ID` of the MDM blueprint linked to the OTA enrollment.
 - `display_name` (String) Name of the MDM OTA enrollment as displayed on the device.
 - `meta_business_unit_id` (Number) The `ID` of the meta business unit the machine will be assigned to at enrollment.
 - `push_certificate_id` (Number) `ID` of the MDM push certificate linked to the OTA enrollment.
 - `quota` (Number) The number of time the enrollment can be used.
 - `realm_uuid` (String) `UUID` of the identity realm linked to the OTA enrollment.
-- `scep_config_id` (Number) `ID` of the MDM SCEP configuration linked to the OTA enrollment.
-- `scep_verification` (Boolean) Indicates if a SCEP verification is expected during the enrollment.
+- `scep_issuer_id` (String) `ID` of the MDM SCEP issuer linked to the OTA enrollment.
 - `secret` (String) Enrollment secret.
 - `serial_numbers` (Set of String) The serial numbers the enrollment is restricted to.
 - `tag_ids` (Set of Number) The `ID`s of the tags that the machine will get at enrollment.

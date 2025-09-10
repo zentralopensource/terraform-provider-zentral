@@ -15,7 +15,7 @@ func TestAccMDMOTAEnrollmentResource(t *testing.T) {
 	bpResourceName := "zentral_mdm_blueprint.test"
 	pcResourceName := "data.zentral_mdm_push_certificate.test"
 	rResourceName := "data.zentral_realm.test"
-	scResouceName := "data.zentral_mdm_scep_config.test"
+	siResouceName := "zentral_mdm_scep_issuer.test"
 	mbuResourceName := "zentral_meta_business_unit.test"
 	tagResourceName := "zentral_tag.test"
 
@@ -37,10 +37,10 @@ func TestAccMDMOTAEnrollmentResource(t *testing.T) {
 						resourceName, "push_certificate_id", pcResourceName, "id"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "realm_uuid"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "acme_issuer_id"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "scep_config_id", scResouceName, "id"),
-					resource.TestCheckResourceAttr(
-						resourceName, "scep_verification", "false"),
+						resourceName, "scep_issuer_id", siResouceName, "id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "meta_business_unit_id", mbuResourceName, "id"),
 					resource.TestCheckResourceAttr(
@@ -73,10 +73,10 @@ func TestAccMDMOTAEnrollmentResource(t *testing.T) {
 						resourceName, "push_certificate_id", pcResourceName, "id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "realm_uuid", rResourceName, "uuid"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "acme_issuer_id"),
 					resource.TestCheckResourceAttrPair(
-						resourceName, "scep_config_id", scResouceName, "id"),
-					resource.TestCheckResourceAttr(
-						resourceName, "scep_verification", "true"),
+						resourceName, "scep_issuer_id", siResouceName, "id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "meta_business_unit_id", mbuResourceName, "id"),
 					resource.TestCheckResourceAttr(
@@ -120,15 +120,19 @@ data "zentral_mdm_push_certificate" "test" {
   name = "TF provider GitHub"
 }
 
-# provisioned resource on the integration server
-data "zentral_mdm_scep_config" "test" {
-  name = "TF provider GitHub"
+resource "zentral_mdm_scep_issuer" "test" {
+  name = %[1]q
+  url = "https://www.example.com/scep"
+  backend = "STATIC_CHALLENGE"
+  static_challenge = {
+    challenge = "yolo"
+  }
 }
 
 resource "zentral_mdm_ota_enrollment" "test" {
   name                  = %[1]q
   push_certificate_id   = data.zentral_mdm_push_certificate.test.id
-  scep_config_id        = data.zentral_mdm_scep_config.test.id
+  scep_issuer_id        = zentral_mdm_scep_issuer.test.id
   meta_business_unit_id = zentral_meta_business_unit.test.id
 }
 `, name)
@@ -154,9 +158,13 @@ data "zentral_realm" "test" {
   name = "TF provider GitHub"
 }
 
-# provisioned resource on the integration server
-data "zentral_mdm_scep_config" "test" {
-  name = "TF provider GitHub"
+resource "zentral_mdm_scep_issuer" "test" {
+  name = %[1]q
+  url = "https://www.example.com/scep"
+  backend = "STATIC_CHALLENGE"
+  static_challenge = {
+    challenge = "yolo"
+  }
 }
 
 resource "zentral_taxonomy" "test" {
@@ -174,8 +182,7 @@ resource "zentral_mdm_ota_enrollment" "test" {
   blueprint_id          = zentral_mdm_blueprint.test.id
   push_certificate_id   = data.zentral_mdm_push_certificate.test.id
   realm_uuid            = data.zentral_realm.test.uuid
-  scep_config_id        = data.zentral_mdm_scep_config.test.id
-  scep_verification     = true
+  scep_issuer_id        = zentral_mdm_scep_issuer.test.id
   meta_business_unit_id = zentral_meta_business_unit.test.id
   tag_ids               = [zentral_tag.test.id]
   serial_numbers        = ["un", "deux"]
