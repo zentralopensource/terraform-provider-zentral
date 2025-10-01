@@ -65,6 +65,7 @@ func (r *MDMArtifactResource) Schema(ctx context.Context, req resource.SchemaReq
 						"Activation",
 						"Asset",
 						"Configuration",
+						"Certificate Asset",
 						"Data Asset",
 						"Enterprise App",
 						"Configuration (manual)",

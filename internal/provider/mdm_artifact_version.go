@@ -6,15 +6,7 @@ import (
 	"github.com/zentralopensource/goztl"
 )
 
-func exTagIDsForState(mav goztl.MDMArtifactVersion) []attr.Value {
-	exTagIDs := make([]attr.Value, 0)
-	for _, exTagID := range mav.ExcludedTagIDs {
-		exTagIDs = append(exTagIDs, types.Int64Value(int64(exTagID)))
-	}
-	return exTagIDs
-}
-
-func tagShardsForState(mav goztl.MDMArtifactVersion) []attr.Value {
+func tagShardsForState(mav goztl.MDMArtifactVersion) types.Set {
 	tagShards := make([]attr.Value, 0)
 	for _, tagShard := range mav.TagShards {
 		tagShards = append(
@@ -27,6 +19,23 @@ func tagShardsForState(mav goztl.MDMArtifactVersion) []attr.Value {
 				},
 			),
 		)
+	}
+	return types.SetValueMust(types.ObjectType{AttrTypes: tagShardAttrTypes}, tagShards)
+}
+
+func tagShardsWithState(ts types.Set) []goztl.TagShard {
+	tagShards := make([]goztl.TagShard, 0)
+	for _, tagShard := range ts.Elements() { // nil if null or unknown → no iterations
+		tagShardMap := tagShard.(types.Object).Attributes()
+		if tagShardMap != nil {
+			tagShards = append(
+				tagShards,
+				goztl.TagShard{
+					TagID: int(tagShardMap["tag_id"].(types.Int64).ValueInt64()),
+					Shard: int(tagShardMap["shard"].(types.Int64).ValueInt64()),
+				},
+			)
+		}
 	}
 	return tagShards
 }

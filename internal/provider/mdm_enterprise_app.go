@@ -34,22 +34,12 @@ type mdmEnterpriseApp struct {
 }
 
 func mdmEnterpriseAppForState(mea *goztl.MDMEnterpriseApp) mdmEnterpriseApp {
-	exTagIDs := exTagIDsForState(mea.MDMArtifactVersion)
-	tagShards := tagShardsForState(mea.MDMArtifactVersion)
-
-	var configuration types.String
-	if mea.Configuration != nil {
-		configuration = types.StringValue(*mea.Configuration)
-	} else {
-		configuration = types.StringNull()
-	}
-
 	return mdmEnterpriseApp{
 		ID:               types.StringValue(mea.ID),
 		PackageURI:       types.StringValue(mea.PackageURI),
 		PackageSHA256:    types.StringValue(mea.PackageSHA256),
 		IOSApp:           types.BoolValue(mea.IOSApp),
-		Configuration:    configuration,
+		Configuration:    optionalStringForState(mea.Configuration),
 		InstallAsManaged: types.BoolValue(mea.InstallAsManaged),
 		RemoveOnUnenroll: types.BoolValue(mea.RemoveOnUnenroll),
 		ArtifactID:       types.StringValue(mea.ArtifactID),
@@ -67,42 +57,18 @@ func mdmEnterpriseAppForState(mea *goztl.MDMEnterpriseApp) mdmEnterpriseApp {
 		TVOSMinVersion:   types.StringValue(mea.TVOSMinVersion),
 		DefaultShard:     types.Int64Value(int64(mea.DefaultShard)),
 		ShardModulo:      types.Int64Value(int64(mea.ShardModulo)),
-		ExcludedTagIDs:   types.SetValueMust(types.Int64Type, exTagIDs),
-		TagShards:        types.SetValueMust(types.ObjectType{AttrTypes: tagShardAttrTypes}, tagShards),
+		ExcludedTagIDs:   int64SetForState(mea.MDMArtifactVersion.ExcludedTagIDs),
+		TagShards:        tagShardsForState(mea.MDMArtifactVersion),
 		Version:          types.Int64Value(int64(mea.Version)),
 	}
 }
 
 func mdmEnterpriseAppRequestWithState(data mdmEnterpriseApp) *goztl.MDMEnterpriseAppRequest {
-	exTagIDs := make([]int, 0)
-	for _, exTagID := range data.ExcludedTagIDs.Elements() { // nil if null or unknown → no iterations
-		exTagIDs = append(exTagIDs, int(exTagID.(types.Int64).ValueInt64()))
-	}
-
-	tagShards := make([]goztl.TagShard, 0)
-	for _, tagShard := range data.TagShards.Elements() { // nil if null or unknown → no iterations
-		tagShardMap := tagShard.(types.Object).Attributes()
-		if tagShardMap != nil {
-			tagShards = append(
-				tagShards,
-				goztl.TagShard{
-					TagID: int(tagShardMap["tag_id"].(types.Int64).ValueInt64()),
-					Shard: int(tagShardMap["shard"].(types.Int64).ValueInt64()),
-				},
-			)
-		}
-	}
-
-	var configuration *string
-	if !data.Configuration.IsNull() {
-		configuration = goztl.String(data.Configuration.ValueString())
-	}
-
 	return &goztl.MDMEnterpriseAppRequest{
 		PackageURI:       data.PackageURI.ValueString(),
 		PackageSHA256:    data.PackageSHA256.ValueString(),
 		IOSApp:           data.IOSApp.ValueBool(),
-		Configuration:    configuration,
+		Configuration:    optionalStringWithState(data.Configuration),
 		InstallAsManaged: data.InstallAsManaged.ValueBool(),
 		RemoveOnUnenroll: data.RemoveOnUnenroll.ValueBool(),
 		MDMArtifactVersionRequest: goztl.MDMArtifactVersionRequest{
@@ -121,8 +87,8 @@ func mdmEnterpriseAppRequestWithState(data mdmEnterpriseApp) *goztl.MDMEnterpris
 			TVOSMinVersion:   data.TVOSMinVersion.ValueString(),
 			DefaultShard:     int(data.DefaultShard.ValueInt64()),
 			ShardModulo:      int(data.ShardModulo.ValueInt64()),
-			ExcludedTagIDs:   exTagIDs,
-			TagShards:        tagShards,
+			ExcludedTagIDs:   intListWithState(data.ExcludedTagIDs),
+			TagShards:        tagShardsWithState(data.TagShards),
 			Version:          int(data.Version.ValueInt64()),
 		},
 	}

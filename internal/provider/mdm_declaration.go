@@ -62,9 +62,6 @@ func mdmDeclarationForState(mda *goztl.MDMDeclaration) (mdmDeclaration, error) {
 		return mdmDeclaration{}, err
 	}
 
-	exTagIDs := exTagIDsForState(mda.MDMArtifactVersion)
-	tagShards := tagShardsForState(mda.MDMArtifactVersion)
-
 	return mdmDeclaration{
 		ID:               types.StringValue(mda.ID),
 		Source:           types.StringValue(source),
@@ -83,8 +80,8 @@ func mdmDeclarationForState(mda *goztl.MDMDeclaration) (mdmDeclaration, error) {
 		TVOSMinVersion:   types.StringValue(mda.TVOSMinVersion),
 		DefaultShard:     types.Int64Value(int64(mda.DefaultShard)),
 		ShardModulo:      types.Int64Value(int64(mda.ShardModulo)),
-		ExcludedTagIDs:   types.SetValueMust(types.Int64Type, exTagIDs),
-		TagShards:        types.SetValueMust(types.ObjectType{AttrTypes: tagShardAttrTypes}, tagShards),
+		ExcludedTagIDs:   int64SetForState(mda.MDMArtifactVersion.ExcludedTagIDs),
+		TagShards:        tagShardsForState(mda.MDMArtifactVersion),
 		Version:          types.Int64Value(int64(mda.Version)),
 	}, nil
 }
@@ -93,25 +90,6 @@ func mdmDeclarationRequestWithState(data mdmDeclaration) (*goztl.MDMDeclarationR
 	source, err := deserializeMDMDeclarationSource(data.Source.ValueString())
 	if err != nil {
 		return nil, err
-	}
-
-	exTagIDs := make([]int, 0)
-	for _, exTagID := range data.ExcludedTagIDs.Elements() { // nil if null or unknown → no iterations
-		exTagIDs = append(exTagIDs, int(exTagID.(types.Int64).ValueInt64()))
-	}
-
-	tagShards := make([]goztl.TagShard, 0)
-	for _, tagShard := range data.TagShards.Elements() { // nil if null or unknown → no iterations
-		tagShardMap := tagShard.(types.Object).Attributes()
-		if tagShardMap != nil {
-			tagShards = append(
-				tagShards,
-				goztl.TagShard{
-					TagID: int(tagShardMap["tag_id"].(types.Int64).ValueInt64()),
-					Shard: int(tagShardMap["shard"].(types.Int64).ValueInt64()),
-				},
-			)
-		}
 	}
 
 	return &goztl.MDMDeclarationRequest{
@@ -132,8 +110,8 @@ func mdmDeclarationRequestWithState(data mdmDeclaration) (*goztl.MDMDeclarationR
 			TVOSMinVersion:   data.TVOSMinVersion.ValueString(),
 			DefaultShard:     int(data.DefaultShard.ValueInt64()),
 			ShardModulo:      int(data.ShardModulo.ValueInt64()),
-			ExcludedTagIDs:   exTagIDs,
-			TagShards:        tagShards,
+			ExcludedTagIDs:   intListWithState(data.ExcludedTagIDs),
+			TagShards:        tagShardsWithState(data.TagShards),
 			Version:          int(data.Version.ValueInt64()),
 		},
 	}, nil
