@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
@@ -13,6 +12,8 @@ type mdmBlueprint struct {
 	CollectApps                  types.String `tfsdk:"collect_apps"`
 	CollectCertificates          types.String `tfsdk:"collect_certificates"`
 	CollectProfiles              types.String `tfsdk:"collect_profiles"`
+	LegacyProfilesViaDDM         types.Bool   `tfsdk:"legacy_profiles_via_ddm"`
+	DefaultLocationID            types.Int64  `tfsdk:"default_location_id"`
 	FileVaultConfigID            types.Int64  `tfsdk:"filevault_config_id"`
 	RecoveryPasswordConfigID     types.Int64  `tfsdk:"recovery_password_config_id"`
 	SoftwareUpdateEnforcementIDs types.Set    `tfsdk:"software_update_enforcement_ids"`
@@ -41,22 +42,6 @@ func collectionOptWithState(collectionOpt types.String) int {
 }
 
 func mdmBlueprintForState(mb *goztl.MDMBlueprint) mdmBlueprint {
-	var fvCfgID types.Int64
-	if mb.FileVaultConfigID != nil {
-		fvCfgID = types.Int64Value(int64(*mb.FileVaultConfigID))
-	} else {
-		fvCfgID = types.Int64Null()
-	}
-	var rpCfgID types.Int64
-	if mb.RecoveryPasswordConfigID != nil {
-		rpCfgID = types.Int64Value(int64(*mb.RecoveryPasswordConfigID))
-	} else {
-		rpCfgID = types.Int64Null()
-	}
-	sueIDs := make([]attr.Value, 0)
-	for _, sueID := range mb.SoftwareUpdateEnforcementIDs {
-		sueIDs = append(sueIDs, types.Int64Value(int64(sueID)))
-	}
 	return mdmBlueprint{
 		ID:                           types.Int64Value(int64(mb.ID)),
 		Name:                         types.StringValue(mb.Name),
@@ -64,34 +49,25 @@ func mdmBlueprintForState(mb *goztl.MDMBlueprint) mdmBlueprint {
 		CollectApps:                  collectionOptForState(mb.CollectApps),
 		CollectCertificates:          collectionOptForState(mb.CollectCertificates),
 		CollectProfiles:              collectionOptForState(mb.CollectProfiles),
-		FileVaultConfigID:            fvCfgID,
-		RecoveryPasswordConfigID:     rpCfgID,
-		SoftwareUpdateEnforcementIDs: types.SetValueMust(types.Int64Type, sueIDs),
+		LegacyProfilesViaDDM:         types.BoolValue(mb.LegacyProfilesViaDDM),
+		DefaultLocationID:            optionalInt64ForState(mb.DefaultLocationID),
+		FileVaultConfigID:            optionalInt64ForState(mb.FileVaultConfigID),
+		RecoveryPasswordConfigID:     optionalInt64ForState(mb.RecoveryPasswordConfigID),
+		SoftwareUpdateEnforcementIDs: int64SetForState(mb.SoftwareUpdateEnforcementIDs),
 	}
 }
 
 func mdmBlueprintRequestWithState(data mdmBlueprint) *goztl.MDMBlueprintRequest {
-	var fvCfgID *int
-	if !data.FileVaultConfigID.IsNull() {
-		fvCfgID = goztl.Int(int(data.FileVaultConfigID.ValueInt64()))
-	}
-	var rpCfgID *int
-	if !data.RecoveryPasswordConfigID.IsNull() {
-		rpCfgID = goztl.Int(int(data.RecoveryPasswordConfigID.ValueInt64()))
-	}
-	sueIDs := make([]int, 0)
-	for _, sueID := range data.SoftwareUpdateEnforcementIDs.Elements() { // nil if null or unknown → no iterations
-		sueIDs = append(sueIDs, int(sueID.(types.Int64).ValueInt64()))
-	}
-
 	return &goztl.MDMBlueprintRequest{
 		Name:                         data.Name.ValueString(),
 		InventoryInterval:            int(data.InventoryInterval.ValueInt64()),
 		CollectApps:                  collectionOptWithState(data.CollectApps),
 		CollectCertificates:          collectionOptWithState(data.CollectCertificates),
 		CollectProfiles:              collectionOptWithState(data.CollectProfiles),
-		FileVaultConfigID:            fvCfgID,
-		RecoveryPasswordConfigID:     rpCfgID,
-		SoftwareUpdateEnforcementIDs: sueIDs,
+		LegacyProfilesViaDDM:         data.LegacyProfilesViaDDM.ValueBool(),
+		DefaultLocationID:            optionalIntWithState(data.DefaultLocationID),
+		FileVaultConfigID:            optionalIntWithState(data.FileVaultConfigID),
+		RecoveryPasswordConfigID:     optionalIntWithState(data.RecoveryPasswordConfigID),
+		SoftwareUpdateEnforcementIDs: intListWithState(data.SoftwareUpdateEnforcementIDs),
 	}
 }

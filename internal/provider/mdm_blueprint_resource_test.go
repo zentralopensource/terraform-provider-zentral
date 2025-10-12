@@ -12,6 +12,7 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 	firstName := acctest.RandString(12)
 	secondName := acctest.RandString(12)
 	resourceName := "zentral_mdm_blueprint.test"
+	lResourceName := "data.zentral_mdm_location.test"
 	fcResourceName := "zentral_mdm_filevault_config.test"
 	rpcResourceName := "zentral_mdm_recovery_password_config.test"
 	sueResourceName := "zentral_mdm_software_update_enforcement.test"
@@ -34,6 +35,10 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 						resourceName, "collect_certificates", "NO"),
 					resource.TestCheckResourceAttr(
 						resourceName, "collect_profiles", "NO"),
+					resource.TestCheckResourceAttr(
+						resourceName, "legacy_profiles_via_ddm", "true"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "default_location_id"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "filevault_config_id"),
 					resource.TestCheckNoResourceAttr(
@@ -62,6 +67,10 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 						resourceName, "collect_certificates", "ALL"),
 					resource.TestCheckResourceAttr(
 						resourceName, "collect_profiles", "MANAGED_ONLY"),
+					resource.TestCheckResourceAttr(
+						resourceName, "legacy_profiles_via_ddm", "false"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "default_location_id", lResourceName, "id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "filevault_config_id", fcResourceName, "id"),
 					resource.TestCheckResourceAttrPair(
@@ -92,6 +101,10 @@ resource "zentral_mdm_blueprint" "test" {
 
 func testAccMDMBlueprintResourceConfigFull(name string) string {
 	return fmt.Sprintf(`
+data "zentral_mdm_location" "test" {
+  name = "Terraform Provider CI/CD"
+}
+
 resource "zentral_mdm_filevault_config" "test" {
   name                         = %[1]q
   escrow_location_display_name = %[1]q
@@ -113,6 +126,8 @@ resource "zentral_mdm_blueprint" "test" {
   collect_apps                    = "MANAGED_ONLY"
   collect_certificates            = "ALL"
   collect_profiles                = "MANAGED_ONLY"
+  legacy_profiles_via_ddm         = false
+  default_location_id             = data.zentral_mdm_location.test.id
   filevault_config_id             = zentral_mdm_filevault_config.test.id
   recovery_password_config_id     = zentral_mdm_recovery_password_config.test.id
   software_update_enforcement_ids = [zentral_mdm_software_update_enforcement.test.id]

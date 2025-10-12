@@ -62,6 +62,16 @@ func (d *MDMBlueprintDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "Possible values: `NO`, `MANAGED_ONLY`, `ALL`.",
 				Computed:            true,
 			},
+			"legacy_profiles_via_ddm": schema.BoolAttribute{
+				Description:         "If true, legacy profiles are distributed via DDM.",
+				MarkdownDescription: "If `true`, legady profiles are distributed via DDM.",
+				Computed:            true,
+			},
+			"default_location_id": schema.Int64Attribute{
+				Description:         "The ID of the default apps & books location.",
+				MarkdownDescription: "The `ID` of the default apps & books location.",
+				Computed:            true,
+			},
 			"filevault_config_id": schema.Int64Attribute{
 				Description:         "The ID of the attached FileVault configuration.",
 				MarkdownDescription: "The `ID` of the attached FileVault configuration.",

@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -93,6 +94,18 @@ func (r *MDMBlueprintResource) Schema(ctx context.Context, req resource.SchemaRe
 					stringvalidator.OneOf([]string{"NO", "MANAGED_ONLY", "ALL"}...),
 				},
 				Default: stringdefault.StaticString("NO"),
+			},
+			"legacy_profiles_via_ddm": schema.BoolAttribute{
+				Description:         "If true, legacy profiles are distributed via DDM. Defaults to true.",
+				MarkdownDescription: "If `true`, legady profiles are distributed via DDM. Defaults to `true`.",
+				Optional:            true,
+				Computed:            true,
+				Default:             booldefault.StaticBool(true),
+			},
+			"default_location_id": schema.Int64Attribute{
+				Description:         "The ID of the default apps & books location.",
+				MarkdownDescription: "The `ID` of the default apps & books location.",
+				Optional:            true,
 			},
 			"filevault_config_id": schema.Int64Attribute{
 				Description:         "The ID of the attached FileVault configuration.",

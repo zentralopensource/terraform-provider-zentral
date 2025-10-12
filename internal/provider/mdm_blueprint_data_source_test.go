@@ -13,6 +13,7 @@ func TestAccMDMBlueprintDataSource(t *testing.T) {
 	c2Name := acctest.RandString(12)
 	c1ResourceName := "zentral_mdm_blueprint.check1"
 	c2ResourceName := "zentral_mdm_blueprint.check2"
+	l2ResourceName := "data.zentral_mdm_location.check2"
 	fc2ResourceName := "zentral_mdm_filevault_config.check2"
 	rpc2ResourceName := "zentral_mdm_recovery_password_config.check2"
 	sue2ResourceName := "zentral_mdm_software_update_enforcement.check2"
@@ -39,6 +40,10 @@ func TestAccMDMBlueprintDataSource(t *testing.T) {
 						ds1ResourceName, "collect_certificates", "NO"),
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "collect_profiles", "NO"),
+					resource.TestCheckResourceAttr(
+						ds1ResourceName, "legacy_profiles_via_ddm", "true"),
+					resource.TestCheckNoResourceAttr(
+						ds1ResourceName, "default_location_id"),
 					resource.TestCheckNoResourceAttr(
 						ds1ResourceName, "filevault_config_id"),
 					resource.TestCheckNoResourceAttr(
@@ -58,6 +63,10 @@ func TestAccMDMBlueprintDataSource(t *testing.T) {
 						ds2ResourceName, "collect_certificates", "ALL"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "collect_profiles", "MANAGED_ONLY"),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "legacy_profiles_via_ddm", "false"),
+					resource.TestCheckResourceAttrPair(
+						ds2ResourceName, "default_location_id", l2ResourceName, "id"),
 					resource.TestCheckResourceAttrPair(
 						ds2ResourceName, "filevault_config_id", fc2ResourceName, "id"),
 					resource.TestCheckResourceAttrPair(
@@ -76,6 +85,10 @@ func testAccMDMBlueprintDataSourceConfig(c1Name string, c2Name string) string {
 	return fmt.Sprintf(`
 resource "zentral_mdm_blueprint" "check1" {
   name = %[1]q
+}
+
+data "zentral_mdm_location" "check2" {
+  name = "Terraform Provider CI/CD"
 }
 
 resource "zentral_mdm_filevault_config" "check2" {
@@ -99,6 +112,8 @@ resource "zentral_mdm_blueprint" "check2" {
   collect_apps                    = "MANAGED_ONLY"
   collect_certificates            = "ALL"
   collect_profiles                = "MANAGED_ONLY"
+  legacy_profiles_via_ddm         = false
+  default_location_id             = data.zentral_mdm_location.check2.id
   filevault_config_id             = zentral_mdm_filevault_config.check2.id
   recovery_password_config_id     = zentral_mdm_recovery_password_config.check2.id
   software_update_enforcement_ids = [zentral_mdm_software_update_enforcement.check2.id]

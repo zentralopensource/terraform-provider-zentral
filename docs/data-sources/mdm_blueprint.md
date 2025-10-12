@@ -25,7 +25,9 @@ The data source `zentral_mdm_blueprint` allows details of a MDM blueprint to be 
 - `collect_apps` (String) Possible values: `NO`, `MANAGED_ONLY`, `ALL`.
 - `collect_certificates` (String) Possible values: `NO`, `MANAGED_ONLY`, `ALL`.
 - `collect_profiles` (String) Possible values: `NO`, `MANAGED_ONLY`, `ALL`.
+- `default_location_id` (Number) The `ID` of the default apps & books location.
 - `filevault_config_id` (Number) The `ID` of the attached FileVault configuration.
 - `inventory_interval` (Number) In seconds, the minimum interval between two inventory collection. Minimum 4h, maximum 7d, default 1d.
+- `legacy_profiles_via_ddm` (Boolean) If `true`, legady profiles are distributed via DDM.
 - `recovery_password_config_id` (Number) The `ID` of the attached recovery password configuration.
 - `software_update_enforcement_ids` (Set of Number) The `ID`s of the software update enforcements.
