@@ -24,6 +24,7 @@ The resource `zentral_mdm_scep_issuer` manages MDM SCEP issuers.
 ### Optional
 
 - `description` (String) Description of the SCEP issuer.
+- `digicert` (Attributes) IDent backend parameters. (see [below for nested schema](#nestedatt--digicert))
 - `ident` (Attributes) IDent backend parameters. (see [below for nested schema](#nestedatt--ident))
 - `key_size` (Number) The key size in bits, either `1024`, `2048`, or `4096`. Defaults to `2048`.
 - `key_usage` (Number) A bitmask that specifies the use of the key: `1` is signing, `4` is encryption, and `5` is both signing and encryption. Defaults to `0`.
@@ -34,6 +35,23 @@ The resource `zentral_mdm_scep_issuer` manages MDM SCEP issuers.
 ### Read-Only
 
 - `id` (String) `ID` of the SCEP issuer (UUID).
+
+<a id="nestedatt--digicert"></a>
+### Nested Schema for `digicert`
+
+Required:
+
+- `api_token` (String, Sensitive) API token.
+- `business_unit_guid` (String) Business unit GUID.
+- `default_seat_email` (String) Default seat email.
+- `profile_guid` (String) Profile GUID.
+
+Optional:
+
+- `api_base_url` (String) API base URL. Defaults to `https://one.digicert.com/mpki/api/`.
+- `seat_id_mapping` (String) Seat ID mapping. Possible values: `common_name`, `email`, `serial_number`, `unique_identifier`, `user_identifier`, `pseudonym`, `dn_qualifier`, `rfc822Name`, `dNSName`. Defaults to `common_name`.
+- `seat_type` (String) Seat type. `DEVICE_SEAT` or `USER_SEAT`. Defaults to `DEVICE_SEAT`.
+
 
 <a id="nestedatt--ident"></a>
 ### Nested Schema for `ident`

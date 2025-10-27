@@ -3,24 +3,206 @@ package provider
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dataschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
 const (
-	tfCertIssuerIDentBackend           string = "IDENT"
+	tfCertIssuerDigicertBackend        string = "DIGICERT"
+	tfCertIssuerIDentBackend                  = "IDENT"
 	tfCertIssuerMicrosoftCABackend            = "MICROSOFT_CA"
 	tfCertIssuerOktaCABackend                 = "OKTA_CA"
 	tfCertIssuerStaticChallengeBackend        = "STATIC_CHALLENGE"
+	tfDigicertDefaultAPIBaseURL               = "https://one.digicert.com/mpki/api/"
+	tfDigicertDeviceSeatType                  = "DEVICE_SEAT"
+	tfDigicertCommonName                      = "common_name"
+	tfDigicertEmail                           = "email"
+	tfDigicertSerialNumber                    = "serial_number"
+	tfDigicertUniqueIdentifier                = "unique_identifier"
+	tfDigicertUserIdentifier                  = "user_identifier"
+	tfDigicertPseudonym                       = "pseudonym"
+	tfDigicertDNQualifier                     = "dn_qualifier"
+	tfDigicertRFC882Name                      = "rfc822Name"
+	tfDigicertDNSName                         = "dNSName"
+	tfDigicertUserSeatType                    = "USER_SEAT"
 	tfIDentDefaultRequestTimeout       int64  = 30
 	tfIDentDefaultMaxRetries                  = 3
 )
 
-// IDente
+// Digicert
+
+var digicertAttrTypes = map[string]attr.Type{
+	"api_base_url":       types.StringType,
+	"api_token":          types.StringType,
+	"profile_guid":       types.StringType,
+	"business_unit_guid": types.StringType,
+	"seat_type":          types.StringType,
+	"seat_id_mapping":    types.StringType,
+	"default_seat_email": types.StringType,
+}
+
+func digicertBackendForState(digi *goztl.Digicert) types.Object {
+	var b types.Object
+	if digi != nil {
+		b = types.ObjectValueMust(
+			digicertAttrTypes,
+			map[string]attr.Value{
+				"api_base_url":       types.StringValue(digi.APIBaseURL),
+				"api_token":          types.StringValue(digi.APIToken),
+				"profile_guid":       types.StringValue(digi.ProfileGUID),
+				"business_unit_guid": types.StringValue(digi.BusinessUnitGUID),
+				"seat_type":          types.StringValue(digi.SeatType),
+				"seat_id_mapping":    types.StringValue(digi.SeatIDMapping),
+				"default_seat_email": types.StringValue(digi.DefaultSeatEmail),
+			},
+		)
+	} else {
+		b = types.ObjectNull(digicertAttrTypes)
+	}
+	return b
+}
+
+func digicertBackendWithState(backend types.Object) *goztl.Digicert {
+	var b *goztl.Digicert
+	if !backend.IsNull() {
+		bMap := backend.Attributes()
+		b = &goztl.Digicert{
+			APIBaseURL:       bMap["api_base_url"].(types.String).ValueString(),
+			APIToken:         bMap["api_token"].(types.String).ValueString(),
+			ProfileGUID:      bMap["profile_guid"].(types.String).ValueString(),
+			BusinessUnitGUID: bMap["business_unit_guid"].(types.String).ValueString(),
+			SeatType:         bMap["seat_type"].(types.String).ValueString(),
+			SeatIDMapping:    bMap["seat_id_mapping"].(types.String).ValueString(),
+			DefaultSeatEmail: bMap["default_seat_email"].(types.String).ValueString(),
+		}
+	}
+	return b
+}
+
+func makeDigicertBackendDataSourceAttribute() dataschema.SingleNestedAttribute {
+	desc := "Digicert backend parameters."
+	return dataschema.SingleNestedAttribute{
+		Description:         desc,
+		MarkdownDescription: desc,
+		Attributes: map[string]dataschema.Attribute{
+			"api_base_url": dataschema.StringAttribute{
+				Description:         "API base URL.",
+				MarkdownDescription: "API base URL.",
+				Computed:            true,
+			},
+			"api_token": dataschema.StringAttribute{
+				Description:         "API token.",
+				MarkdownDescription: "API token.",
+				Sensitive:           true,
+				Computed:            true,
+			},
+			"profile_guid": dataschema.StringAttribute{
+				Description:         "Profile GUID.",
+				MarkdownDescription: "Profile GUID.",
+				Computed:            true,
+			},
+			"business_unit_guid": dataschema.StringAttribute{
+				Description:         "Business unit GUID.",
+				MarkdownDescription: "Business unit GUID.",
+				Computed:            true,
+			},
+			"seat_type": dataschema.StringAttribute{
+				Description:         "Seat type.",
+				MarkdownDescription: "Seat type.",
+				Computed:            true,
+			},
+			"seat_id_mapping": dataschema.StringAttribute{
+				Description:         "Seat ID mapping.",
+				MarkdownDescription: "Seat ID mapping.",
+				Computed:            true,
+			},
+			"default_seat_email": dataschema.StringAttribute{
+				Description:         "Default seat email.",
+				MarkdownDescription: "Default seat email.",
+				Computed:            true,
+			},
+		},
+		Computed: true,
+	}
+}
+
+func makeDigicertBackendResourceAttribute() schema.SingleNestedAttribute {
+	desc := "IDent backend parameters."
+	return schema.SingleNestedAttribute{
+		Description:         desc,
+		MarkdownDescription: desc,
+		Attributes: map[string]schema.Attribute{
+			"api_base_url": schema.StringAttribute{
+				Description:         "API base URL. Defaults to https://one.digicert.com/mpki/api/.",
+				MarkdownDescription: "API base URL. Defaults to `https://one.digicert.com/mpki/api/`.",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString(tfDigicertDefaultAPIBaseURL),
+			},
+			"api_token": schema.StringAttribute{
+				Description:         "API token.",
+				MarkdownDescription: "API token.",
+				Sensitive:           true,
+				Required:            true,
+			},
+			"profile_guid": schema.StringAttribute{
+				Description:         "Profile GUID.",
+				MarkdownDescription: "Profile GUID.",
+				Required:            true,
+			},
+			"business_unit_guid": schema.StringAttribute{
+				Description:         "Business unit GUID.",
+				MarkdownDescription: "Business unit GUID.",
+				Required:            true,
+			},
+			"seat_type": schema.StringAttribute{
+				Description:         "Seat type. DEVICE_SEAT or USER_SEAT. Defaults to DEVICE_SEAT.",
+				MarkdownDescription: "Seat type. `DEVICE_SEAT` or `USER_SEAT`. Defaults to `DEVICE_SEAT`.",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString(tfDigicertDeviceSeatType),
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{tfDigicertDeviceSeatType, tfDigicertUserSeatType}...),
+				},
+			},
+			"seat_id_mapping": schema.StringAttribute{
+				Description:         "Seat ID mapping. Possible values: common_name, email, serial_number, unique_identifier, user_identifier, pseudonym, dn_qualifier, rfc822Name, dNSName. Defaults to common_name.",
+				MarkdownDescription: "Seat ID mapping. Possible values: `common_name`, `email`, `serial_number`, `unique_identifier`, `user_identifier`, `pseudonym`, `dn_qualifier`, `rfc822Name`, `dNSName`. Defaults to `common_name`.",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString(tfDigicertCommonName),
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{
+						tfDigicertCommonName,
+						tfDigicertEmail,
+						tfDigicertSerialNumber,
+						tfDigicertUniqueIdentifier,
+						tfDigicertUserIdentifier,
+						tfDigicertPseudonym,
+						tfDigicertDNQualifier,
+						tfDigicertRFC882Name,
+						tfDigicertDNSName,
+					}...),
+				},
+			},
+			"default_seat_email": schema.StringAttribute{
+				Description:         "Default seat email.",
+				MarkdownDescription: "Default seat email.",
+				Required:            true,
+			},
+		},
+		Optional: true,
+	}
+}
+
+// IDent
 
 var identAttrTypes = map[string]attr.Type{
 	"url":             types.StringType,

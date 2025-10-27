@@ -18,6 +18,7 @@ type mdmSCEPIssuer struct {
 	KeySize         types.Int64  `tfsdk:"key_size"`
 	KeyUsage        types.Int64  `tfsdk:"key_usage"`
 	Backend         types.String `tfsdk:"backend"`
+	Digicert        types.Object `tfsdk:"digicert"`
 	IDent           types.Object `tfsdk:"ident"`
 	MicrosoftCA     types.Object `tfsdk:"microsoft_ca"`
 	OktaCA          types.Object `tfsdk:"okta_ca"`
@@ -33,6 +34,7 @@ func mdmSCEPIssuerForState(msi *goztl.MDMSCEPIssuer) mdmSCEPIssuer {
 		KeySize:         types.Int64Value(int64(msi.KeySize)),
 		KeyUsage:        types.Int64Value(int64(msi.KeyUsage)),
 		Backend:         optionalStringForState(msi.Backend),
+		Digicert:        digicertBackendForState(msi.Digicert),
 		IDent:           identBackendForState(msi.IDent),
 		MicrosoftCA:     microsoftCABackendForState(msi.MicrosoftCA),
 		OktaCA:          microsoftCABackendForState(msi.OktaCA),
@@ -48,6 +50,7 @@ func mdmSCEPIssuerRequestWithState(data mdmSCEPIssuer) *goztl.MDMSCEPIssuerReque
 		KeySize:         int(data.KeySize.ValueInt64()),
 		KeyUsage:        int(data.KeyUsage.ValueInt64()),
 		Backend:         data.Backend.ValueString(),
+		Digicert:        digicertBackendWithState(data.Digicert),
 		IDent:           identBackendWithState(data.IDent),
 		MicrosoftCA:     microsoftCABackendWithState(data.MicrosoftCA),
 		OktaCA:          microsoftCABackendWithState(data.OktaCA),

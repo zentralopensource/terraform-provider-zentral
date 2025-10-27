@@ -91,6 +91,7 @@ func (r *MDMSCEPIssuerResource) Schema(ctx context.Context, req resource.SchemaR
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{
+						tfCertIssuerDigicertBackend,
 						tfCertIssuerIDentBackend,
 						tfCertIssuerMicrosoftCABackend,
 						tfCertIssuerOktaCABackend,
@@ -98,6 +99,7 @@ func (r *MDMSCEPIssuerResource) Schema(ctx context.Context, req resource.SchemaR
 					}...),
 				},
 			},
+			"digicert":         makeDigicertBackendResourceAttribute(),
 			"ident":            makeIDentBackendResourceAttribute(),
 			"microsoft_ca":     makeMicrosoftCABackendResourceAttribute("Microsoft CA"),
 			"okta_ca":          makeMicrosoftCABackendResourceAttribute("Okta CA"),

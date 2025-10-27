@@ -24,6 +24,7 @@ The data source `zentral_mdm_scep_issuer` allows details of a MDM SCEP issuer to
 
 - `backend` (String) SCEP issuer backend.
 - `description` (String) Description of the SCEP issuer.
+- `digicert` (Attributes) Digicert backend parameters. (see [below for nested schema](#nestedatt--digicert))
 - `ident` (Attributes) IDent backend parameters. (see [below for nested schema](#nestedatt--ident))
 - `key_size` (Number) The size of the private key in bits.
 - `key_usage` (Number) Key usage for the SCEP requests.
@@ -31,6 +32,20 @@ The data source `zentral_mdm_scep_issuer` allows details of a MDM SCEP issuer to
 - `okta_ca` (Attributes) Okta CA backend parameters. (see [below for nested schema](#nestedatt--okta_ca))
 - `static_challenge` (Attributes) Static Challenge backend parameters. (see [below for nested schema](#nestedatt--static_challenge))
 - `url` (String) URL of the SCEP server.
+
+<a id="nestedatt--digicert"></a>
+### Nested Schema for `digicert`
+
+Read-Only:
+
+- `api_base_url` (String) API base URL.
+- `api_token` (String, Sensitive) API token.
+- `business_unit_guid` (String) Business unit GUID.
+- `default_seat_email` (String) Default seat email.
+- `profile_guid` (String) Profile GUID.
+- `seat_id_mapping` (String) Seat ID mapping.
+- `seat_type` (String) Seat type.
+
 
 <a id="nestedatt--ident"></a>
 ### Nested Schema for `ident`

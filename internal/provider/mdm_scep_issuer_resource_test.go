@@ -12,6 +12,7 @@ func TestAccMDMSCEPIssuerResource(t *testing.T) {
 	firstName := acctest.RandString(12)
 	secondName := acctest.RandString(12)
 	thirdName := acctest.RandString(12)
+	fourthName := acctest.RandString(12)
 	resourceName := "zentral_mdm_scep_issuer.test"
 
 	resource.Test(t, resource.TestCase{
@@ -35,6 +36,8 @@ func TestAccMDMSCEPIssuerResource(t *testing.T) {
 						resourceName, "key_size", "2048"),
 					resource.TestCheckResourceAttr(
 						resourceName, "backend", "STATIC_CHALLENGE"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "digicert"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "ident"),
 					resource.TestCheckNoResourceAttr(
@@ -67,6 +70,8 @@ func TestAccMDMSCEPIssuerResource(t *testing.T) {
 						resourceName, "key_size", "4096"),
 					resource.TestCheckResourceAttr(
 						resourceName, "backend", "MICROSOFT_CA"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "digicert"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "ident"),
 					resource.TestCheckResourceAttr(
@@ -103,6 +108,8 @@ func TestAccMDMSCEPIssuerResource(t *testing.T) {
 						resourceName, "key_size", "2048"),
 					resource.TestCheckResourceAttr(
 						resourceName, "backend", "IDENT"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "digicert"),
 					resource.TestCheckResourceAttr(
 						resourceName, "ident.url", "https://www.example.com/ident"),
 					resource.TestCheckResourceAttr(
@@ -111,6 +118,52 @@ func TestAccMDMSCEPIssuerResource(t *testing.T) {
 						resourceName, "ident.request_timeout", "30"),
 					resource.TestCheckResourceAttr(
 						resourceName, "ident.max_retries", "3"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "microsoft_ca"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "okta_ca"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "static_challenge"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update and Read
+			{
+				Config: testAccMDMSCEPIssuerResourceFourthConfig(fourthName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "name", fourthName),
+					resource.TestCheckResourceAttr(
+						resourceName, "description", "Description"),
+					resource.TestCheckResourceAttr(
+						resourceName, "url", "https://www.example.com/scep3"),
+					resource.TestCheckResourceAttr(
+						resourceName, "key_usage", "4"),
+					resource.TestCheckResourceAttr(
+						resourceName, "key_size", "2048"),
+					resource.TestCheckResourceAttr(
+						resourceName, "backend", "DIGICERT"),
+					resource.TestCheckResourceAttr(
+						resourceName, "digicert.api_base_url", "https://www.example.com/api/"),
+					resource.TestCheckResourceAttr(
+						resourceName, "digicert.api_token", "YoloFomo"),
+					resource.TestCheckResourceAttr(
+						resourceName, "digicert.profile_guid", "531049b7-8fff-4d4f-8250-0e3e048ac957"),
+					resource.TestCheckResourceAttr(
+						resourceName, "digicert.business_unit_guid", "88d2b54e-cb5b-4197-8ed9-8a77d6f15806"),
+					resource.TestCheckResourceAttr(
+						resourceName, "digicert.seat_type", "USER_SEAT"),
+					resource.TestCheckResourceAttr(
+						resourceName, "digicert.seat_id_mapping", "common_name"),
+					resource.TestCheckResourceAttr(
+						resourceName, "digicert.default_seat_email", "yolo@example.com"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "ident"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "microsoft_ca"),
 					resource.TestCheckNoResourceAttr(
@@ -172,6 +225,28 @@ resource  "zentral_mdm_scep_issuer" "test" {
   ident = {
       url          = "https://www.example.com/ident"
       bearer_token = "YoloFomo"
+  }
+}
+`, name)
+}
+
+func testAccMDMSCEPIssuerResourceFourthConfig(name string) string {
+	return fmt.Sprintf(`
+resource  "zentral_mdm_scep_issuer" "test" {
+  name             = %[1]q
+  description      = "Description"
+  url              = "https://www.example.com/scep3"
+  key_size         = 2048
+  key_usage        = 4
+  backend          = "DIGICERT"
+  digicert = {
+      api_base_url       = "https://www.example.com/api/"
+      api_token          = "YoloFomo"
+      profile_guid       = "531049b7-8fff-4d4f-8250-0e3e048ac957"
+      business_unit_guid = "88d2b54e-cb5b-4197-8ed9-8a77d6f15806"
+      seat_type          = "USER_SEAT"
+      seat_id_mapping    = "common_name"
+      default_seat_email = "yolo@example.com"
   }
 }
 `, name)

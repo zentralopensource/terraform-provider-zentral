@@ -66,6 +66,7 @@ func (d *MDMSCEPIssuerDataSource) Schema(ctx context.Context, req datasource.Sch
 				MarkdownDescription: "SCEP issuer backend.",
 				Computed:            true,
 			},
+			"digicert":         makeDigicertBackendDataSourceAttribute(),
 			"ident":            makeIDentBackendDataSourceAttribute(),
 			"microsoft_ca":     makeMicrosoftCABackendDataSourceAttribute("Microsoft CA"),
 			"okta_ca":          makeMicrosoftCABackendDataSourceAttribute("Okta CA"),
