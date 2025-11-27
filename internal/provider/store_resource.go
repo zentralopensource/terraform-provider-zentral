@@ -147,6 +147,75 @@ var httpBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttribut
 	Optional: true,
 }
 
+var kinesisBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttribute{
+	Description:         "Kinesis backend parameters.",
+	MarkdownDescription: "Kinesis backend parameters.",
+	Attributes: map[string]schema.Attribute{
+		"region_name": schema.StringAttribute{
+			Description:         "AWS region.",
+			MarkdownDescription: "AWS region.",
+			Required:            true,
+		},
+		"aws_access_key_id": schema.StringAttribute{
+			Description:         "AWS access key ID.",
+			MarkdownDescription: "AWS access key ID.",
+			Optional:            true,
+		},
+		"aws_secret_access_key": schema.StringAttribute{
+			Description:         "AWS secret access key.",
+			MarkdownDescription: "AWS secret access key.",
+			Optional:            true,
+		},
+		"assume_role_arn": schema.StringAttribute{
+			Description:         "ARN of the AWS role to assume.",
+			MarkdownDescription: "`ARN` of the AWS role to assume.",
+			Optional:            true,
+		},
+		"stream": schema.StringAttribute{
+			Description:         "Name of the Kinesis stream.",
+			MarkdownDescription: "Name of the Kinesis stream.",
+			Required:            true,
+		},
+		"batch_size": schema.Int64Attribute{
+			Description: fmt.Sprintf(
+				"Number of events sent in a single request. Defaults to %d. Must be between %d and %d.",
+				tfStoreKinesisBackendDefaultBatchSize,
+				tfStoreKinesisBackendMinBatchSize,
+				tfStoreKinesisBackendMaxBatchSize,
+			),
+			MarkdownDescription: fmt.Sprintf(
+				"Number of events sent in a single request. Defaults to `%d`. Must be between `%d` and `%d`.",
+				tfStoreKinesisBackendDefaultBatchSize,
+				tfStoreKinesisBackendMinBatchSize,
+				tfStoreKinesisBackendMaxBatchSize,
+			),
+			Optional: true,
+			Computed: true,
+			Default:  int64default.StaticInt64(tfStoreKinesisBackendDefaultBatchSize),
+			Validators: []validator.Int64{
+				int64validator.Between(tfStoreKinesisBackendMinBatchSize, tfStoreKinesisBackendMaxBatchSize),
+			},
+		},
+		"serialization_format": schema.StringAttribute{
+			Description: fmt.Sprintf(
+				"Zentral event serialization format. Either %s or %s.",
+				tfStoreKinesisSerializationFormatZentral,
+				tfStoreKinesisSerializationFormatFirehoseV1,
+			),
+			MarkdownDescription: fmt.Sprintf(
+				"Zentral event serialization format. Either `%s` or `%s`.",
+				tfStoreKinesisSerializationFormatZentral,
+				tfStoreKinesisSerializationFormatFirehoseV1,
+			),
+			Required: true,
+			Validators: []validator.String{
+				stringvalidator.OneOf([]string{tfStoreKinesisSerializationFormatZentral, tfStoreKinesisSerializationFormatFirehoseV1}...),
+			},
+		},
+	},
+	Optional: true,
+}
+
 var splunkBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttribute{
 	Description:         "Splunk backend parameters.",
 	MarkdownDescription: "Splunk backend parameters.",
@@ -357,11 +426,12 @@ func (r *StoreResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				MarkdownDescription: "Store backend.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{tfStoreHTTPBackend, tfStoreSplunkBackend}...),
+					stringvalidator.OneOf([]string{tfStoreHTTPBackend, tfStoreKinesisBackend, tfStoreSplunkBackend}...),
 				},
 			},
-			"http":   httpBackendSchema,
-			"splunk": splunkBackendSchema,
+			"http":    httpBackendSchema,
+			"kinesis": kinesisBackendSchema,
+			"splunk":  splunkBackendSchema,
 		},
 	}
 }

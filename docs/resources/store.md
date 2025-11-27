@@ -126,6 +126,7 @@ resource "zentral_store" "splunk-full" {
 - `event_filters` (Attributes) Used to filter the events sent to the store. By default, all the events are sent to the store. (see [below for nested schema](#nestedatt--event_filters))
 - `events_url_authorized_role_ids` (Set of Number) The `ID`s of the roles authorized to see the links to the external event store.
 - `http` (Attributes) HTTP backend parameters. (see [below for nested schema](#nestedatt--http))
+- `kinesis` (Attributes) Kinesis backend parameters. (see [below for nested schema](#nestedatt--kinesis))
 - `splunk` (Attributes) Splunk backend parameters. (see [below for nested schema](#nestedatt--splunk))
 
 ### Read-Only
@@ -186,6 +187,23 @@ Required:
 - `name` (String) Name of the HTTP header.
 - `value` (String, Sensitive) Value of the HTTP header.
 
+
+
+<a id="nestedatt--kinesis"></a>
+### Nested Schema for `kinesis`
+
+Required:
+
+- `region_name` (String) AWS region.
+- `serialization_format` (String) Zentral event serialization format. Either `zentral` or `firehose_v1`.
+- `stream` (String) Name of the Kinesis stream.
+
+Optional:
+
+- `assume_role_arn` (String) `ARN` of the AWS role to assume.
+- `aws_access_key_id` (String) AWS access key ID.
+- `aws_secret_access_key` (String) AWS secret access key.
+- `batch_size` (Number) Number of events sent in a single request. Defaults to `1`. Must be between `1` and `500`.
 
 
 <a id="nestedatt--splunk"></a>

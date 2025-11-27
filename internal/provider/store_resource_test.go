@@ -52,6 +52,9 @@ func TestAccStoreResource(t *testing.T) {
 						resourceName, "http.max_retries", "3"),
 					resource.TestCheckResourceAttr(
 						resourceName, "http.verify_tls", "true"),
+					// KINESIS
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis"),
 					// SPLUNK
 					resource.TestCheckNoResourceAttr(
 						resourceName, "splunk"),
@@ -120,6 +123,9 @@ func TestAccStoreResource(t *testing.T) {
 						resourceName, "http.max_retries", "4"),
 					resource.TestCheckResourceAttr(
 						resourceName, "http.verify_tls", "false"),
+					// KINESIS
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis"),
 					// SPLUNK
 					resource.TestCheckNoResourceAttr(
 						resourceName, "splunk"),
@@ -133,12 +139,100 @@ func TestAccStoreResource(t *testing.T) {
 			},
 			// Update and Read
 			{
+				Config: testAccStoreResourceConfigKinesisBase(firstName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "name", firstName),
+					resource.TestCheckResourceAttr(
+						resourceName, "description", ""),
+					resource.TestCheckResourceAttr(
+						resourceName, "admin_console", "false"),
+					resource.TestCheckResourceAttr(
+						resourceName, "events_url_authorized_role_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_filters.included_event_filters.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_filters.excluded_event_filters.#", "0"),
+					// KINESIS
+					resource.TestCheckResourceAttr(
+						resourceName, "backend", "KINESIS"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.region_name", "eu-central-1"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis.aws_access_key_id"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis.aws_secret_access_key"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis.assume_role_arn"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.stream", "yolo-fomo"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.batch_size", "1"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.serialization_format", "zentral"),
+					// HTTP
+					resource.TestCheckNoResourceAttr(
+						resourceName, "http"),
+					// SPLUNK
+					resource.TestCheckNoResourceAttr(
+						resourceName, "splunk"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update and Read
+			{
+				Config: testAccStoreResourceConfigKinesisFull(firstName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "name", firstName),
+					resource.TestCheckResourceAttr(
+						resourceName, "description", "Second description"),
+					resource.TestCheckResourceAttr(
+						resourceName, "admin_console", "false"),
+					resource.TestCheckResourceAttr(
+						resourceName, "events_url_authorized_role_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_filters.included_event_filters.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_filters.excluded_event_filters.#", "0"),
+					// KINESIS
+					resource.TestCheckResourceAttr(
+						resourceName, "backend", "KINESIS"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.region_name", "us-east-1"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.aws_access_key_id", "yolo"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.aws_secret_access_key", "fomo"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.assume_role_arn", "arn::role"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.stream", "fomo-yolo"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.batch_size", "17"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.serialization_format", "firehose_v1"),
+					// HTTP
+					resource.TestCheckNoResourceAttr(
+						resourceName, "http"),
+					// SPLUNK
+					resource.TestCheckNoResourceAttr(
+						resourceName, "splunk"),
+				),
+			},
+			// Update and Read
+			{
 				Config: testAccStoreResourceConfigSplunkBase(secondName),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
 					resource.TestCheckResourceAttr(
-						resourceName, "description", "Second description"),
+						resourceName, "description", ""),
 					resource.TestCheckResourceAttr(
 						resourceName, "admin_console", "false"),
 					resource.TestCheckResourceAttr(
@@ -193,6 +287,9 @@ func TestAccStoreResource(t *testing.T) {
 					// HTTP
 					resource.TestCheckNoResourceAttr(
 						resourceName, "http"),
+					// KINESIS
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis"),
 				),
 			},
 			// ImportState
@@ -208,7 +305,7 @@ func TestAccStoreResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "name", firstName),
 					resource.TestCheckResourceAttr(
-						resourceName, "description", "First description"),
+						resourceName, "description", "Third description"),
 					resource.TestCheckResourceAttr(
 						resourceName, "admin_console", "false"),
 					resource.TestCheckResourceAttr(
@@ -275,6 +372,9 @@ func TestAccStoreResource(t *testing.T) {
 					// HTTP
 					resource.TestCheckNoResourceAttr(
 						resourceName, "http"),
+					// KINESIS
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis"),
 				),
 			},
 			// ImportState
@@ -337,11 +437,43 @@ resource "zentral_store" "test" {
 `, name)
 }
 
-func testAccStoreResourceConfigSplunkBase(name string) string {
+func testAccStoreResourceConfigKinesisBase(name string) string {
+	return fmt.Sprintf(`
+resource "zentral_store" "test" {
+  name    = %[1]q
+  backend = "KINESIS"
+  kinesis = {
+    region_name          = "eu-central-1"
+    stream               = "yolo-fomo"
+    serialization_format = "zentral"
+  }
+}
+`, name)
+}
+
+func testAccStoreResourceConfigKinesisFull(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_store" "test" {
   name        = %[1]q
   description = "Second description"
+  backend     = "KINESIS"
+  kinesis = {
+    region_name           = "us-east-1"
+    aws_access_key_id     = "yolo"
+    aws_secret_access_key = "fomo"
+    assume_role_arn       = "arn::role"
+    stream                = "fomo-yolo"
+    batch_size            = 17
+    serialization_format  = "firehose_v1"
+  }
+}
+`, name)
+}
+
+func testAccStoreResourceConfigSplunkBase(name string) string {
+	return fmt.Sprintf(`
+resource "zentral_store" "test" {
+  name        = %[1]q
   backend     = "SPLUNK"
   splunk = {
     hec_url   = "https://www.example.com/hec"
@@ -355,7 +487,7 @@ func testAccStoreResourceConfigSplunkFull(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_store" "test" {
   name        = %[1]q
-  description = "First description"
+  description = "Third description"
   backend     = "SPLUNK"
   splunk = {
     hec_url   = "https://www.example.com/hec"

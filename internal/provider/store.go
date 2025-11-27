@@ -7,20 +7,26 @@ import (
 )
 
 const (
-	tfStoreHTTPBackend                      string = "HTTP"
-	tfStoreSplunkBackend                           = "SPLUNK"
-	tfStoreHTTPBackendDefaultConcurrency    int64  = 1
-	tfStoreHTTPBackendMinConcurrency               = 1
-	tfStoreHTTPBackendDefaultRequestTimeout        = 120
-	tfStoreHTTPBackendMinRequestTimeout            = 1
-	tfStoreHTTPBackendMaxRequestTimeout            = 600
-	tfStoreHTTPBackendDefaultMaxRetries            = 3
-	tfStoreHTTPBackendMinMaxRetries                = 1
-	tfStoreHTTPBackendMaxMaxRetries                = 5
-	tfStoreSplunkBackendDefaultTimeout             = 300
-	tfStoreSplunkBackendDefaultBatchSize           = 1
-	tfStoreSplunkBackendMinBatchSize               = 1
-	tfStoreSplunkBackendMaxBatchSize               = 100
+	tfStoreHTTPBackend                          string = "HTTP"
+	tfStoreKinesisBackend                              = "KINESIS"
+	tfStoreSplunkBackend                               = "SPLUNK"
+	tfStoreHTTPBackendDefaultConcurrency        int64  = 1
+	tfStoreHTTPBackendMinConcurrency                   = 1
+	tfStoreHTTPBackendDefaultRequestTimeout            = 120
+	tfStoreHTTPBackendMinRequestTimeout                = 1
+	tfStoreHTTPBackendMaxRequestTimeout                = 600
+	tfStoreHTTPBackendDefaultMaxRetries                = 3
+	tfStoreHTTPBackendMinMaxRetries                    = 1
+	tfStoreHTTPBackendMaxMaxRetries                    = 5
+	tfStoreKinesisBackendDefaultBatchSize              = 1
+	tfStoreKinesisBackendMinBatchSize                  = 1
+	tfStoreKinesisBackendMaxBatchSize                  = 500
+	tfStoreKinesisSerializationFormatZentral           = "zentral"
+	tfStoreKinesisSerializationFormatFirehoseV1        = "firehose_v1"
+	tfStoreSplunkBackendDefaultTimeout                 = 300
+	tfStoreSplunkBackendDefaultBatchSize               = 1
+	tfStoreSplunkBackendMinBatchSize                   = 1
+	tfStoreSplunkBackendMaxBatchSize                   = 100
 )
 
 type store struct {
@@ -32,6 +38,7 @@ type store struct {
 	EventFilters               types.Object `tfsdk:"event_filters"`
 	Backend                    types.String `tfsdk:"backend"`
 	HTTP                       types.Object `tfsdk:"http"`
+	Kinesis                    types.Object `tfsdk:"kinesis"`
 	Splunk                     types.Object `tfsdk:"splunk"`
 }
 
@@ -44,6 +51,16 @@ var storeHTTPAttrTypes = map[string]attr.Type{
 	"concurrency":     types.Int64Type,
 	"request_timeout": types.Int64Type,
 	"max_retries":     types.Int64Type,
+}
+
+var storeKinesisAttrTypes = map[string]attr.Type{
+	"region_name":           types.StringType,
+	"aws_access_key_id":     types.StringType,
+	"aws_secret_access_key": types.StringType,
+	"assume_role_arn":       types.StringType,
+	"stream":                types.StringType,
+	"batch_size":            types.Int64Type,
+	"serialization_format":  types.StringType,
 }
 
 var storeSplunkAttrTypes = map[string]attr.Type{
@@ -89,6 +106,27 @@ func httpBackendForState(s *goztl.Store) types.Object {
 		)
 	} else {
 		b = types.ObjectNull(storeHTTPAttrTypes)
+	}
+	return b
+}
+
+func kinesisBackendForState(s *goztl.Store) types.Object {
+	var b types.Object
+	if s.Kinesis != nil {
+		b = types.ObjectValueMust(
+			storeKinesisAttrTypes,
+			map[string]attr.Value{
+				"region_name":           types.StringValue(s.Kinesis.RegionName),
+				"aws_access_key_id":     optionalStringForState(s.Kinesis.AWSAccessKeyID),
+				"aws_secret_access_key": optionalStringForState(s.Kinesis.AWSSecretAccessKey),
+				"assume_role_arn":       optionalStringForState(s.Kinesis.AssumeRoleARN),
+				"stream":                types.StringValue(s.Kinesis.Stream),
+				"batch_size":            types.Int64Value(int64(s.Kinesis.BatchSize)),
+				"serialization_format":  types.StringValue(s.Kinesis.SerializationFormat),
+			},
+		)
+	} else {
+		b = types.ObjectNull(storeKinesisAttrTypes)
 	}
 	return b
 }
@@ -139,6 +177,7 @@ func storeForState(s *goztl.Store) store {
 		EventFilters:               eventFilterSetForState(s.EventFilters),
 		Backend:                    types.StringValue(s.Backend),
 		HTTP:                       httpBackendForState(s),
+		Kinesis:                    kinesisBackendForState(s),
 		Splunk:                     splunkBackendForState(s),
 	}
 }
@@ -156,6 +195,23 @@ func httpBackendWithState(data store) *goztl.StoreHTTP {
 			Concurrency:    int(bMap["concurrency"].(types.Int64).ValueInt64()),
 			RequestTimeout: int(bMap["request_timeout"].(types.Int64).ValueInt64()),
 			MaxRetries:     int(bMap["max_retries"].(types.Int64).ValueInt64()),
+		}
+	}
+	return b
+}
+
+func kinesisBackendWithState(data store) *goztl.StoreKinesis {
+	var b *goztl.StoreKinesis
+	if !data.Kinesis.IsNull() {
+		bMap := data.Kinesis.Attributes()
+		b = &goztl.StoreKinesis{
+			RegionName:          bMap["region_name"].(types.String).ValueString(),
+			AWSAccessKeyID:      optionalStringWithState(bMap["aws_access_key_id"].(types.String)),
+			AWSSecretAccessKey:  optionalStringWithState(bMap["aws_secret_access_key"].(types.String)),
+			AssumeRoleARN:       optionalStringWithState(bMap["assume_role_arn"].(types.String)),
+			Stream:              bMap["stream"].(types.String).ValueString(),
+			BatchSize:           int(bMap["batch_size"].(types.Int64).ValueInt64()),
+			SerializationFormat: bMap["serialization_format"].(types.String).ValueString(),
 		}
 	}
 	return b
@@ -202,6 +258,7 @@ func storeRequestWithState(data store) *goztl.StoreRequest {
 		EventFilters:               eventFilterSetWithState(data.EventFilters),
 		Backend:                    data.Backend.ValueString(),
 		HTTP:                       httpBackendWithState(data),
+		Kinesis:                    kinesisBackendWithState(data),
 		Splunk:                     splunkBackendWithState(data),
 	}
 }
