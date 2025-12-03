@@ -1,0 +1,4 @@
+{
+    "name": "Zental terraform-provider Dev Enviroment",
+    "image": "mcr.microsoft.com/devcontainers/go:1.24"
+}
