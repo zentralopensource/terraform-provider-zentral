@@ -126,6 +126,7 @@ func (p *ZentralProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		NewGWSGroupTagMappingResource,
 		NewJMESPathCheckResource,
 		NewMetaBusinessUnitResource,
 		NewMDMACMEIssuerResource,
@@ -176,6 +177,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 
 func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		NewGWSConnectionDataSource,
 		NewJMESPathCheckDataSource,
 		NewMetaBusinessUnitDataSource,
 		NewMDMACMEIssuerDataSource,
