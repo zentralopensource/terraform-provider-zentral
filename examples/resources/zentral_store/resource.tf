@@ -41,6 +41,17 @@ resource "zentral_store" "http-full" {
   }
 }
 
+resource "zentral_store" "panther" {
+  name        = "Panther"
+  description = "Example of a Panther store backend"
+  backend     = "PANTHER"
+  panther = {
+    endpoint_url = "https://logs.acme.runpanther.net/http/b1a5141b-d494-452f-88ca-a04adb25b861"
+    bearer_token = "19cd744d-fc4c-48eb-be9f-abd6dd17a575"
+    batch_size   = 100
+  }
+}
+
 resource "zentral_store" "splunk-minimal" {
   name        = "Splunk-minimal"
   description = "Example of a minimal Splunk store backend"

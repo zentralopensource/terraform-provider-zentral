@@ -56,6 +56,17 @@ resource "zentral_store" "http-full" {
   }
 }
 
+resource "zentral_store" "panther" {
+  name        = "Panther"
+  description = "Example of a Panther store backend"
+  backend     = "PANTHER"
+  panther = {
+    endpoint_url = "https://logs.acme.runpanther.net/http/b1a5141b-d494-452f-88ca-a04adb25b861"
+    bearer_token = "19cd744d-fc4c-48eb-be9f-abd6dd17a575"
+    batch_size   = 100
+  }
+}
+
 resource "zentral_store" "splunk-minimal" {
   name        = "Splunk-minimal"
   description = "Example of a minimal Splunk store backend"
@@ -127,6 +138,7 @@ resource "zentral_store" "splunk-full" {
 - `events_url_authorized_role_ids` (Set of Number) The `ID`s of the roles authorized to see the links to the external event store.
 - `http` (Attributes) HTTP backend parameters. (see [below for nested schema](#nestedatt--http))
 - `kinesis` (Attributes) Kinesis backend parameters. (see [below for nested schema](#nestedatt--kinesis))
+- `panther` (Attributes) Panther backend parameters (HTTP log source). (see [below for nested schema](#nestedatt--panther))
 - `splunk` (Attributes) Splunk backend parameters. (see [below for nested schema](#nestedatt--splunk))
 
 ### Read-Only
@@ -204,6 +216,19 @@ Optional:
 - `aws_access_key_id` (String) AWS access key ID.
 - `aws_secret_access_key` (String) AWS secret access key.
 - `batch_size` (Number) Number of events sent in a single request. Defaults to `1`. Must be between `1` and `500`.
+
+
+<a id="nestedatt--panther"></a>
+### Nested Schema for `panther`
+
+Required:
+
+- `bearer_token` (String, Sensitive) Bearer Token.
+- `endpoint_url` (String) HTTP log source URL.
+
+Optional:
+
+- `batch_size` (Number) Number of events sent in a single request. Defaults to `1`. Must be between `1` and `100`.
 
 
 <a id="nestedatt--splunk"></a>

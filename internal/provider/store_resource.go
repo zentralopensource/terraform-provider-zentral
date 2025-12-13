@@ -216,6 +216,45 @@ var kinesisBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttri
 	Optional: true,
 }
 
+var pantherBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttribute{
+	Description:         "Panther backend parameters (HTTP log source).",
+	MarkdownDescription: "Panther backend parameters (HTTP log source).",
+	Attributes: map[string]schema.Attribute{
+		"endpoint_url": schema.StringAttribute{
+			Description:         "HTTP log source URL.",
+			MarkdownDescription: "HTTP log source URL.",
+			Required:            true,
+		},
+		"bearer_token": schema.StringAttribute{
+			Description:         "Bearer Token.",
+			MarkdownDescription: "Bearer Token.",
+			Required:            true,
+			Sensitive:           true,
+		},
+		"batch_size": schema.Int64Attribute{
+			Description: fmt.Sprintf(
+				"Number of events sent in a single request. Defaults to %d. Must be between %d and %d.",
+				tfStorePantherBackendDefaultBatchSize,
+				tfStorePantherBackendMinBatchSize,
+				tfStorePantherBackendMaxBatchSize,
+			),
+			MarkdownDescription: fmt.Sprintf(
+				"Number of events sent in a single request. Defaults to `%d`. Must be between `%d` and `%d`.",
+				tfStorePantherBackendDefaultBatchSize,
+				tfStorePantherBackendMinBatchSize,
+				tfStorePantherBackendMaxBatchSize,
+			),
+			Optional: true,
+			Computed: true,
+			Default:  int64default.StaticInt64(tfStorePantherBackendDefaultBatchSize),
+			Validators: []validator.Int64{
+				int64validator.Between(tfStorePantherBackendMinBatchSize, tfStorePantherBackendMaxBatchSize),
+			},
+		},
+	},
+	Optional: true,
+}
+
 var splunkBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttribute{
 	Description:         "Splunk backend parameters.",
 	MarkdownDescription: "Splunk backend parameters.",
@@ -426,11 +465,12 @@ func (r *StoreResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				MarkdownDescription: "Store backend.",
 				Required:            true,
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{tfStoreHTTPBackend, tfStoreKinesisBackend, tfStoreSplunkBackend}...),
+					stringvalidator.OneOf([]string{tfStoreHTTPBackend, tfStoreKinesisBackend, tfStorePantherBackend, tfStoreSplunkBackend}...),
 				},
 			},
 			"http":    httpBackendSchema,
 			"kinesis": kinesisBackendSchema,
+			"panther": pantherBackendSchema,
 			"splunk":  splunkBackendSchema,
 		},
 	}

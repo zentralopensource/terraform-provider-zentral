@@ -211,8 +211,8 @@ github.com/zclconf/go-cty v1.17.0 h1:seZvECve6XX4tmnvRzWtJNHdscMtYEx5R7bnnVyd/d0
 github.com/zclconf/go-cty v1.17.0/go.mod h1:wqFzcImaLTI6A5HfsRwB0nj5n0MRZFwmey8YoFPPs3U=
 github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940 h1:4r45xpDWB6ZMSMNJFMOjqrGHynW3DIBuR2H9j0ug+Mo=
 github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmBdvvj3nqzfzJ6nTCIwDTPZ56aVGvDrmztiO5g3qrM=
-github.com/zentralopensource/goztl v0.1.66 h1:tguZqPkhLo0TDflJoyXvgdzBfrcgy+LResO0Eg64hg0=
-github.com/zentralopensource/goztl v0.1.66/go.mod h1:wNijpCZljn/seFf9D4q25KE5ugdcDidJAbA2ZUwxfnA=
+github.com/zentralopensource/goztl v0.1.67 h1:tKHXEuC1zIN6d2itD4FRNgs7mN8R/iUk6VQsbuH/0bo=
+github.com/zentralopensource/goztl v0.1.67/go.mod h1:wNijpCZljn/seFf9D4q25KE5ugdcDidJAbA2ZUwxfnA=
 go.abhg.dev/goldmark/frontmatter v0.2.0 h1:P8kPG0YkL12+aYk2yU3xHv4tcXzeVnN+gU0tJ5JnxRw=
 go.abhg.dev/goldmark/frontmatter v0.2.0/go.mod h1:XqrEkZuM57djk7zrlRUB02x8I5J0px76YjkOzhB4YlU=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=

@@ -9,6 +9,7 @@ import (
 const (
 	tfStoreHTTPBackend                          string = "HTTP"
 	tfStoreKinesisBackend                              = "KINESIS"
+	tfStorePantherBackend                              = "PANTHER"
 	tfStoreSplunkBackend                               = "SPLUNK"
 	tfStoreHTTPBackendDefaultConcurrency        int64  = 1
 	tfStoreHTTPBackendMinConcurrency                   = 1
@@ -23,6 +24,9 @@ const (
 	tfStoreKinesisBackendMaxBatchSize                  = 500
 	tfStoreKinesisSerializationFormatZentral           = "zentral"
 	tfStoreKinesisSerializationFormatFirehoseV1        = "firehose_v1"
+	tfStorePantherBackendDefaultBatchSize              = 1
+	tfStorePantherBackendMinBatchSize                  = 1
+	tfStorePantherBackendMaxBatchSize                  = 100
 	tfStoreSplunkBackendDefaultTimeout                 = 300
 	tfStoreSplunkBackendDefaultBatchSize               = 1
 	tfStoreSplunkBackendMinBatchSize                   = 1
@@ -39,6 +43,7 @@ type store struct {
 	Backend                    types.String `tfsdk:"backend"`
 	HTTP                       types.Object `tfsdk:"http"`
 	Kinesis                    types.Object `tfsdk:"kinesis"`
+	Panther                    types.Object `tfsdk:"panther"`
 	Splunk                     types.Object `tfsdk:"splunk"`
 }
 
@@ -61,6 +66,12 @@ var storeKinesisAttrTypes = map[string]attr.Type{
 	"stream":                types.StringType,
 	"batch_size":            types.Int64Type,
 	"serialization_format":  types.StringType,
+}
+
+var storePantherAttrTypes = map[string]attr.Type{
+	"endpoint_url": types.StringType,
+	"bearer_token": types.StringType,
+	"batch_size":   types.Int64Type,
 }
 
 var storeSplunkAttrTypes = map[string]attr.Type{
@@ -131,6 +142,23 @@ func kinesisBackendForState(s *goztl.Store) types.Object {
 	return b
 }
 
+func pantherBackendForState(s *goztl.Store) types.Object {
+	var b types.Object
+	if s.Panther != nil {
+		b = types.ObjectValueMust(
+			storePantherAttrTypes,
+			map[string]attr.Value{
+				"endpoint_url": types.StringValue(s.Panther.EndpointURL),
+				"bearer_token": types.StringValue(s.Panther.BearerToken),
+				"batch_size":   types.Int64Value(int64(s.Panther.BatchSize)),
+			},
+		)
+	} else {
+		b = types.ObjectNull(storePantherAttrTypes)
+	}
+	return b
+}
+
 func splunkBackendForState(s *goztl.Store) types.Object {
 	var b types.Object
 	if s.Splunk != nil {
@@ -178,6 +206,7 @@ func storeForState(s *goztl.Store) store {
 		Backend:                    types.StringValue(s.Backend),
 		HTTP:                       httpBackendForState(s),
 		Kinesis:                    kinesisBackendForState(s),
+		Panther:                    pantherBackendForState(s),
 		Splunk:                     splunkBackendForState(s),
 	}
 }
@@ -212,6 +241,19 @@ func kinesisBackendWithState(data store) *goztl.StoreKinesis {
 			Stream:              bMap["stream"].(types.String).ValueString(),
 			BatchSize:           int(bMap["batch_size"].(types.Int64).ValueInt64()),
 			SerializationFormat: bMap["serialization_format"].(types.String).ValueString(),
+		}
+	}
+	return b
+}
+
+func pantherBackendWithState(data store) *goztl.StorePanther {
+	var b *goztl.StorePanther
+	if !data.Panther.IsNull() {
+		bMap := data.Panther.Attributes()
+		b = &goztl.StorePanther{
+			EndpointURL: bMap["endpoint_url"].(types.String).ValueString(),
+			BearerToken: bMap["bearer_token"].(types.String).ValueString(),
+			BatchSize:   int(bMap["batch_size"].(types.Int64).ValueInt64()),
 		}
 	}
 	return b
@@ -259,6 +301,7 @@ func storeRequestWithState(data store) *goztl.StoreRequest {
 		Backend:                    data.Backend.ValueString(),
 		HTTP:                       httpBackendWithState(data),
 		Kinesis:                    kinesisBackendWithState(data),
+		Panther:                    pantherBackendWithState(data),
 		Splunk:                     splunkBackendWithState(data),
 	}
 }

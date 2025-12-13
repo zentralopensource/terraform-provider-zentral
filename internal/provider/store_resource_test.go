@@ -55,6 +55,9 @@ func TestAccStoreResource(t *testing.T) {
 					// KINESIS
 					resource.TestCheckNoResourceAttr(
 						resourceName, "kinesis"),
+					// PANTHER
+					resource.TestCheckNoResourceAttr(
+						resourceName, "panther"),
 					// SPLUNK
 					resource.TestCheckNoResourceAttr(
 						resourceName, "splunk"),
@@ -73,7 +76,7 @@ func TestAccStoreResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
 					resource.TestCheckResourceAttr(
-						resourceName, "description", "First description"),
+						resourceName, "description", "HTTP description"),
 					resource.TestCheckResourceAttr(
 						resourceName, "admin_console", "true"),
 					resource.TestCheckResourceAttr(
@@ -126,6 +129,9 @@ func TestAccStoreResource(t *testing.T) {
 					// KINESIS
 					resource.TestCheckNoResourceAttr(
 						resourceName, "kinesis"),
+					// PANTHER
+					resource.TestCheckNoResourceAttr(
+						resourceName, "panther"),
 					// SPLUNK
 					resource.TestCheckNoResourceAttr(
 						resourceName, "splunk"),
@@ -173,6 +179,9 @@ func TestAccStoreResource(t *testing.T) {
 					// HTTP
 					resource.TestCheckNoResourceAttr(
 						resourceName, "http"),
+					// PANTHER
+					resource.TestCheckNoResourceAttr(
+						resourceName, "panther"),
 					// SPLUNK
 					resource.TestCheckNoResourceAttr(
 						resourceName, "splunk"),
@@ -191,7 +200,7 @@ func TestAccStoreResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "name", firstName),
 					resource.TestCheckResourceAttr(
-						resourceName, "description", "Second description"),
+						resourceName, "description", "Kinesis description"),
 					resource.TestCheckResourceAttr(
 						resourceName, "admin_console", "false"),
 					resource.TestCheckResourceAttr(
@@ -220,10 +229,103 @@ func TestAccStoreResource(t *testing.T) {
 					// HTTP
 					resource.TestCheckNoResourceAttr(
 						resourceName, "http"),
+					// PANTHER
+					resource.TestCheckNoResourceAttr(
+						resourceName, "panther"),
 					// SPLUNK
 					resource.TestCheckNoResourceAttr(
 						resourceName, "splunk"),
 				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update and Read
+			{
+				Config: testAccStoreResourceConfigPantherBase(firstName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "name", firstName),
+					resource.TestCheckResourceAttr(
+						resourceName, "description", ""),
+					resource.TestCheckResourceAttr(
+						resourceName, "admin_console", "false"),
+					resource.TestCheckResourceAttr(
+						resourceName, "events_url_authorized_role_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_filters.included_event_filters.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_filters.excluded_event_filters.#", "0"),
+					// HTTP
+					resource.TestCheckNoResourceAttr(
+						resourceName, "http"),
+					// KINESIS
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis"),
+					// PANTHER
+					resource.TestCheckResourceAttr(
+						resourceName, "backend", "PANTHER"),
+					resource.TestCheckResourceAttr(
+						resourceName, "panther.endpoint_url", "https://logs.acme.runpanther.net/http/51ed68f2-6979-45b7-897b-cfed15adc01c"),
+					resource.TestCheckResourceAttr(
+						resourceName, "panther.bearer_token", "06cd5246-8d82-44c7-98c6-3ae2186b593d"),
+					resource.TestCheckResourceAttr(
+						resourceName, "panther.batch_size", "1"),
+					// SPLUNK
+					resource.TestCheckNoResourceAttr(
+						resourceName, "splunk"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Update and Read
+			{
+				Config: testAccStoreResourceConfigPantherFull(secondName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "name", secondName),
+					resource.TestCheckResourceAttr(
+						resourceName, "description", "Panther description"),
+					resource.TestCheckResourceAttr(
+						resourceName, "admin_console", "false"),
+					resource.TestCheckResourceAttr(
+						resourceName, "events_url_authorized_role_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_filters.included_event_filters.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_filters.excluded_event_filters.#", "0"),
+					// HTTP
+					resource.TestCheckNoResourceAttr(
+						resourceName, "http"),
+					// KINESIS
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis"),
+					// PANTHER
+					resource.TestCheckResourceAttr(
+						resourceName, "backend", "PANTHER"),
+					resource.TestCheckResourceAttr(
+						resourceName, "panther.endpoint_url", "https://logs.acme.runpanther.net/http/b1a5141b-d494-452f-88ca-a04adb25b861"),
+					resource.TestCheckResourceAttr(
+						resourceName, "panther.bearer_token", "19cd744d-fc4c-48eb-be9f-abd6dd17a575"),
+					resource.TestCheckResourceAttr(
+						resourceName, "panther.batch_size", "17"),
+					// SPLUNK
+					resource.TestCheckNoResourceAttr(
+						resourceName, "splunk"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 			// Update and Read
 			{
@@ -287,6 +389,9 @@ func TestAccStoreResource(t *testing.T) {
 					// HTTP
 					resource.TestCheckNoResourceAttr(
 						resourceName, "http"),
+					// PANTHER
+					resource.TestCheckNoResourceAttr(
+						resourceName, "panther"),
 					// KINESIS
 					resource.TestCheckNoResourceAttr(
 						resourceName, "kinesis"),
@@ -305,7 +410,7 @@ func TestAccStoreResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "name", firstName),
 					resource.TestCheckResourceAttr(
-						resourceName, "description", "Third description"),
+						resourceName, "description", "Splunk description"),
 					resource.TestCheckResourceAttr(
 						resourceName, "admin_console", "false"),
 					resource.TestCheckResourceAttr(
@@ -372,6 +477,9 @@ func TestAccStoreResource(t *testing.T) {
 					// HTTP
 					resource.TestCheckNoResourceAttr(
 						resourceName, "http"),
+					// PANTHER
+					resource.TestCheckNoResourceAttr(
+						resourceName, "panther"),
 					// KINESIS
 					resource.TestCheckNoResourceAttr(
 						resourceName, "kinesis"),
@@ -403,7 +511,7 @@ func testAccStoreResourceConfigHTTPFull(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_store" "test" {
   name                           = %[1]q
-  description                    = "First description"
+  description                    = "HTTP description"
   admin_console                  = true
   # TODO: replace with zentral_role when available
   events_url_authorized_role_ids = [6]
@@ -455,7 +563,7 @@ func testAccStoreResourceConfigKinesisFull(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_store" "test" {
   name        = %[1]q
-  description = "Second description"
+  description = "Kinesis description"
   backend     = "KINESIS"
   kinesis = {
     region_name           = "us-east-1"
@@ -465,6 +573,34 @@ resource "zentral_store" "test" {
     stream                = "fomo-yolo"
     batch_size            = 17
     serialization_format  = "firehose_v1"
+  }
+}
+`, name)
+}
+
+func testAccStoreResourceConfigPantherBase(name string) string {
+	return fmt.Sprintf(`
+resource "zentral_store" "test" {
+  name    = %[1]q
+  backend = "PANTHER"
+  panther = {
+    endpoint_url = "https://logs.acme.runpanther.net/http/51ed68f2-6979-45b7-897b-cfed15adc01c"
+    bearer_token = "06cd5246-8d82-44c7-98c6-3ae2186b593d"
+  }
+}
+`, name)
+}
+
+func testAccStoreResourceConfigPantherFull(name string) string {
+	return fmt.Sprintf(`
+resource "zentral_store" "test" {
+  name        = %[1]q
+  description = "Panther description"
+  backend     = "PANTHER"
+  panther = {
+    endpoint_url = "https://logs.acme.runpanther.net/http/b1a5141b-d494-452f-88ca-a04adb25b861"
+    bearer_token = "19cd744d-fc4c-48eb-be9f-abd6dd17a575"
+    batch_size   = 17
   }
 }
 `, name)
@@ -487,7 +623,7 @@ func testAccStoreResourceConfigSplunkFull(name string) string {
 	return fmt.Sprintf(`
 resource "zentral_store" "test" {
   name        = %[1]q
-  description = "Third description"
+  description = "Splunk description"
   backend     = "SPLUNK"
   splunk = {
     hec_url   = "https://www.example.com/hec"
