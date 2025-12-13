@@ -47,7 +47,7 @@ resource "zentral_store" "panther" {
   backend     = "PANTHER"
   panther = {
     endpoint_url = "https://logs.acme.runpanther.net/http/b1a5141b-d494-452f-88ca-a04adb25b861"
-    bearer_token = "19cd744d-fc4c-48eb-be9f-abd6dd17a575"
+    bearer_token = var.panther_bearer_token
     batch_size   = 100
   }
 }
