@@ -7,7 +7,6 @@ import (
 )
 
 func TestAccMDMDEPVirtualServerDataSource(t *testing.T) {
-
 	ds1ResourceName := "data.zentral_mdm_dep_virtual_server.check1_by_name"
 	ds2ResourceName := "data.zentral_mdm_dep_virtual_server.check2_by_id"
 
