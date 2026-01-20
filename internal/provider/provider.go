@@ -184,6 +184,7 @@ func (p *ZentralProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewMDMArtifactDataSource,
 		NewMDMBlueprintDataSource,
 		NewMDMFileVaultConfigDataSource,
+		NewMDMDEPVirtualServerDataSource,
 		NewMDMLocationDataSource,
 		NewMDMLocationAssetDataSource,
 		NewMDMOTAEnrollmentDataSource,
