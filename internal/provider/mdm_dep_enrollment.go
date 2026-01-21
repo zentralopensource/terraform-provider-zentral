@@ -22,7 +22,7 @@ type mdmDEPEnrollment struct {
 	AwaitDeviceConfigured      types.Bool   `tfsdk:"await_device_configured"`
 	Department                 types.String `tfsdk:"department"`
 	IsMandatory                types.Bool   `tfsdk:"is_mandatory"`
-	IsMdmRemovable             types.Bool   `tfsdk:"is_mdm_removable"`
+	IsMDMRemovable             types.Bool   `tfsdk:"is_mdm_removable"`
 	IsMultiUser                types.Bool   `tfsdk:"is_multi_user"`
 	IsSupervised               types.Bool   `tfsdk:"is_supervised"`
 	Language                   types.String `tfsdk:"language"`
@@ -31,11 +31,11 @@ type mdmDEPEnrollment struct {
 	SkipSetupItems             types.Set    `tfsdk:"skip_setup_items"`
 	SupportEmailAddress        types.String `tfsdk:"support_email_address"`
 	SupportPhoneNumber         types.String `tfsdk:"support_phone_number"`
-	IncludeTlsCertificates     types.Bool   `tfsdk:"include_tls_certificates"`
-	IosMaxVersion              types.String `tfsdk:"ios_max_version"`
-	IosMinVersion              types.String `tfsdk:"ios_min_version"`
-	MacosMaxVersion            types.String `tfsdk:"macos_max_version"`
-	MacosMinVersion            types.String `tfsdk:"macos_min_version"`
+	IncludeTLSCertificates     types.Bool   `tfsdk:"include_tls_certificates"`
+	IOSMaxVersion              types.String `tfsdk:"ios_max_version"`
+	IOSMinVersion              types.String `tfsdk:"ios_min_version"`
+	MacOSMaxVersion            types.String `tfsdk:"macos_max_version"`
+	MacOSMinVersion            types.String `tfsdk:"macos_min_version"`
 	PushCertificateID          types.Int64  `tfsdk:"push_certificate_id"`
 	ACMEIssuerUUID             types.String `tfsdk:"acme_issuer_id"`
 	SCEPIssuerUUID             types.String `tfsdk:"scep_issuer_id"`
@@ -69,7 +69,7 @@ func mdmDEPEnrollmentForState(enrollment *goztl.MDMDEPEnrollment) mdmDEPEnrollme
 		AwaitDeviceConfigured:      types.BoolValue(enrollment.AwaitDeviceConfigured),
 		Department:                 types.StringValue(enrollment.Department),
 		IsMandatory:                types.BoolValue(enrollment.IsMandatory),
-		IsMdmRemovable:             types.BoolValue(enrollment.IsMdmRemovable),
+		IsMDMRemovable:             types.BoolValue(enrollment.IsMDMRemovable),
 		IsMultiUser:                types.BoolValue(enrollment.IsMultiUser),
 		IsSupervised:               types.BoolValue(enrollment.IsSupervised),
 		Language:                   types.StringValue(enrollment.Language),
@@ -78,17 +78,17 @@ func mdmDEPEnrollmentForState(enrollment *goztl.MDMDEPEnrollment) mdmDEPEnrollme
 		SkipSetupItems:             stringSetForState(enrollment.SkipSetupItems),
 		SupportEmailAddress:        types.StringValue(enrollment.SupportEmailAddress),
 		SupportPhoneNumber:         types.StringValue(enrollment.SupportPhoneNumber),
-		IncludeTlsCertificates:     types.BoolValue(enrollment.IncludeTlsCertificates),
-		IosMaxVersion:              types.StringValue(enrollment.IosMaxVersion),
-		IosMinVersion:              types.StringValue(enrollment.IosMinVersion),
-		MacosMaxVersion:            types.StringValue(enrollment.MacosMaxVersion),
-		MacosMinVersion:            types.StringValue(enrollment.MacosMinVersion),
+		IncludeTLSCertificates:     types.BoolValue(enrollment.IncludeTLSCertificates),
+		IOSMaxVersion:              types.StringValue(enrollment.IOSMaxVersion),
+		IOSMinVersion:              types.StringValue(enrollment.IOSMinVersion),
+		MacOSMaxVersion:            types.StringValue(enrollment.MacOSMaxVersion),
+		MacOSMinVersion:            types.StringValue(enrollment.MacOSMinVersion),
 		PushCertificateID:          types.Int64Value(int64(enrollment.PushCertificateID)),
 		ACMEIssuerUUID:             optionalStringForState(enrollment.ACMEIssuerUUID),
 		SCEPIssuerUUID:             types.StringValue(enrollment.SCEPIssuerUUID),
 		BlueprintID:                optionalInt64ForState(enrollment.BlueprintID),
 		RealmUUID:                  optionalStringForState(enrollment.RealmUUID),
-		VirtualServerID:            types.Int64Value(int64(enrollment.VirtualServer)),
+		VirtualServerID:            types.Int64Value(int64(enrollment.VirtualServerID)),
 		// enrollment secret
 		Secret:             types.StringValue(enrollment.Secret.Secret),
 		MetaBusinessUnitID: types.Int64Value(int64(enrollment.Secret.MetaBusinessUnitID)),
@@ -123,7 +123,7 @@ func mdmDEPEnrollmentCreateRequestWithState(data mdmDEPEnrollment) *goztl.MDMDEP
 		AwaitDeviceConfigured:      data.AwaitDeviceConfigured.ValueBool(),
 		Department:                 data.Department.ValueString(),
 		IsMandatory:                data.IsMandatory.ValueBool(),
-		IsMdmRemovable:             data.IsMdmRemovable.ValueBool(),
+		IsMDMRemovable:             data.IsMDMRemovable.ValueBool(),
 		IsMultiUser:                data.IsMultiUser.ValueBool(),
 		IsSupervised:               data.IsSupervised.ValueBool(),
 		Language:                   data.Language.ValueString(),
@@ -132,17 +132,17 @@ func mdmDEPEnrollmentCreateRequestWithState(data mdmDEPEnrollment) *goztl.MDMDEP
 		SkipSetupItems:             stringListWithStateSet(data.SkipSetupItems),
 		SupportEmailAddress:        data.SupportEmailAddress.ValueString(),
 		SupportPhoneNumber:         data.SupportPhoneNumber.ValueString(),
-		IncludeTlsCertificates:     data.IncludeTlsCertificates.ValueBool(),
-		IosMaxVersion:              data.IosMaxVersion.ValueString(),
-		IosMinVersion:              data.IosMinVersion.ValueString(),
-		MacosMaxVersion:            data.MacosMaxVersion.ValueString(),
-		MacosMinVersion:            data.MacosMinVersion.ValueString(),
+		IncludeTLSCertificates:     data.IncludeTLSCertificates.ValueBool(),
+		IOSMaxVersion:              data.IOSMaxVersion.ValueString(),
+		IOSMinVersion:              data.IOSMinVersion.ValueString(),
+		MacOSMaxVersion:            data.MacOSMaxVersion.ValueString(),
+		MacOSMinVersion:            data.MacOSMinVersion.ValueString(),
 		PushCertificateID:          int(data.PushCertificateID.ValueInt64()),
 		ACMEIssuerUUID:             optionalStringWithState(data.ACMEIssuerUUID),
 		SCEPIssuerUUID:             data.SCEPIssuerUUID.ValueString(),
 		BlueprintID:                optionalIntWithState(data.BlueprintID),
 		RealmUUID:                  optionalStringWithState(data.RealmUUID),
-		VirtualServer:              int(data.VirtualServerID.ValueInt64()),
+		VirtualServerID:            int(data.VirtualServerID.ValueInt64()),
 	}
 
 	return mdmDEPEnrollmentRequest
@@ -172,7 +172,7 @@ func mdmDEPEnrollmentUpdateRequestWithState(data mdmDEPEnrollment) *goztl.MDMDEP
 		AwaitDeviceConfigured:      data.AwaitDeviceConfigured.ValueBool(),
 		Department:                 data.Department.ValueString(),
 		IsMandatory:                data.IsMandatory.ValueBool(),
-		IsMdmRemovable:             data.IsMdmRemovable.ValueBool(),
+		IsMDMRemovable:             data.IsMDMRemovable.ValueBool(),
 		IsMultiUser:                data.IsMultiUser.ValueBool(),
 		IsSupervised:               data.IsSupervised.ValueBool(),
 		Language:                   data.Language.ValueString(),
@@ -181,11 +181,11 @@ func mdmDEPEnrollmentUpdateRequestWithState(data mdmDEPEnrollment) *goztl.MDMDEP
 		SkipSetupItems:             stringListWithStateSet(data.SkipSetupItems),
 		SupportEmailAddress:        data.SupportEmailAddress.ValueString(),
 		SupportPhoneNumber:         data.SupportPhoneNumber.ValueString(),
-		IncludeTlsCertificates:     data.IncludeTlsCertificates.ValueBool(),
-		IosMaxVersion:              data.IosMaxVersion.ValueString(),
-		IosMinVersion:              data.IosMinVersion.ValueString(),
-		MacosMaxVersion:            data.MacosMaxVersion.ValueString(),
-		MacosMinVersion:            data.MacosMinVersion.ValueString(),
+		IncludeTLSCertificates:     data.IncludeTLSCertificates.ValueBool(),
+		IOSMaxVersion:              data.IOSMaxVersion.ValueString(),
+		IOSMinVersion:              data.IOSMinVersion.ValueString(),
+		MacOSMaxVersion:            data.MacOSMaxVersion.ValueString(),
+		MacOSMinVersion:            data.MacOSMinVersion.ValueString(),
 		PushCertificateID:          int(data.PushCertificateID.ValueInt64()),
 		ACMEIssuerUUID:             optionalStringWithState(data.ACMEIssuerUUID),
 		SCEPIssuerUUID:             data.SCEPIssuerUUID.ValueString(),
