@@ -132,8 +132,8 @@ func TestAccMDMDEPEnrollmentResource_basic(t *testing.T) {
 						resourceName, "push_certificate_id", pcResourceName, "id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "realm_uuid", rResourceName, "uuid"),
-					resource.TestCheckNoResourceAttr(
-						resourceName, "acme_issuer_id"),
+					resource.TestCheckResourceAttrPair(
+						resourceName, "acme_issuer_id", "zentral_mdm_acme_issuer.test", "id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "scep_issuer_id", siResouceName, "id"),
 					resource.TestCheckResourceAttrPair(
@@ -257,6 +257,24 @@ data "zentral_mdm_dep_virtual_server" "test" {
   name = "TF provider GitHub"
 }
 
+resource  "zentral_mdm_acme_issuer" "test" {
+  name               = %[1]q
+  description        = "Description"
+  directory_url      = "https://www.example.com/acme"
+  key_type           = "ECSECPrimeRandom"
+  key_size           = 256
+  usage_flags        = 1
+  extended_key_usage = ["1.3.6.1.5.5.7.3.2"]
+  hardware_bound     = true
+  attest             = true
+  backend            = "MICROSOFT_CA"
+  microsoft_ca       = {
+    "url"      = "https://www.example.com/ndes"
+    "username" = "yolo"
+    "password" = "fomo"
+  }
+}
+
 resource "zentral_mdm_dep_enrollment" "test" {
 	name                  			= %[1]q
   	display_name          			= %[1]q
@@ -302,7 +320,8 @@ resource "zentral_mdm_dep_enrollment" "test" {
   	push_certificate_id   			= data.zentral_mdm_push_certificate.test.id
   	realm_uuid            			= data.zentral_realm.test.uuid
   	scep_issuer_id        			= zentral_mdm_scep_issuer.test.id
-
+	acme_issuer_id					= zentral_mdm_acme_issuer.test.id
+	
 	virtual_server_id				= data.zentral_mdm_dep_virtual_server.test.id
 }
 `, name, tagName)
