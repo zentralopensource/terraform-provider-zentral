@@ -22,15 +22,10 @@ func mdmDEPEnrollmentCustomViewForState(customView *goztl.MDMDEPEnrollmentCustom
 }
 
 func mdmDEPEnrollmentCustomViewRequestWithState(data mdmDEPEnrollmentCutomView) *goztl.MDMDEPEnrollmentCustomViewRequest {
-	w := 0
-	if !data.Weight.IsNull() {
-		w = int(data.Weight.ValueInt64())
-	}
-
 	mdmEnrollmentCustomViewRequest := &goztl.MDMDEPEnrollmentCustomViewRequest{
 		DEPEnrollmentID: int(data.DEPEnrollmentID.ValueInt64()),
 		CustomViewID:    data.CustomViewID.ValueString(),
-		Weight:          &w,
+		Weight:          int(data.Weight.ValueInt64()),
 	}
 	return mdmEnrollmentCustomViewRequest
 }

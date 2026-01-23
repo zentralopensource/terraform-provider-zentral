@@ -84,7 +84,7 @@ func mdmEnrollmentCustomViewRequestWithState(data mdmEnrollmentCutomView) (*gozt
 		Name:                   data.Name.ValueString(),
 		Description:            data.Description.ValueString(),
 		HTML:                   html,
-		RequiresAuthentication: data.RequiresAuthentication.ValueBoolPointer(),
+		RequiresAuthentication: data.RequiresAuthentication.ValueBool(),
 	}
 	return mdmEnrollmentCustomViewRequest, diags
 }
