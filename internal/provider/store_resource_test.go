@@ -168,8 +168,8 @@ func TestAccStoreResource(t *testing.T) {
 						resourceName, "kinesis.aws_access_key_id"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "kinesis.aws_secret_access_key"),
-					resource.TestCheckNoResourceAttr(
-						resourceName, "kinesis.assume_role_arn"),
+					resource.TestCheckResourceAttr(
+						resourceName, "kinesis.assume_role_arn", "arn::role"),
 					resource.TestCheckResourceAttr(
 						resourceName, "kinesis.stream", "yolo-fomo"),
 					resource.TestCheckResourceAttr(
@@ -218,8 +218,8 @@ func TestAccStoreResource(t *testing.T) {
 						resourceName, "kinesis.aws_access_key_id", "yolo"),
 					resource.TestCheckResourceAttr(
 						resourceName, "kinesis.aws_secret_access_key", "fomo"),
-					resource.TestCheckResourceAttr(
-						resourceName, "kinesis.assume_role_arn", "arn::role"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "kinesis.assume_role_arn"),
 					resource.TestCheckResourceAttr(
 						resourceName, "kinesis.stream", "fomo-yolo"),
 					resource.TestCheckResourceAttr(
@@ -552,6 +552,7 @@ resource "zentral_store" "test" {
   backend = "KINESIS"
   kinesis = {
     region_name          = "eu-central-1"
+    assume_role_arn      = "arn::role"
     stream               = "yolo-fomo"
     serialization_format = "zentral"
   }
@@ -569,7 +570,6 @@ resource "zentral_store" "test" {
     region_name           = "us-east-1"
     aws_access_key_id     = "yolo"
     aws_secret_access_key = "fomo"
-    assume_role_arn       = "arn::role"
     stream                = "fomo-yolo"
     batch_size            = 17
     serialization_format  = "firehose_v1"
