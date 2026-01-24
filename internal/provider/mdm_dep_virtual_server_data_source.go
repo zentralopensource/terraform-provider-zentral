@@ -28,7 +28,7 @@ func (d *MDMDEPVirtualServerDataSource) Metadata(ctx context.Context, req dataso
 func (d *MDMDEPVirtualServerDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Description:         "Allows details of a MDM DEP virtual server to be retrieved by its ID and name.",
-		MarkdownDescription: "The data source `context` allows details of a MDM DEP virtual server to be retrieved by its `ID` and `name`.",
+		MarkdownDescription: "The data source `zentral_mdm_dep_virtual_server` allows details of a MDM DEP virtual server to be retrieved by its `ID` or `name`.",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
