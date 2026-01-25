@@ -50,7 +50,7 @@ resource "zentral_mdm_dep_enrollment" "simple" {
 
   // https://developer.apple.com/documentation/devicemanagement/profile/
   profile = {
-    virtual_server_id = data.zentral_mdm_dep_virtual_server.this
+    virtual_server_id = data.zentral_mdm_dep_virtual_server.this.id
     name              = "Zentral MDM simple"
   }
 }
@@ -111,12 +111,12 @@ resource "zentral_mdm_dep_enrollment" "full" {
 
   // https://developer.apple.com/documentation/devicemanagement/profile/
   profile = {
-    virtual_server_id = data.zentral_mdm_dep_virtual_server.this
+    virtual_server_id = data.zentral_mdm_dep_virtual_server.this.id
     name              = "Zentral MDM full"
 
     allow_pairing           = false
     auto_advance_setup      = false
-    await_device_configured = true // required when authentication → use_for_user_creation
+    await_device_configured = true // required when authentication > use_for_setup_assistant_user is set
 
     is_mandatory     = true
     is_mdm_removable = false
@@ -253,7 +253,7 @@ Optional:
 
 Optional:
 
-- `auto_ios_min_version_until` (String) If set, the minimum iOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set for example `28` to automatically required the latest iOS version until (but not including) iOS 28.
-- `auto_macos_min_version_until` (String) If set, the minimum macOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set for example `28` to automatically required the latest macOS version until (but not including) macOS 28.
+- `auto_ios_min_version_until` (String) If set, the minimum iOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set it to `28` for example to automatically require the latest iOS version until (but not including) iOS 28.
+- `auto_macos_min_version_until` (String) If set, the minimum macOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set it to `28` for example to automatically require the latest macOS version until (but not including) macOS 28.
 - `ios_min_version` (String) The fixed minimum iOS version required for a successful enrollment.
 - `macos_min_version` (String) The fixed minimum macOS version required for a successful enrollment.

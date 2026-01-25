@@ -35,7 +35,7 @@ resource "zentral_mdm_dep_enrollment" "simple" {
 
   // https://developer.apple.com/documentation/devicemanagement/profile/
   profile = {
-    virtual_server_id = data.zentral_mdm_dep_virtual_server.this
+    virtual_server_id = data.zentral_mdm_dep_virtual_server.this.id
     name              = "Zentral MDM simple"
   }
 }
@@ -96,12 +96,12 @@ resource "zentral_mdm_dep_enrollment" "full" {
 
   // https://developer.apple.com/documentation/devicemanagement/profile/
   profile = {
-    virtual_server_id = data.zentral_mdm_dep_virtual_server.this
+    virtual_server_id = data.zentral_mdm_dep_virtual_server.this.id
     name              = "Zentral MDM full"
 
     allow_pairing           = false
     auto_advance_setup      = false
-    await_device_configured = true // required when authentication → use_for_user_creation
+    await_device_configured = true // required when authentication > use_for_setup_assistant_user is set
 
     is_mandatory     = true
     is_mdm_removable = false

@@ -262,8 +262,8 @@ var mdeOSVersionEnforcementSchema schema.SingleNestedAttribute = schema.SingleNe
 			Default:             stringdefault.StaticString(""),
 		},
 		"auto_ios_min_version_until": schema.StringAttribute{
-			Description:         "If set, the minimum iOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set for example 28 to automatically required the latest iOS version until (but not including) iOS 28.",
-			MarkdownDescription: "If set, the minimum iOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set for example `28` to automatically required the latest iOS version until (but not including) iOS 28.",
+			Description:         "If set, the minimum iOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set it to 28 for example to automatically require the latest iOS version until (but not including) iOS 28.",
+			MarkdownDescription: "If set, the minimum iOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set it to `28` for example to automatically require the latest iOS version until (but not including) iOS 28.",
 			Optional:            true,
 			Computed:            true,
 			Default:             stringdefault.StaticString(""),
@@ -276,8 +276,8 @@ var mdeOSVersionEnforcementSchema schema.SingleNestedAttribute = schema.SingleNe
 			Default:             stringdefault.StaticString(""),
 		},
 		"auto_macos_min_version_until": schema.StringAttribute{
-			Description:         "If set, the minimum macOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set for example 28 to automatically required the latest macOS version until (but not including) macOS 28.",
-			MarkdownDescription: "If set, the minimum macOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set for example `28` to automatically required the latest macOS version until (but not including) macOS 28.",
+			Description:         "If set, the minimum macOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set it to 28 for example to automatically require the latest macOS version until (but not including) macOS 28.",
+			MarkdownDescription: "If set, the minimum macOS version required for a successful enrollment will be the latest available for the enrolling device until this version (excluded). Set it to `28` for example to automatically require the latest macOS version until (but not including) macOS 28.",
 			Optional:            true,
 			Computed:            true,
 			Default:             stringdefault.StaticString(""),
