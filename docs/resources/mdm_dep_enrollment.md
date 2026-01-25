@@ -192,7 +192,7 @@ Optional:
 
 Read-Only:
 
-- `secret` (String) Enrollment secret.
+- `secret` (String, Sensitive) Enrollment secret.
 
 
 <a id="nestedatt--profile"></a>
