@@ -70,6 +70,7 @@ func (r *MDMArtifactResource) Schema(ctx context.Context, req resource.SchemaReq
 						"Enterprise App",
 						"Configuration (manual)",
 						"Profile",
+						"Provisioning Profile",
 						"Store App",
 					}...),
 				},
