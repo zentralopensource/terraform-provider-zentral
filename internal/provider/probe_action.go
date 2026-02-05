@@ -8,7 +8,7 @@ import (
 
 const (
 	tfProbeActionHTTPPostBackend             string = "HTTP_POST"
-	tfProbeActionSlackIncomingWebhookBackend        = "SLACK_INCOMING_WEBHOOK"
+	tfProbeActionSlackIncomingWebhookBackend string = "SLACK_INCOMING_WEBHOOK"
 )
 
 type probeAction struct {
@@ -26,10 +26,11 @@ var probeActionHTTPPostHeaderAttrTypes = map[string]attr.Type{
 }
 
 var probeActionHTTPPostAttrTypes = map[string]attr.Type{
-	"url":      types.StringType,
-	"username": types.StringType,
-	"password": types.StringType,
-	"headers":  types.SetType{ElemType: types.ObjectType{AttrTypes: probeActionHTTPPostHeaderAttrTypes}},
+	"url":                types.StringType,
+	"username":           types.StringType,
+	"password":           types.StringType,
+	"headers":            types.SetType{ElemType: types.ObjectType{AttrTypes: probeActionHTTPPostHeaderAttrTypes}},
+	"cel_transformation": types.StringType,
 }
 
 var probeActionSlackIncomingWebhookAttrTypes = map[string]attr.Type{
@@ -42,10 +43,11 @@ func probeActionForState(pa *goztl.ProbeAction) probeAction {
 		hp = types.ObjectValueMust(
 			probeActionHTTPPostAttrTypes,
 			map[string]attr.Value{
-				"url":      types.StringValue(pa.HTTPPost.URL),
-				"username": optionalStringForState(pa.HTTPPost.Username),
-				"password": optionalStringForState(pa.HTTPPost.Password),
-				"headers":  headersForState(pa.HTTPPost.Headers),
+				"url":                types.StringValue(pa.HTTPPost.URL),
+				"username":           optionalStringForState(pa.HTTPPost.Username),
+				"password":           optionalStringForState(pa.HTTPPost.Password),
+				"headers":            headersForState(pa.HTTPPost.Headers),
+				"cel_transformation": optionalStringForState(pa.HTTPPost.CELTransformation),
 			},
 		)
 	} else {
@@ -85,10 +87,11 @@ func probeActionRequestWithState(data probeAction) *goztl.ProbeActionRequest {
 		hpMap := data.HTTPPost.Attributes()
 		if hpMap != nil {
 			req.HTTPPost = &goztl.ProbeActionHTTPPost{
-				URL:      hpMap["url"].(types.String).ValueString(),
-				Username: optionalStringWithState(hpMap["username"].(types.String)),
-				Password: optionalStringWithState(hpMap["password"].(types.String)),
-				Headers:  headersWithState(hpMap["headers"].(types.Set)),
+				URL:               hpMap["url"].(types.String).ValueString(),
+				Username:          optionalStringWithState(hpMap["username"].(types.String)),
+				Password:          optionalStringWithState(hpMap["password"].(types.String)),
+				Headers:           headersWithState(hpMap["headers"].(types.Set)),
+				CELTransformation: optionalStringWithState(hpMap["cel_transformation"].(types.String)),
 			}
 		}
 	}

@@ -36,6 +36,8 @@ func TestAccProbeActionResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "http_post.headers.#", "0"),
 					resource.TestCheckNoResourceAttr(
+						resourceName, "http_post.cel_transformation"),
+					resource.TestCheckNoResourceAttr(
 						resourceName, "slack_incoming_webhook"),
 				),
 			},
@@ -67,6 +69,8 @@ func TestAccProbeActionResource(t *testing.T) {
 						resourceName, "http_post.headers.0.name", "X-Custom-Header"),
 					resource.TestCheckResourceAttr(
 						resourceName, "http_post.headers.0.value", "Value"),
+					resource.TestCheckResourceAttr(
+						resourceName, "http_post.cel_transformation", "{\"serial_number\": metadata.machine_serial_number}"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "slack_incoming_webhook"),
 				),
@@ -129,6 +133,7 @@ resource "zentral_probe_action" "test" {
       { name = "X-Custom-Header"
       value = "Value" }
     ]
+	cel_transformation = "{\"serial_number\": metadata.machine_serial_number}"
   }
 }
 `, name)

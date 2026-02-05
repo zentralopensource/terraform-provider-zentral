@@ -91,6 +91,11 @@ func (r *ProbeActionDataSource) Schema(ctx context.Context, req datasource.Schem
 						},
 						Computed: true,
 					},
+					"cel_transformation": schema.StringAttribute{
+						Description:         "CEL expression that is used to transform the event data. The input to the expression is a Map with two keys: metadata for the event metadata and payload for the event payload.",
+						MarkdownDescription: "CEL expression that is used to transform the event data. The input to the expression is a `Map` with two keys: `metadata` for the event metadata and `payload` for the event payload.",
+						Computed:            true,
+					},
 				},
 				Computed: true,
 			},

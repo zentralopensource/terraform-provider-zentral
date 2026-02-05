@@ -111,6 +111,11 @@ func (r *ProbeActionResource) Schema(ctx context.Context, req resource.SchemaReq
 						Computed: true,
 						Default:  setdefault.StaticValue(types.SetValueMust(types.ObjectType{AttrTypes: probeActionHTTPPostHeaderAttrTypes}, []attr.Value{})),
 					},
+					"cel_transformation": schema.StringAttribute{
+						Description:         "CEL expression that is used to transform the event data. The input to the expression is a Map with two keys: metadata for the event metadata and payload for the event payload.",
+						MarkdownDescription: "CEL expression that is used to transform the event data. The input to the expression is a `Map` with two keys: `metadata` for the event metadata and `payload` for the event payload.",
+						Optional:            true,
+					},
 				},
 				Optional: true,
 			},
