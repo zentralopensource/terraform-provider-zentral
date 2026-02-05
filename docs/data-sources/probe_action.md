@@ -32,6 +32,7 @@ The data source `zentral_probe_action` allows details of a probe action to be re
 
 Read-Only:
 
+- `cel_transformation` (String) CEL expression that is used to transform the event data. The input to the expression is a `Map` with two keys: `metadata` for the event metadata and `payload` for the event payload.
 - `headers` (Attributes Set) A set of additional HTTP headers to add to the requests. (see [below for nested schema](#nestedatt--http_post--headers))
 - `password` (String, Sensitive) Password for basic authentication.
 - `url` (String) `URL`.
