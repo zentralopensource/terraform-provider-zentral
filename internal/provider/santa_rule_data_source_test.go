@@ -40,6 +40,8 @@ func TestAccSantaRuleDataSource(t *testing.T) {
 						dataSourceName, "description", "description"),
 					resource.TestCheckResourceAttr(
 						dataSourceName, "custom_message", "custom message"),
+					resource.TestCheckResourceAttr(
+						dataSourceName, "custom_url", "https://zentral.com"),
 					resource.TestCheckNoResourceAttr(
 						dataSourceName, "ruleset_id"),
 					resource.TestCheckResourceAttr(
@@ -116,6 +118,7 @@ resource "zentral_santa_rule" "test" {
   target_identifier       = "bff4a6a4d6b42e94e7d7f48e66b66c69b58fb409"
   description             = "description"
   custom_message          = "custom message"
+  custom_url			  = "https://zentral.com"
   primary_users           = ["un", "deux"]
   excluded_primary_users  = ["trois", "quatre"]
   serial_numbers          = ["cinq", "six"]

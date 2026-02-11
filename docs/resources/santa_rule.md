@@ -26,6 +26,7 @@ The resource `zentral_santa_rule` manages Santa rules.
 
 - `cel_expr` (String) CEL expression. Only valid for `CEL` policy rule.
 - `custom_message` (String) Custom message displayed in the popover when a binary is blocked.
+- `custom_url` (String) Custom URL the user can visit for more information when blocked.
 - `description` (String) Description of the rule. Only displayed in the Zentral GUI.
 - `excluded_primary_users` (Set of String) The excluded primary users used to scope the rule.
 - `excluded_serial_numbers` (Set of String) The excluded serial numbers used to scope the rule.

@@ -39,6 +39,8 @@ func TestAccSantaRuleResource(t *testing.T) {
 						resourceName, "description", ""),
 					resource.TestCheckResourceAttr(
 						resourceName, "custom_message", ""),
+					resource.TestCheckResourceAttr(
+						resourceName, "custom_url", ""),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "ruleset_id"),
 					resource.TestCheckResourceAttr(
@@ -81,6 +83,8 @@ func TestAccSantaRuleResource(t *testing.T) {
 						resourceName, "description", "description"),
 					resource.TestCheckResourceAttr(
 						resourceName, "custom_message", "custom message"),
+					resource.TestCheckResourceAttr(
+						resourceName, "custom_url", "https://zentral.com"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "ruleset_id"),
 					resource.TestCheckResourceAttr(
@@ -172,6 +176,7 @@ resource "zentral_santa_rule" "test" {
   target_identifier       = "platform:com.apple.curl"
   description             = "description"
   custom_message          = "custom message"
+  custom_url			  = "https://zentral.com"
   primary_users           = ["un", "deux"]
   excluded_primary_users  = ["trois", "quatre"]
   serial_numbers          = ["cinq", "six"]

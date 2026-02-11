@@ -28,6 +28,7 @@ type santaRule struct {
 	TargetIdentifier      types.String `tfsdk:"target_identifier"`
 	Description           types.String `tfsdk:"description"`
 	CustomMessage         types.String `tfsdk:"custom_message"`
+	CustomURL             types.String `tfsdk:"custom_url"`
 	RulesetID             types.Int64  `tfsdk:"ruleset_id"`
 	PrimaryUsers          types.Set    `tfsdk:"primary_users"`
 	ExcludedPrimaryUsers  types.Set    `tfsdk:"excluded_primary_users"`
@@ -101,6 +102,7 @@ func santaRuleForState(sr *goztl.SantaRule) santaRule {
 		TargetIdentifier:      types.StringValue(sr.TargetIdentifier),
 		Description:           types.StringValue(sr.Description),
 		CustomMessage:         types.StringValue(sr.CustomMessage),
+		CustomURL:             types.StringValue(sr.CustomURL),
 		RulesetID:             rulesetID,
 		PrimaryUsers:          types.SetValueMust(types.StringType, primaryUsers),
 		ExcludedPrimaryUsers:  types.SetValueMust(types.StringType, excludedPrimaryUsers),
@@ -167,6 +169,7 @@ func santaRuleRequestWithState(data santaRule) *goztl.SantaRuleRequest {
 		TargetIdentifier:      data.TargetIdentifier.ValueString(),
 		Description:           data.Description.ValueString(),
 		CustomMessage:         data.CustomMessage.ValueString(),
+		CustomURL:             data.CustomURL.ValueString(),
 		PrimaryUsers:          primaryUsers,
 		ExcludedPrimaryUsers:  excludedPrimaryUsers,
 		SerialNumbers:         serialNumbers,

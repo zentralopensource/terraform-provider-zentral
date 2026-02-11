@@ -72,6 +72,11 @@ func (d *SantaRuleDataSource) Schema(ctx context.Context, req datasource.SchemaR
 				MarkdownDescription: "Custom message displayed in the popover when a binary is blocked.",
 				Computed:            true,
 			},
+			"custom_url": schema.StringAttribute{
+				Description:         "Custom URL the user can visit for more information when blocked.",
+				MarkdownDescription: "Custom URL the user can visit for more information when blocked.",
+				Computed:            true,
+			},
 			"ruleset_id": schema.Int64Attribute{
 				Description:         "ID of the Santa ruleset.",
 				MarkdownDescription: "`ID` of the Santa ruleset.",

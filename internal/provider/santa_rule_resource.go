@@ -96,6 +96,13 @@ func (r *SantaRuleResource) Schema(ctx context.Context, req resource.SchemaReque
 				Computed:            true,
 				Default:             stringdefault.StaticString(""),
 			},
+			"custom_url": schema.StringAttribute{
+				Description:         "Custom URL the user can visit for more information when blocked.",
+				MarkdownDescription: "Custom URL the user can visit for more information when blocked.",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString(""),
+			},
 			"ruleset_id": schema.Int64Attribute{
 				Description:         "ID of the Santa ruleset.",
 				MarkdownDescription: "`ID` of the Santa ruleset.",
