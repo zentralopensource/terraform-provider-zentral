@@ -19,7 +19,4 @@ The data source `zentral_monolith_catalog` allows details of a Monolith catalog 
 
 - `id` (Number) `ID` of the Monolith catalog.
 - `name` (String) Name of the catalog.
-
-### Read-Only
-
 - `repository_id` (Number) `ID` of the Monolith repository.

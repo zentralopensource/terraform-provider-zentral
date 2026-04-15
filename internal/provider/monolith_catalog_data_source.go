@@ -39,7 +39,7 @@ func (d *MonolithCatalogDataSource) Schema(ctx context.Context, req datasource.S
 			"repository_id": schema.Int64Attribute{
 				Description:         "ID of the Monolith repository.",
 				MarkdownDescription: "`ID` of the Monolith repository.",
-				Computed:            true,
+				Optional:            true,
 			},
 			"name": schema.StringAttribute{
 				Description:         "Name of the catalog.",
@@ -78,15 +78,10 @@ func (d *MonolithCatalogDataSource) ValidateConfig(ctx context.Context, req data
 		return
 	}
 
-	if data.ID.IsNull() && data.Name.IsNull() {
+	if (data.ID.IsNull() && (data.RepositoryID.IsNull() || data.Name.IsNull())) || (!data.ID.IsNull() && (!data.Name.IsNull() || !data.RepositoryID.IsNull())) {
 		resp.Diagnostics.AddError(
 			"Invalid `zentral_monolith_catalog` data source",
-			"`id` or `name` missing",
-		)
-	} else if !data.ID.IsNull() && !data.Name.IsNull() {
-		resp.Diagnostics.AddError(
-			"Invalid `zentral_monolith_catalog` data source",
-			"`id` and `name` cannot be both set",
+			"This data source accepts either the `id` argument or the `name` + `repository_id` pair",
 		)
 	}
 }
@@ -112,11 +107,11 @@ func (d *MonolithCatalogDataSource) Read(ctx context.Context, req datasource.Rea
 			)
 		}
 	} else {
-		ztlMC, _, err = d.client.MonolithCatalogs.GetByName(ctx, data.Name.ValueString())
+		ztlMC, _, err = d.client.MonolithCatalogs.GetByNameAndRepositoryID(ctx, data.Name.ValueString(), int(data.RepositoryID.ValueInt64()))
 		if err != nil {
 			resp.Diagnostics.AddError(
 				"Client Error",
-				fmt.Sprintf("Unable to get Monolith catalog '%s' by name, got error: %s", data.Name.ValueString(), err),
+				fmt.Sprintf("Unable to get Monolith catalog '%s' by name and repository ID, got error: %s", data.Name.ValueString(), err),
 			)
 		}
 	}
