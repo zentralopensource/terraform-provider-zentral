@@ -14,7 +14,7 @@ func TestAccMonolithCatalogDataSource(t *testing.T) {
 	c1ResourceName := "zentral_monolith_catalog.test1"
 	c2ResourceName := "zentral_monolith_catalog.test2"
 	ds1ResourceName := "data.zentral_monolith_catalog.test_by_id"
-	ds2ResourceName := "data.zentral_monolith_catalog.test_by_name"
+	ds2ResourceName := "data.zentral_monolith_catalog.test_by_name_and_repository"
 	r1ResourceName := "zentral_monolith_repository.test1"
 	r2ResourceName := "zentral_monolith_repository.test2"
 
@@ -71,8 +71,9 @@ data "zentral_monolith_catalog" "test_by_id" {
   id = zentral_monolith_catalog.test1.id
 }
 
-data "zentral_monolith_catalog" "test_by_name" {
+data "zentral_monolith_catalog" "test_by_name_and_repository" {
   name = zentral_monolith_catalog.test2.name
+  repository_id = zentral_monolith_repository.test2.id
 }
 `, c1Name, c2Name)
 }
