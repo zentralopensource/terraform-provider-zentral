@@ -74,5 +74,9 @@ jobs:
           TF_ACC: "1"
           ZTL_API_BASE_URL: ${{ secrets.ZTL_API_BASE_URL }}
           ZTL_API_TOKEN: ${{ secrets.ZTL_API_TOKEN }}
+          ZTL_TEST_PACKAGE_URI: ${{ vars.ZTL_TEST_PACKAGE_URI }}
+          ZTL_TEST_PACKAGE_SHA256: ${{ vars.ZTL_TEST_PACKAGE_SHA256 }}
+          ZTL_TEST_PACKAGE_URI_2: ${{ vars.ZTL_TEST_PACKAGE_URI_2 }}
+          ZTL_TEST_PACKAGE_SHA256_2: ${{ vars.ZTL_TEST_PACKAGE_SHA256_2 }}
         run: go test -v -cover ./internal/provider/
         timeout-minutes: 10
