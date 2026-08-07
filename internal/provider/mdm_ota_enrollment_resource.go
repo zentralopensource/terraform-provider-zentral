@@ -117,8 +117,8 @@ func (r *MDMOTAEnrollmentResource) Schema(ctx context.Context, req resource.Sche
 				Computed:            true,
 			},
 			"quota": schema.Int64Attribute{
-				Description:         "The number of time the enrollment can be used.",
-				MarkdownDescription: "The number of time the enrollment can be used.",
+				Description:         "The number of times the enrollment can be used.",
+				MarkdownDescription: "The number of times the enrollment can be used.",
 				Optional:            true,
 			},
 		},
