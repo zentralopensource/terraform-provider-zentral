@@ -23,7 +23,7 @@ The resource `zentral_osquery_enrollment` manages Osquery enrollments.
 ### Optional
 
 - `osquery_release` (String) Osquery release to include in the enrollment artifacts.
-- `quota` (Number) The number of time the enrollment can be used.
+- `quota` (Number) The number of times the enrollment can be used.
 - `serial_numbers` (Set of String) The serial numbers the enrollment is restricted to.
 - `tag_ids` (Set of Number) The `ID`s of the tags that the machine will get at enrollment.
 - `udids` (Set of String) The `UDID`s the enrollment is restricted to.

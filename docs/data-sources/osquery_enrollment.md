@@ -26,7 +26,7 @@ The data source `zentral_osquery_enrollment` allows details of a Osquery enrollm
 - `osquery_release` (String) Osquery release to include in the enrollment artifacts.
 - `package_url` (String) macOS package download URL.
 - `powershell_script_url` (String) Powershell script download URL.
-- `quota` (Number) The number of time the enrollment can be used.
+- `quota` (Number) The number of times the enrollment can be used.
 - `script_url` (String) Linux script download URL.
 - `secret` (String) Enrollment secret.
 - `serial_numbers` (Set of String) The serial numbers the enrollment is restricted to.

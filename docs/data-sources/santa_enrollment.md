@@ -25,7 +25,7 @@ The data source `zentral_santa_enrollment` allows details of a Santa enrollment 
 - `configuration_profile_url` (String) Configuration profile download URL.
 - `meta_business_unit_id` (Number) The `ID` of the meta business unit the machine will be assigned to at enrollment.
 - `plist_url` (String) Plist download URL.
-- `quota` (Number) The number of time the enrollment can be used.
+- `quota` (Number) The number of times the enrollment can be used.
 - `secret` (String) Enrollment secret.
 - `serial_numbers` (Set of String) The serial numbers the enrollment is restricted to.
 - `tag_ids` (Set of Number) The `ID`s of the tags that the machine will get at enrollment.
