@@ -1,10 +1,46 @@
 package provider
 
 import (
+	"regexp"
+
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
+
+// Timestamps
+
+// Zentral runs with USE_TZ = False. The API parses any ISO 8601 timestamp, but it stores and echoes
+// back a naive UTC datetime with no timezone suffix and no fractional seconds. Only that form comes
+// back unchanged, and an echo that differs from the configured value fails the apply, so it is the
+// only form the timestamp attributes accept.
+var naiveTimestampRe = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$`)
+
+var naiveTimestampValidator = stringvalidator.RegexMatches(
+	naiveTimestampRe,
+	"must be a UTC timestamp without a timezone suffix, e.g. 2026-09-01T09:00:00",
+)
+
+// Bool (optional)
+
+func optionalBoolForState(b *bool) types.Bool {
+	var bfs types.Bool
+	if b != nil {
+		bfs = types.BoolValue(*b)
+	} else {
+		bfs = types.BoolNull()
+	}
+	return bfs
+}
+
+func optionalBoolWithState(b types.Bool) *bool {
+	var bws *bool
+	if !b.IsNull() {
+		bws = goztl.Bool(b.ValueBool())
+	}
+	return bws
+}
 
 // Int64 (optional)
 

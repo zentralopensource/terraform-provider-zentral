@@ -177,6 +177,12 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewStoreResource,
 		NewTagResource,
 		NewTaxonomyResource,
+		NewTurboConfigurationResource,
+		NewTurboEnrollmentResource,
+		NewTurboMSCPCheckResource,
+		NewTurboOneTimeJobResource,
+		NewTurboRecurringJobResource,
+		NewTurboScriptResource,
 	}
 }
 
