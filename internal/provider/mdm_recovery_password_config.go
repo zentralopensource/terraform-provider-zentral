@@ -11,6 +11,7 @@ type mdmRecoveryPasswordConfig struct {
 	DynamicPassword        types.Bool   `tfsdk:"dynamic_password"`
 	StaticPassword         types.String `tfsdk:"static_password"`
 	RotationIntervalDays   types.Int64  `tfsdk:"rotation_interval_days"`
+	RevealRotationDelay    types.Int64  `tfsdk:"reveal_rotation_delay"`
 	RotateFirmwarePassword types.Bool   `tfsdk:"rotate_firmware_password"`
 }
 
@@ -28,6 +29,7 @@ func mdmRecoveryPasswordConfigForState(mrpc *goztl.MDMRecoveryPasswordConfig) md
 		DynamicPassword:        types.BoolValue(mrpc.DynamicPassword),
 		StaticPassword:         staticPassword,
 		RotationIntervalDays:   types.Int64Value(int64(mrpc.RotationIntervalDays)),
+		RevealRotationDelay:    types.Int64Value(int64(mrpc.RevealRotationDelay)),
 		RotateFirmwarePassword: types.BoolValue(mrpc.RotateFirmwarePassword),
 	}
 }
@@ -43,6 +45,7 @@ func mdmRecoveryPasswordConfigRequestWithState(data mdmRecoveryPasswordConfig) *
 		DynamicPassword:        data.DynamicPassword.ValueBool(),
 		StaticPassword:         staticPassword,
 		RotationIntervalDays:   int(data.RotationIntervalDays.ValueInt64()),
+		RevealRotationDelay:    int(data.RevealRotationDelay.ValueInt64()),
 		RotateFirmwarePassword: data.RotateFirmwarePassword.ValueBool(),
 	}
 }

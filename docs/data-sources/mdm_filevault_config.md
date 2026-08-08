@@ -26,5 +26,6 @@ The data source `zentral_mdm_filevault_config` allows details of a MDM FileVault
 - `bypass_attempts` (Number) The maximum number of times users can bypass enabling FileVault before being required to enable it to log in.
 - `destroy_key_on_standby` (Boolean) Set to `true` to prevent storing the FileVault key across restarts. Defaults to `false`.
 - `escrow_location_display_name` (String) Description of the location where the FDE PRK will be escrowed. This text will be inserted into the message the user sees when enabling FileVault.
+- `prk_reveal_rotation_delay` (Number) The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed.
 - `prk_rotation_interval_days` (Number) The automatic PRK rotation interval in days. It has a maximum value of `365`. Defaults to `0` (no automatic rotation).
 - `show_recovery_key` (Boolean) If `false`, prevents display of the personal recovery key to the user after FileVault is enabled. Defaults to `false`.

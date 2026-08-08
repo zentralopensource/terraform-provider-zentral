@@ -22,6 +22,7 @@ The resource `zentral_mdm_recovery_password_config` manages MDM recovery passwor
 ### Optional
 
 - `dynamic_password` (Boolean) If `true`, a unique password is generated for each device. Defaults to `true`.
+- `reveal_rotation_delay` (Number) The delay in minutes after which a recovery password rotation is scheduled once the password has been revealed. Must be `0`, or between `5` and `1440`, and must be `0` with a static password. Defaults to `0` (no rotation after a reveal). Note that a configuration created outside of Terraform defaults to `60`.
 - `rotate_firmware_password` (Boolean) Set to `true` to rotate the firmware passwords. Defaults to `false`.
 - `rotation_interval_days` (Number) The automatic recovery password rotation interval in days. It has a maximum value of `365`. Defaults to `0` (no automatic rotation).
 - `static_password` (String) The  static password to set for all devices.

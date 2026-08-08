@@ -14,6 +14,7 @@ type mdmFileVaultConfig struct {
 	ShowRecoveryKey           types.Bool   `tfsdk:"show_recovery_key"`
 	DestroyKeyOnStandby       types.Bool   `tfsdk:"destroy_key_on_standby"`
 	PRKRotationIntervalDays   types.Int64  `tfsdk:"prk_rotation_interval_days"`
+	PRKRevealRotationDelay    types.Int64  `tfsdk:"prk_reveal_rotation_delay"`
 }
 
 func mdmFileVaultConfigForState(mfc *goztl.MDMFileVaultConfig) mdmFileVaultConfig {
@@ -26,6 +27,7 @@ func mdmFileVaultConfigForState(mfc *goztl.MDMFileVaultConfig) mdmFileVaultConfi
 		ShowRecoveryKey:           types.BoolValue(mfc.ShowRecoveryKey),
 		DestroyKeyOnStandby:       types.BoolValue(mfc.DestroyKeyOnStandby),
 		PRKRotationIntervalDays:   types.Int64Value(int64(mfc.PRKRotationIntervalDays)),
+		PRKRevealRotationDelay:    types.Int64Value(int64(mfc.PRKRevealRotationDelay)),
 	}
 }
 
@@ -38,5 +40,6 @@ func mdmFileVaultConfigRequestWithState(data mdmFileVaultConfig) *goztl.MDMFileV
 		ShowRecoveryKey:           data.ShowRecoveryKey.ValueBool(),
 		DestroyKeyOnStandby:       data.DestroyKeyOnStandby.ValueBool(),
 		PRKRotationIntervalDays:   int(data.PRKRotationIntervalDays.ValueInt64()),
+		PRKRevealRotationDelay:    int(data.PRKRevealRotationDelay.ValueInt64()),
 	}
 }

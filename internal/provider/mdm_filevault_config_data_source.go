@@ -71,6 +71,11 @@ func (d *MDMFileVaultConfigDataSource) Schema(ctx context.Context, req datasourc
 				MarkdownDescription: "The automatic PRK rotation interval in days. It has a maximum value of `365`. Defaults to `0` (no automatic rotation).",
 				Computed:            true,
 			},
+			"prk_reveal_rotation_delay": schema.Int64Attribute{
+				Description:         "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed.",
+				MarkdownDescription: "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed.",
+				Computed:            true,
+			},
 		},
 	}
 }
