@@ -74,6 +74,11 @@ func (d *JMESPathCheckDataSource) Schema(ctx context.Context, req datasource.Sch
 				MarkdownDescription: "The JMESPath compliance check version.",
 				Computed:            true,
 			},
+			"compliance_check_id": schema.Int64Attribute{
+				Description:         "ID of the compliance check backing this JMESPath check.",
+				MarkdownDescription: "`ID` of the compliance check backing this JMESPath check.",
+				Computed:            true,
+			},
 		},
 	}
 }

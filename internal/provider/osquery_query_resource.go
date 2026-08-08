@@ -96,6 +96,11 @@ func (r *OsqueryQueryResource) Schema(ctx context.Context, req resource.SchemaRe
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
 			},
+			"compliance_check_id": schema.Int64Attribute{
+				Description:         "ID of the compliance check backing this query, when compliance_check_enabled is true.",
+				MarkdownDescription: "`ID` of the compliance check backing this query, when `compliance_check_enabled` is `true`.",
+				Computed:            true,
+			},
 			"tag_id": schema.Int64Attribute{
 				Description:         "ID of the machine tag that is updated by this query.",
 				MarkdownDescription: "`ID` of the machine tag that is updated by this query.",

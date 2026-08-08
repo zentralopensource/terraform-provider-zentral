@@ -16,6 +16,7 @@ type osqueryQuery struct {
 	Value                  types.String `tfsdk:"value"`
 	Version                types.Int64  `tfsdk:"version"`
 	ComplianceCheckEnabled types.Bool   `tfsdk:"compliance_check_enabled"`
+	ComplianceCheckID      types.Int64  `tfsdk:"compliance_check_id"`
 	TagID                  types.Int64  `tfsdk:"tag_id"`
 	Scheduling             types.Object `tfsdk:"scheduling"`
 }
@@ -57,6 +58,7 @@ func osqueryQueryForState(oq *goztl.OsqueryQuery) osqueryQuery {
 		Value:                  types.StringValue(oq.Value),
 		Version:                types.Int64Value(int64(oq.Version)),
 		ComplianceCheckEnabled: types.BoolValue(oq.ComplianceCheckEnabled),
+		ComplianceCheckID:      optionalInt64ForState(oq.ComplianceCheckID),
 		TagID:                  optionalInt64ForState(oq.TagID),
 		Scheduling:             scheduling,
 	}

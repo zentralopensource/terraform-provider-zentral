@@ -29,5 +29,6 @@ The resource `zentral_jmespath_check` manages JMESPath compliance checks.
 
 ### Read-Only
 
+- `compliance_check_id` (Number) `ID` of the compliance check backing this JMESPath check.
 - `id` (Number) `ID` of the JMESPath compliance check.
 - `version` (Number) The JMESPath compliance check version.

@@ -41,6 +41,8 @@ func TestAccOsqueryQueryResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "compliance_check_enabled", "false"),
 					resource.TestCheckNoResourceAttr(
+						resourceName, "compliance_check_id"),
+					resource.TestCheckNoResourceAttr(
 						resourceName, "tag_id"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "scheduling"),
@@ -74,6 +76,8 @@ func TestAccOsqueryQueryResource(t *testing.T) {
 						resourceName, "version", "2"),
 					resource.TestCheckResourceAttr(
 						resourceName, "compliance_check_enabled", "true"),
+					resource.TestCheckResourceAttrSet(
+						resourceName, "compliance_check_id"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "tag_id"),
 					resource.TestCheckResourceAttr(
@@ -118,6 +122,8 @@ func TestAccOsqueryQueryResource(t *testing.T) {
 						resourceName, "version", "3"),
 					resource.TestCheckResourceAttr(
 						resourceName, "compliance_check_enabled", "false"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "compliance_check_id"),
 					resource.TestCheckResourceAttrPair(
 						resourceName, "tag_id", tagResourceName, "id"),
 					resource.TestCheckResourceAttr(

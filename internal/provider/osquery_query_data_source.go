@@ -78,6 +78,11 @@ func (d *OsqueryQueryDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "If `true`, the query will be used as compliance check. Defaults to `false`.",
 				Computed:            true,
 			},
+			"compliance_check_id": schema.Int64Attribute{
+				Description:         "ID of the compliance check backing this query, when compliance_check_enabled is true.",
+				MarkdownDescription: "`ID` of the compliance check backing this query, when `compliance_check_enabled` is `true`.",
+				Computed:            true,
+			},
 			"tag_id": schema.Int64Attribute{
 				Description:         "ID of the machine tag that is updated by this query.",
 				MarkdownDescription: "`ID` of the machine tag that is updated by this query.",

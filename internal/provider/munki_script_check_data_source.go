@@ -99,6 +99,11 @@ func (d *MunkiScriptCheckDataSource) Schema(ctx context.Context, req datasource.
 				MarkdownDescription: "Version of the Munki script check.",
 				Computed:            true,
 			},
+			"compliance_check_id": schema.Int64Attribute{
+				Description:         "ID of the compliance check backing this script check.",
+				MarkdownDescription: "`ID` of the compliance check backing this script check.",
+				Computed:            true,
+			},
 		},
 	}
 }

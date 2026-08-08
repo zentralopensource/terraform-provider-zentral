@@ -22,6 +22,7 @@ The data source `zentral_jmespath_check` allows details of a JMESPath compliance
 
 ### Read-Only
 
+- `compliance_check_id` (Number) `ID` of the compliance check backing this JMESPath check.
 - `description` (String) Description of the JMESPath compliance check.
 - `jmespath_expression` (String) The JMESPath compliance check expression.
 - `platforms` (Set of String) The platforms the JMESPath compliance check is restricted to.

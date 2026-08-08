@@ -14,6 +14,7 @@ type jmespathCheck struct {
 	TagIDs             types.Set    `tfsdk:"tag_ids"`
 	JMESPathExpression types.String `tfsdk:"jmespath_expression"`
 	Version            types.Int64  `tfsdk:"version"`
+	ComplianceCheckID  types.Int64  `tfsdk:"compliance_check_id"`
 }
 
 func jmespathCheckForState(j *goztl.JMESPathCheck) jmespathCheck {
@@ -26,5 +27,6 @@ func jmespathCheckForState(j *goztl.JMESPathCheck) jmespathCheck {
 		TagIDs:             int64SetForState(j.TagIDs),
 		JMESPathExpression: types.StringValue(j.JMESPathExpression),
 		Version:            types.Int64Value(int64(j.Version)),
+		ComplianceCheckID:  types.Int64Value(int64(j.ComplianceCheckID)),
 	}
 }
