@@ -27,16 +27,6 @@ func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfigu
 		options[k] = types.StringValue(fmt.Sprintf("%v", v))
 	}
 
-	atcIDs := make([]attr.Value, 0)
-	for _, atcID := range oc.ATCIDs {
-		atcIDs = append(atcIDs, types.Int64Value(int64(atcID)))
-	}
-
-	fileCategoryIDs := make([]attr.Value, 0)
-	for _, fileCategoryID := range oc.FileCategoryIDs {
-		fileCategoryIDs = append(fileCategoryIDs, types.Int64Value(int64(fileCategoryID)))
-	}
-
 	return osqueryConfiguration{
 		ID:                types.Int64Value(int64(oc.ID)),
 		Name:              types.StringValue(oc.Name),
@@ -46,8 +36,8 @@ func osqueryConfigurationForState(oc *goztl.OsqueryConfiguration) osqueryConfigu
 		InventoryEC2:      types.BoolValue(oc.InventoryEC2),
 		InventoryInterval: types.Int64Value(int64(oc.InventoryInterval)),
 		Options:           types.MapValueMust(types.StringType, options),
-		ATCIDs:            types.SetValueMust(types.Int64Type, atcIDs),
-		FileCategoryIDs:   types.SetValueMust(types.Int64Type, fileCategoryIDs),
+		ATCIDs:            int64SetForState(oc.ATCIDs),
+		FileCategoryIDs:   int64SetForState(oc.FileCategoryIDs),
 	}
 }
 
@@ -55,16 +45,6 @@ func osqueryConfigurationRequestWithState(data osqueryConfiguration) *goztl.Osqu
 	options := make(map[string]interface{})
 	for k, v := range data.Options.Elements() {
 		options[k] = v.(types.String).ValueString()
-	}
-
-	atcIDs := make([]int, 0)
-	for _, atcID := range data.ATCIDs.Elements() { // nil if null or unknown → no iterations
-		atcIDs = append(atcIDs, int(atcID.(types.Int64).ValueInt64()))
-	}
-
-	fileCategoryIDs := make([]int, 0)
-	for _, fileCategoryID := range data.FileCategoryIDs.Elements() { // nil if null or unknown → no iterations
-		fileCategoryIDs = append(fileCategoryIDs, int(fileCategoryID.(types.Int64).ValueInt64()))
 	}
 
 	return &goztl.OsqueryConfigurationRequest{
@@ -75,7 +55,7 @@ func osqueryConfigurationRequestWithState(data osqueryConfiguration) *goztl.Osqu
 		InventoryEC2:      data.InventoryEC2.ValueBool(),
 		InventoryInterval: int(data.InventoryInterval.ValueInt64()),
 		Options:           options,
-		ATCIDs:            atcIDs,
-		FileCategoryIDs:   fileCategoryIDs,
+		ATCIDs:            intListWithState(data.ATCIDs),
+		FileCategoryIDs:   intListWithState(data.FileCategoryIDs),
 	}
 }

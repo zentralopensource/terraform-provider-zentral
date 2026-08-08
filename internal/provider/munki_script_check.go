@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
@@ -23,16 +22,6 @@ type munkiScriptCheck struct {
 }
 
 func munkiScriptCheckForState(msc *goztl.MunkiScriptCheck) munkiScriptCheck {
-	tagIDs := make([]attr.Value, 0)
-	for _, tv := range msc.TagIDs {
-		tagIDs = append(tagIDs, types.Int64Value(int64(tv)))
-	}
-
-	excludedTagIDs := make([]attr.Value, 0)
-	for _, tv := range msc.ExcludedTagIDs {
-		excludedTagIDs = append(excludedTagIDs, types.Int64Value(int64(tv)))
-	}
-
 	return munkiScriptCheck{
 		ID:             types.Int64Value(int64(msc.ID)),
 		Name:           types.StringValue(msc.Name),
@@ -44,23 +33,13 @@ func munkiScriptCheckForState(msc *goztl.MunkiScriptCheck) munkiScriptCheck {
 		ArchARM64:      types.BoolValue(msc.ArchARM64),
 		MinOSVersion:   types.StringValue(msc.MinOSVersion),
 		MaxOSVersion:   types.StringValue(msc.MaxOSVersion),
-		TagIDs:         types.SetValueMust(types.Int64Type, tagIDs),
-		ExcludedTagIDs: types.SetValueMust(types.Int64Type, excludedTagIDs),
+		TagIDs:         int64SetForState(msc.TagIDs),
+		ExcludedTagIDs: int64SetForState(msc.ExcludedTagIDs),
 		Version:        types.Int64Value(int64(msc.Version)),
 	}
 }
 
 func munkiScriptCheckRequestWithState(data munkiScriptCheck) *goztl.MunkiScriptCheckRequest {
-	tagIDs := make([]int, 0)
-	for _, tagID := range data.TagIDs.Elements() { // nil if null or unknown → no iterations
-		tagIDs = append(tagIDs, int(tagID.(types.Int64).ValueInt64()))
-	}
-
-	excludedTagIDs := make([]int, 0)
-	for _, tagID := range data.ExcludedTagIDs.Elements() { // nil if null or unknown → no iterations
-		excludedTagIDs = append(excludedTagIDs, int(tagID.(types.Int64).ValueInt64()))
-	}
-
 	return &goztl.MunkiScriptCheckRequest{
 		Name:           data.Name.ValueString(),
 		Description:    data.Description.ValueString(),
@@ -71,7 +50,7 @@ func munkiScriptCheckRequestWithState(data munkiScriptCheck) *goztl.MunkiScriptC
 		ArchARM64:      data.ArchARM64.ValueBool(),
 		MinOSVersion:   data.MinOSVersion.ValueString(),
 		MaxOSVersion:   data.MaxOSVersion.ValueString(),
-		TagIDs:         tagIDs,
-		ExcludedTagIDs: excludedTagIDs,
+		TagIDs:         intListWithState(data.TagIDs),
+		ExcludedTagIDs: intListWithState(data.ExcludedTagIDs),
 	}
 }

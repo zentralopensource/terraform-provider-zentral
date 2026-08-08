@@ -29,11 +29,6 @@ type mdmBlueprintArtifact struct {
 }
 
 func mdmBlueprintArtifactForState(mba *goztl.MDMBlueprintArtifact) mdmBlueprintArtifact {
-	exTagIDs := make([]attr.Value, 0)
-	for _, exTagID := range mba.ExcludedTagIDs {
-		exTagIDs = append(exTagIDs, types.Int64Value(int64(exTagID)))
-	}
-
 	tagShards := make([]attr.Value, 0)
 	for _, tagShard := range mba.TagShards {
 		tagShards = append(
@@ -66,17 +61,12 @@ func mdmBlueprintArtifactForState(mba *goztl.MDMBlueprintArtifact) mdmBlueprintA
 		TVOSMinVersion:   types.StringValue(mba.TVOSMinVersion),
 		DefaultShard:     types.Int64Value(int64(mba.DefaultShard)),
 		ShardModulo:      types.Int64Value(int64(mba.ShardModulo)),
-		ExcludedTagIDs:   types.SetValueMust(types.Int64Type, exTagIDs),
+		ExcludedTagIDs:   int64SetForState(mba.ExcludedTagIDs),
 		TagShards:        types.SetValueMust(types.ObjectType{AttrTypes: tagShardAttrTypes}, tagShards),
 	}
 }
 
 func mdmBlueprintArtifactRequestWithState(data mdmBlueprintArtifact) *goztl.MDMBlueprintArtifactRequest {
-	exTagIDs := make([]int, 0)
-	for _, exTagID := range data.ExcludedTagIDs.Elements() { // nil if null or unknown → no iterations
-		exTagIDs = append(exTagIDs, int(exTagID.(types.Int64).ValueInt64()))
-	}
-
 	tagShards := make([]goztl.TagShard, 0)
 	for _, tagShard := range data.TagShards.Elements() { // nil if null or unknown → no iterations
 		tagShardMap := tagShard.(types.Object).Attributes()
@@ -108,7 +98,7 @@ func mdmBlueprintArtifactRequestWithState(data mdmBlueprintArtifact) *goztl.MDMB
 		TVOSMinVersion:   data.TVOSMinVersion.ValueString(),
 		DefaultShard:     int(data.DefaultShard.ValueInt64()),
 		ShardModulo:      int(data.ShardModulo.ValueInt64()),
-		ExcludedTagIDs:   exTagIDs,
+		ExcludedTagIDs:   intListWithState(data.ExcludedTagIDs),
 		TagShards:        tagShards,
 	}
 }

@@ -14,32 +14,11 @@ type mdmPushCertificate struct {
 }
 
 func mdmPushCertificateForState(mpc *goztl.MDMPushCertificate) mdmPushCertificate {
-	var provisioningUID types.String
-	if mpc.ProvisioningUID != nil {
-		provisioningUID = types.StringValue(*mpc.ProvisioningUID)
-	} else {
-		provisioningUID = types.StringNull()
-	}
-
-	var topic types.String
-	if mpc.Topic != nil {
-		topic = types.StringValue(*mpc.Topic)
-	} else {
-		topic = types.StringNull()
-	}
-
-	var certificate types.String
-	if mpc.Certificate != nil {
-		certificate = types.StringValue(*mpc.Certificate)
-	} else {
-		certificate = types.StringNull()
-	}
-
 	return mdmPushCertificate{
 		ID:              types.Int64Value(int64(mpc.ID)),
-		ProvisioningUID: provisioningUID,
+		ProvisioningUID: optionalStringForState(mpc.ProvisioningUID),
 		Name:            types.StringValue(mpc.Name),
-		Topic:           topic,
-		Certificate:     certificate,
+		Topic:           optionalStringForState(mpc.Topic),
+		Certificate:     optionalStringForState(mpc.Certificate),
 	}
 }

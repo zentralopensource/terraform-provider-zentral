@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
@@ -14,28 +13,18 @@ type monolithManifestSubManifest struct {
 }
 
 func monolithManifestSubManifestForState(mmsm *goztl.MonolithManifestSubManifest) monolithManifestSubManifest {
-	tagIDs := make([]attr.Value, 0)
-	for _, tagID := range mmsm.TagIDs {
-		tagIDs = append(tagIDs, types.Int64Value(int64(tagID)))
-	}
-
 	return monolithManifestSubManifest{
 		ID:            types.Int64Value(int64(mmsm.ID)),
 		ManifestID:    types.Int64Value(int64(mmsm.ManifestID)),
 		SubManifestID: types.Int64Value(int64(mmsm.SubManifestID)),
-		TagIDs:        types.SetValueMust(types.Int64Type, tagIDs),
+		TagIDs:        int64SetForState(mmsm.TagIDs),
 	}
 }
 
 func monolithManifestSubManifestRequestWithState(data monolithManifestSubManifest) *goztl.MonolithManifestSubManifestRequest {
-	tagIDs := make([]int, 0)
-	for _, tagID := range data.TagIDs.Elements() { // nil if null or unknown → no iterations
-		tagIDs = append(tagIDs, int(tagID.(types.Int64).ValueInt64()))
-	}
-
 	return &goztl.MonolithManifestSubManifestRequest{
 		ManifestID:    int(data.ManifestID.ValueInt64()),
 		SubManifestID: int(data.SubManifestID.ValueInt64()),
-		TagIDs:        tagIDs,
+		TagIDs:        intListWithState(data.TagIDs),
 	}
 }

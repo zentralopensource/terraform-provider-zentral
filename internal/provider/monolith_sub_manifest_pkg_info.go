@@ -25,18 +25,6 @@ var tagShardAttrTypes = map[string]attr.Type{
 }
 
 func monolithSubManifestPkgInfoForState(msmpi *goztl.MonolithSubManifestPkgInfo) monolithSubManifestPkgInfo {
-	var cID types.Int64
-	if msmpi.ConditionID != nil {
-		cID = types.Int64Value(int64(*msmpi.ConditionID))
-	} else {
-		cID = types.Int64Null()
-	}
-
-	exTagIDs := make([]attr.Value, 0)
-	for _, exTagID := range msmpi.ExcludedTagIDs {
-		exTagIDs = append(exTagIDs, types.Int64Value(int64(exTagID)))
-	}
-
 	tagShards := make([]attr.Value, 0)
 	for _, tagShard := range msmpi.TagShards {
 		tagShards = append(
@@ -57,25 +45,15 @@ func monolithSubManifestPkgInfoForState(msmpi *goztl.MonolithSubManifestPkgInfo)
 		Key:            types.StringValue(msmpi.Key),
 		PkgInfoName:    types.StringValue(msmpi.PkgInfoName),
 		FeaturedItem:   types.BoolValue(msmpi.FeaturedItem),
-		ConditionID:    cID,
+		ConditionID:    optionalInt64ForState(msmpi.ConditionID),
 		ShardModulo:    types.Int64Value(int64(msmpi.ShardModulo)),
 		DefaultShard:   types.Int64Value(int64(msmpi.DefaultShard)),
-		ExcludedTagIDs: types.SetValueMust(types.Int64Type, exTagIDs),
+		ExcludedTagIDs: int64SetForState(msmpi.ExcludedTagIDs),
 		TagShards:      types.SetValueMust(types.ObjectType{AttrTypes: tagShardAttrTypes}, tagShards),
 	}
 }
 
 func monolithSubManifestPkgInfoRequestWithState(data monolithSubManifestPkgInfo) *goztl.MonolithSubManifestPkgInfoRequest {
-	var cID *int
-	if !data.ConditionID.IsNull() {
-		cID = goztl.Int(int(data.ConditionID.ValueInt64()))
-	}
-
-	exTagIDs := make([]int, 0)
-	for _, exTagID := range data.ExcludedTagIDs.Elements() { // nil if null or unknown → no iterations
-		exTagIDs = append(exTagIDs, int(exTagID.(types.Int64).ValueInt64()))
-	}
-
 	tagShards := make([]goztl.TagShard, 0)
 	for _, tagShard := range data.TagShards.Elements() { // nil if null or unknown → no iterations
 		tagShardMap := tagShard.(types.Object).Attributes()
@@ -95,10 +73,10 @@ func monolithSubManifestPkgInfoRequestWithState(data monolithSubManifestPkgInfo)
 		Key:            data.Key.ValueString(),
 		PkgInfoName:    data.PkgInfoName.ValueString(),
 		FeaturedItem:   data.FeaturedItem.ValueBool(),
-		ConditionID:    cID,
+		ConditionID:    optionalIntWithState(data.ConditionID),
 		ShardModulo:    int(data.ShardModulo.ValueInt64()),
 		DefaultShard:   int(data.DefaultShard.ValueInt64()),
-		ExcludedTagIDs: exTagIDs,
+		ExcludedTagIDs: intListWithState(data.ExcludedTagIDs),
 		TagShards:      tagShards,
 	}
 }

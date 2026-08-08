@@ -118,22 +118,12 @@ func (r *JMESPathCheckResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	platforms := make([]string, 0)
-	for _, pv := range data.Platforms.Elements() { // nil if null or unknown → no iterations
-		platforms = append(platforms, pv.(types.String).ValueString())
-	}
-
-	tagIDs := make([]int, 0)
-	for _, tv := range data.TagIDs.Elements() { // nil if null or unknown → no iterations
-		tagIDs = append(tagIDs, int(tv.(types.Int64).ValueInt64()))
-	}
-
 	ztlReq := &goztl.JMESPathCheckCreateRequest{
 		Name:               data.Name.ValueString(),
 		Description:        data.Description.ValueString(), // default to "" if null or unknown
 		SourceName:         data.SourceName.ValueString(),
-		Platforms:          platforms,
-		TagIDs:             tagIDs,
+		Platforms:          stringListWithStateSet(data.Platforms),
+		TagIDs:             intListWithState(data.TagIDs),
 		JMESPathExpression: data.JMESPathExpression.ValueString(),
 	}
 	ztlJC, _, err := r.client.JMESPathChecks.Create(ctx, ztlReq)
@@ -186,22 +176,12 @@ func (r *JMESPathCheckResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	platforms := make([]string, 0)
-	for _, pv := range data.Platforms.Elements() { // nil if null or unknown → no iterations
-		platforms = append(platforms, pv.(types.String).ValueString())
-	}
-
-	tagIDs := make([]int, 0)
-	for _, tv := range data.TagIDs.Elements() { // nil if null or unknown → no iterations
-		tagIDs = append(tagIDs, int(tv.(types.Int64).ValueInt64()))
-	}
-
 	ztlReq := &goztl.JMESPathCheckUpdateRequest{
 		Name:               data.Name.ValueString(),
 		Description:        data.Description.ValueString(), // default to "" if null or unknown
 		SourceName:         data.SourceName.ValueString(),
-		Platforms:          platforms,
-		TagIDs:             tagIDs,
+		Platforms:          stringListWithStateSet(data.Platforms),
+		TagIDs:             intListWithState(data.TagIDs),
 		JMESPathExpression: data.JMESPathExpression.ValueString(),
 	}
 	ztlJC, _, err := r.client.JMESPathChecks.Update(ctx, int(data.ID.ValueInt64()), ztlReq)
