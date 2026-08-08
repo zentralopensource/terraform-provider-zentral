@@ -94,11 +94,9 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 
 	tagCreateRequest := &goztl.TagCreateRequest{
-		Name:  data.Name.ValueString(),
-		Color: data.Color.ValueString(),
-	}
-	if !data.TaxonomyID.IsNull() {
-		tagCreateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.ValueInt64()))
+		Name:       data.Name.ValueString(),
+		Color:      data.Color.ValueString(),
+		TaxonomyID: optionalIntWithState(data.TaxonomyID),
 	}
 	tag, _, err := r.client.Tags.Create(ctx, tagCreateRequest)
 	if err != nil {
@@ -151,11 +149,9 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	}
 
 	tagUpdateRequest := &goztl.TagUpdateRequest{
-		Name:  data.Name.ValueString(),
-		Color: data.Color.ValueString(),
-	}
-	if !data.TaxonomyID.IsNull() {
-		tagUpdateRequest.TaxonomyID = goztl.Int(int(data.TaxonomyID.ValueInt64()))
+		Name:       data.Name.ValueString(),
+		Color:      data.Color.ValueString(),
+		TaxonomyID: optionalIntWithState(data.TaxonomyID),
 	}
 	tag, _, err := r.client.Tags.Update(ctx, int(data.ID.ValueInt64()), tagUpdateRequest)
 	if err != nil {

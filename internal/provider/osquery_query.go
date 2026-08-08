@@ -30,33 +30,8 @@ var schedulingAttrTypes = map[string]attr.Type{
 }
 
 func osqueryQueryForState(oq *goztl.OsqueryQuery) osqueryQuery {
-	platforms := make([]attr.Value, 0)
-	for _, platform := range oq.Platforms {
-		platforms = append(platforms, types.StringValue(platform))
-	}
-
-	var minOsqueryVersion types.String
-	if oq.MinOsqueryVersion != nil {
-		minOsqueryVersion = types.StringValue(*oq.MinOsqueryVersion)
-	} else {
-		minOsqueryVersion = types.StringNull()
-	}
-
-	var tagID types.Int64
-	if oq.TagID != nil {
-		tagID = types.Int64Value(int64(*oq.TagID))
-	} else {
-		tagID = types.Int64Null()
-	}
-
 	var scheduling types.Object
 	if oq.Scheduling != nil {
-		var shard types.Int64
-		if oq.Scheduling.Shard != nil {
-			shard = types.Int64Value(int64(*oq.Scheduling.Shard))
-		} else {
-			shard = types.Int64Null()
-		}
 		scheduling = types.ObjectValueMust(
 			schedulingAttrTypes,
 			map[string]attr.Value{
@@ -64,7 +39,7 @@ func osqueryQueryForState(oq *goztl.OsqueryQuery) osqueryQuery {
 				"log_removed_actions": types.BoolValue(oq.Scheduling.LogRemovedActions),
 				"interval":            types.Int64Value(int64(oq.Scheduling.Interval)),
 				"pack_id":             types.Int64Value(int64(oq.Scheduling.PackID)),
-				"shard":               shard,
+				"shard":               optionalInt64ForState(oq.Scheduling.Shard),
 				"snapshot_mode":       types.BoolValue(oq.Scheduling.SnapshotMode),
 			},
 		)
@@ -76,57 +51,38 @@ func osqueryQueryForState(oq *goztl.OsqueryQuery) osqueryQuery {
 		ID:                     types.Int64Value(int64(oq.ID)),
 		Name:                   types.StringValue(oq.Name),
 		SQL:                    types.StringValue(oq.SQL),
-		Platforms:              types.SetValueMust(types.StringType, platforms),
-		MinOsqueryVersion:      minOsqueryVersion,
+		Platforms:              stringSetForState(oq.Platforms),
+		MinOsqueryVersion:      optionalStringForState(oq.MinOsqueryVersion),
 		Description:            types.StringValue(oq.Description),
 		Value:                  types.StringValue(oq.Value),
 		Version:                types.Int64Value(int64(oq.Version)),
 		ComplianceCheckEnabled: types.BoolValue(oq.ComplianceCheckEnabled),
-		TagID:                  tagID,
+		TagID:                  optionalInt64ForState(oq.TagID),
 		Scheduling:             scheduling,
 	}
 }
 
 func osqueryQueryRequestWithState(data osqueryQuery) *goztl.OsqueryQueryRequest {
-	platforms := make([]string, 0)
-	for _, platform := range data.Platforms.Elements() { // nil if null or unknown → no iterations
-		platforms = append(platforms, platform.(types.String).ValueString())
-	}
-
-	var minOsqueryVersion *string
-	if !data.MinOsqueryVersion.IsNull() {
-		minOsqueryVersion = goztl.String(data.MinOsqueryVersion.ValueString())
-	}
-
-	var tagID *int
-	if !data.TagID.IsNull() {
-		tagID = goztl.Int(int(data.TagID.ValueInt64()))
-	}
-
 	req := &goztl.OsqueryQueryRequest{
 		Name:                   data.Name.ValueString(),
 		SQL:                    data.SQL.ValueString(),
-		Platforms:              platforms,
-		MinOsqueryVersion:      minOsqueryVersion,
+		Platforms:              stringListWithStateSet(data.Platforms),
+		MinOsqueryVersion:      optionalStringWithState(data.MinOsqueryVersion),
 		Description:            data.Description.ValueString(),
 		Value:                  data.Value.ValueString(),
 		ComplianceCheckEnabled: data.ComplianceCheckEnabled.ValueBool(),
-		TagID:                  tagID,
+		TagID:                  optionalIntWithState(data.TagID),
 	}
 
 	if !data.Scheduling.IsNull() {
 		schedulingMap := data.Scheduling.Attributes()
 		if schedulingMap != nil {
-			var shard *int
-			if !schedulingMap["shard"].(types.Int64).IsNull() {
-				shard = goztl.Int(int(schedulingMap["shard"].(types.Int64).ValueInt64()))
-			}
 			schReq := &goztl.OsqueryQuerySchedulingRequest{
 				CanBeDenyListed:   schedulingMap["can_be_denylisted"].(types.Bool).ValueBool(),
 				LogRemovedActions: schedulingMap["log_removed_actions"].(types.Bool).ValueBool(),
 				Interval:          int(schedulingMap["interval"].(types.Int64).ValueInt64()),
 				PackID:            int(schedulingMap["pack_id"].(types.Int64).ValueInt64()),
-				Shard:             shard,
+				Shard:             optionalIntWithState(schedulingMap["shard"].(types.Int64)),
 				SnapshotMode:      schedulingMap["snapshot_mode"].(types.Bool).ValueBool(),
 			}
 			req.Scheduling = schReq

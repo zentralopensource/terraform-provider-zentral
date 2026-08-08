@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
@@ -56,43 +55,6 @@ func santaRuleForState(sr *goztl.SantaRule) santaRule {
 		panic("Unknown Santa rule policy")
 	}
 
-	var rulesetID types.Int64
-	if sr.RulesetID != nil {
-		rulesetID = types.Int64Value(int64(*sr.RulesetID))
-	} else {
-		rulesetID = types.Int64Null()
-	}
-
-	primaryUsers := make([]attr.Value, 0)
-	for _, primaryUser := range sr.PrimaryUsers {
-		primaryUsers = append(primaryUsers, types.StringValue(primaryUser))
-	}
-
-	excludedPrimaryUsers := make([]attr.Value, 0)
-	for _, primaryUser := range sr.ExcludedPrimaryUsers {
-		excludedPrimaryUsers = append(excludedPrimaryUsers, types.StringValue(primaryUser))
-	}
-
-	serialNumbers := make([]attr.Value, 0)
-	for _, serialNumber := range sr.SerialNumbers {
-		serialNumbers = append(serialNumbers, types.StringValue(serialNumber))
-	}
-
-	excludedSerialNumbers := make([]attr.Value, 0)
-	for _, serialNumber := range sr.ExcludedSerialNumbers {
-		excludedSerialNumbers = append(excludedSerialNumbers, types.StringValue(serialNumber))
-	}
-
-	tagIDs := make([]attr.Value, 0)
-	for _, tagID := range sr.TagIDs {
-		tagIDs = append(tagIDs, types.Int64Value(int64(tagID)))
-	}
-
-	excludedTagIDs := make([]attr.Value, 0)
-	for _, tagID := range sr.ExcludedTagIDs {
-		excludedTagIDs = append(excludedTagIDs, types.Int64Value(int64(tagID)))
-	}
-
 	return santaRule{
 		ID:                    types.Int64Value(int64(sr.ID)),
 		ConfigurationID:       types.Int64Value(int64(sr.ConfigurationID)),
@@ -103,13 +65,13 @@ func santaRuleForState(sr *goztl.SantaRule) santaRule {
 		Description:           types.StringValue(sr.Description),
 		CustomMessage:         types.StringValue(sr.CustomMessage),
 		CustomURL:             types.StringValue(sr.CustomURL),
-		RulesetID:             rulesetID,
-		PrimaryUsers:          types.SetValueMust(types.StringType, primaryUsers),
-		ExcludedPrimaryUsers:  types.SetValueMust(types.StringType, excludedPrimaryUsers),
-		SerialNumbers:         types.SetValueMust(types.StringType, serialNumbers),
-		ExcludedSerialNumbers: types.SetValueMust(types.StringType, excludedSerialNumbers),
-		TagIDs:                types.SetValueMust(types.Int64Type, tagIDs),
-		ExcludedTagIDs:        types.SetValueMust(types.Int64Type, excludedTagIDs),
+		RulesetID:             optionalInt64ForState(sr.RulesetID),
+		PrimaryUsers:          stringSetForState(sr.PrimaryUsers),
+		ExcludedPrimaryUsers:  stringSetForState(sr.ExcludedPrimaryUsers),
+		SerialNumbers:         stringSetForState(sr.SerialNumbers),
+		ExcludedSerialNumbers: stringSetForState(sr.ExcludedSerialNumbers),
+		TagIDs:                int64SetForState(sr.TagIDs),
+		ExcludedTagIDs:        int64SetForState(sr.ExcludedTagIDs),
 		Version:               types.Int64Value(int64(sr.Version)),
 	}
 }
@@ -131,36 +93,6 @@ func santaRuleRequestWithState(data santaRule) *goztl.SantaRuleRequest {
 		panic("Unknown Santa rule policy")
 	}
 
-	primaryUsers := make([]string, 0)
-	for _, primaryUser := range data.PrimaryUsers.Elements() { // nil if null or unknown → no iterations
-		primaryUsers = append(primaryUsers, primaryUser.(types.String).ValueString())
-	}
-
-	excludedPrimaryUsers := make([]string, 0)
-	for _, primaryUser := range data.ExcludedPrimaryUsers.Elements() { // nil if null or unknown → no iterations
-		excludedPrimaryUsers = append(excludedPrimaryUsers, primaryUser.(types.String).ValueString())
-	}
-
-	serialNumbers := make([]string, 0)
-	for _, serialNumber := range data.SerialNumbers.Elements() { // nil if null or unknown → no iterations
-		serialNumbers = append(serialNumbers, serialNumber.(types.String).ValueString())
-	}
-
-	excludedSerialNumbers := make([]string, 0)
-	for _, serialNumber := range data.ExcludedSerialNumbers.Elements() { // nil if null or unknown → no iterations
-		excludedSerialNumbers = append(excludedSerialNumbers, serialNumber.(types.String).ValueString())
-	}
-
-	tagIDs := make([]int, 0)
-	for _, tagID := range data.TagIDs.Elements() { // nil if null or unknown → no iterations
-		tagIDs = append(tagIDs, int(tagID.(types.Int64).ValueInt64()))
-	}
-
-	excludedTagIDs := make([]int, 0)
-	for _, tagID := range data.ExcludedTagIDs.Elements() { // nil if null or unknown → no iterations
-		excludedTagIDs = append(excludedTagIDs, int(tagID.(types.Int64).ValueInt64()))
-	}
-
 	return &goztl.SantaRuleRequest{
 		ConfigurationID:       int(data.ConfigurationID.ValueInt64()),
 		Policy:                policy,
@@ -170,11 +102,11 @@ func santaRuleRequestWithState(data santaRule) *goztl.SantaRuleRequest {
 		Description:           data.Description.ValueString(),
 		CustomMessage:         data.CustomMessage.ValueString(),
 		CustomURL:             data.CustomURL.ValueString(),
-		PrimaryUsers:          primaryUsers,
-		ExcludedPrimaryUsers:  excludedPrimaryUsers,
-		SerialNumbers:         serialNumbers,
-		ExcludedSerialNumbers: excludedSerialNumbers,
-		TagIDs:                tagIDs,
-		ExcludedTagIDs:        excludedTagIDs,
+		PrimaryUsers:          stringListWithStateSet(data.PrimaryUsers),
+		ExcludedPrimaryUsers:  stringListWithStateSet(data.ExcludedPrimaryUsers),
+		SerialNumbers:         stringListWithStateSet(data.SerialNumbers),
+		ExcludedSerialNumbers: stringListWithStateSet(data.ExcludedSerialNumbers),
+		TagIDs:                intListWithState(data.TagIDs),
+		ExcludedTagIDs:        intListWithState(data.ExcludedTagIDs),
 	}
 }

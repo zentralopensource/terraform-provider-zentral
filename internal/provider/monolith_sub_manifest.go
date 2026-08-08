@@ -13,30 +13,18 @@ type monolithSubManifest struct {
 }
 
 func monolithSubManifestForState(msm *goztl.MonolithSubManifest) monolithSubManifest {
-	var mbu types.Int64
-	if msm.MetaBusinessUnitID != nil {
-		mbu = types.Int64Value(int64(*msm.MetaBusinessUnitID))
-	} else {
-		mbu = types.Int64Null()
-	}
-
 	return monolithSubManifest{
 		ID:                 types.Int64Value(int64(msm.ID)),
 		Name:               types.StringValue(msm.Name),
 		Description:        types.StringValue(msm.Description),
-		MetaBusinessUnitID: mbu,
+		MetaBusinessUnitID: optionalInt64ForState(msm.MetaBusinessUnitID),
 	}
 }
 
 func monolithSubManifestRequestWithState(data monolithSubManifest) *goztl.MonolithSubManifestRequest {
-	var mbu *int
-	if !data.MetaBusinessUnitID.IsNull() {
-		mbu = goztl.Int(int(data.MetaBusinessUnitID.ValueInt64()))
-	}
-
 	return &goztl.MonolithSubManifestRequest{
 		Name:               data.Name.ValueString(),
 		Description:        data.Description.ValueString(),
-		MetaBusinessUnitID: mbu,
+		MetaBusinessUnitID: optionalIntWithState(data.MetaBusinessUnitID),
 	}
 }

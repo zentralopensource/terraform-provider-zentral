@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
@@ -33,11 +32,6 @@ type santaConfiguration struct {
 
 func santaConfigurationForState(sc *goztl.SantaConfiguration) santaConfiguration {
 
-	remountUSBModes := make([]attr.Value, 0)
-	for _, rumv := range sc.RemountUSBMode {
-		remountUSBModes = append(remountUSBModes, types.StringValue(rumv))
-	}
-
 	clientMode := tfSantaMonitor // default to MONITOR
 	if sc.ClientMode == ztlSantaLockdown {
 		clientMode = tfSantaLockdown
@@ -55,7 +49,7 @@ func santaConfigurationForState(sc *goztl.SantaConfiguration) santaConfiguration
 		AllowedPathRegex:          types.StringValue(sc.AllowedPathRegex),
 		BlockedPathRegex:          types.StringValue(sc.BlockedPathRegex),
 		BlockUSBMount:             types.BoolValue(sc.BlockUSBMount),
-		RemountUSBMode:            types.SetValueMust(types.StringType, remountUSBModes),
+		RemountUSBMode:            stringSetForState(sc.RemountUSBMode),
 		AllowUnknownShard:         types.Int64Value(int64(sc.AllowUnknownShard)),
 		EnableAllEventUploadShard: types.Int64Value(int64(sc.EnableAllEventUploadShard)),
 		SyncIncidentSeverity:      types.Int64Value(int64(sc.SyncIncidentSeverity)),
@@ -63,11 +57,6 @@ func santaConfigurationForState(sc *goztl.SantaConfiguration) santaConfiguration
 }
 
 func santaConfigurationRequestWithState(data santaConfiguration) *goztl.SantaConfigurationRequest {
-	remountUSBMode := make([]string, 0)
-	for _, rumv := range data.RemountUSBMode.Elements() { // nil if null or unknown → no iterations
-		remountUSBMode = append(remountUSBMode, rumv.(types.String).ValueString())
-	}
-
 	clientMode := ztlSantaMonitor // default to MONITOR
 	if data.ClientMode.ValueString() == tfSantaLockdown {
 		clientMode = ztlSantaLockdown
@@ -84,7 +73,7 @@ func santaConfigurationRequestWithState(data santaConfiguration) *goztl.SantaCon
 		AllowedPathRegex:          data.AllowedPathRegex.ValueString(),
 		BlockedPathRegex:          data.BlockedPathRegex.ValueString(),
 		BlockUSBMount:             data.BlockUSBMount.ValueBool(),
-		RemountUSBMode:            remountUSBMode,
+		RemountUSBMode:            stringListWithStateSet(data.RemountUSBMode),
 		AllowUnknownShard:         int(data.AllowUnknownShard.ValueInt64()),
 		EnableAllEventUploadShard: int(data.EnableAllEventUploadShard.ValueInt64()),
 		SyncIncidentSeverity:      int(data.SyncIncidentSeverity.ValueInt64()),

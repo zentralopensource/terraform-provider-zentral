@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
@@ -21,68 +20,22 @@ type mdmSoftwareUpdateEnforcement struct {
 }
 
 func mdmSoftwareUpdateEnforcementForState(msue *goztl.MDMSoftwareUpdateEnforcement) mdmSoftwareUpdateEnforcement {
-	platforms := make([]attr.Value, 0)
-	for _, platform := range msue.Platforms {
-		platforms = append(platforms, types.StringValue(platform))
-	}
-
-	tagIDs := make([]attr.Value, 0)
-	for _, tagID := range msue.TagIDs {
-		tagIDs = append(tagIDs, types.Int64Value(int64(tagID)))
-	}
-
-	var ldt types.String
-	if msue.LocalDateTime != nil {
-		ldt = types.StringValue(*msue.LocalDateTime)
-	} else {
-		ldt = types.StringNull()
-	}
-
-	var dd types.Int64
-	if msue.DelayDays != nil {
-		dd = types.Int64Value(int64(*msue.DelayDays))
-	} else {
-		dd = types.Int64Null()
-	}
-
-	var lt types.String
-	if msue.LocalTime != nil {
-		lt = types.StringValue(*msue.LocalTime)
-	} else {
-		lt = types.StringNull()
-	}
-
 	return mdmSoftwareUpdateEnforcement{
 		ID:            types.Int64Value(int64(msue.ID)),
 		Name:          types.StringValue(msue.Name),
 		DetailsURL:    types.StringValue(msue.DetailsURL),
-		Platforms:     types.SetValueMust(types.StringType, platforms),
-		TagIDs:        types.SetValueMust(types.Int64Type, tagIDs),
+		Platforms:     stringSetForState(msue.Platforms),
+		TagIDs:        int64SetForState(msue.TagIDs),
 		OSVersion:     types.StringValue(msue.OSVersion),
 		BuildVersion:  types.StringValue(msue.BuildVersion),
-		LocalDateTime: ldt,
+		LocalDateTime: optionalStringForState(msue.LocalDateTime),
 		MaxOSVersion:  types.StringValue(msue.MaxOSVersion),
-		DelayDays:     dd,
-		LocalTime:     lt,
+		DelayDays:     optionalInt64ForState(msue.DelayDays),
+		LocalTime:     optionalStringForState(msue.LocalTime),
 	}
 }
 
 func mdmSoftwareUpdateEnforcementRequestWithState(data mdmSoftwareUpdateEnforcement) *goztl.MDMSoftwareUpdateEnforcementRequest {
-	platforms := make([]string, 0)
-	for _, platform := range data.Platforms.Elements() { // nil if null or unknown → no iterations
-		platforms = append(platforms, platform.(types.String).ValueString())
-	}
-
-	tagIDs := make([]int, 0)
-	for _, tagID := range data.TagIDs.Elements() { // nil if null or unknown → no iterations
-		tagIDs = append(tagIDs, int(tagID.(types.Int64).ValueInt64()))
-	}
-
-	var ldt *string
-	if !data.LocalDateTime.IsNull() {
-		ldt = goztl.String(data.LocalDateTime.ValueString())
-	}
-
 	var dd *int
 	if !data.DelayDays.IsUnknown() {
 		if !data.DelayDays.IsNull() {
@@ -104,11 +57,11 @@ func mdmSoftwareUpdateEnforcementRequestWithState(data mdmSoftwareUpdateEnforcem
 	return &goztl.MDMSoftwareUpdateEnforcementRequest{
 		Name:          data.Name.ValueString(),
 		DetailsURL:    data.DetailsURL.ValueString(),
-		Platforms:     platforms,
-		TagIDs:        tagIDs,
+		Platforms:     stringListWithStateSet(data.Platforms),
+		TagIDs:        intListWithState(data.TagIDs),
 		OSVersion:     data.OSVersion.ValueString(),
 		BuildVersion:  data.BuildVersion.ValueString(),
-		LocalDateTime: ldt,
+		LocalDateTime: optionalStringWithState(data.LocalDateTime),
 		MaxOSVersion:  data.MaxOSVersion.ValueString(),
 		DelayDays:     dd,
 		LocalTime:     lt,

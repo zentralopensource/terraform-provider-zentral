@@ -45,13 +45,6 @@ var s3AttrTypes = map[string]attr.Type{
 }
 
 func monolithRepositoryForState(mr *goztl.MonolithRepository) monolithRepository {
-	var mbu types.Int64
-	if mr.MetaBusinessUnitID != nil {
-		mbu = types.Int64Value(int64(*mr.MetaBusinessUnitID))
-	} else {
-		mbu = types.Int64Null()
-	}
-
 	var az types.Object
 	if mr.Azure != nil {
 		az = types.ObjectValueMust(
@@ -94,7 +87,7 @@ func monolithRepositoryForState(mr *goztl.MonolithRepository) monolithRepository
 	return monolithRepository{
 		ID:                 types.Int64Value(int64(mr.ID)),
 		Name:               types.StringValue(mr.Name),
-		MetaBusinessUnitID: mbu,
+		MetaBusinessUnitID: optionalInt64ForState(mr.MetaBusinessUnitID),
 		Backend:            types.StringValue(mr.Backend),
 		Azure:              az,
 		S3:                 s3,
@@ -102,14 +95,9 @@ func monolithRepositoryForState(mr *goztl.MonolithRepository) monolithRepository
 }
 
 func monolithRepositoryRequestWithState(data monolithRepository) *goztl.MonolithRepositoryRequest {
-	var mbu *int
-	if !data.MetaBusinessUnitID.IsNull() {
-		mbu = goztl.Int(int(data.MetaBusinessUnitID.ValueInt64()))
-	}
-
 	req := &goztl.MonolithRepositoryRequest{
 		Name:               data.Name.ValueString(),
-		MetaBusinessUnitID: mbu,
+		MetaBusinessUnitID: optionalIntWithState(data.MetaBusinessUnitID),
 		Backend:            data.Backend.ValueString(),
 	}
 

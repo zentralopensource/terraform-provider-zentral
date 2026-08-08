@@ -1,7 +1,6 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
@@ -20,50 +19,30 @@ type mdmArtifact struct {
 }
 
 func mdmArtifactForState(ma *goztl.MDMArtifact) mdmArtifact {
-	platforms := make([]attr.Value, 0)
-	for _, p := range ma.Platforms {
-		platforms = append(platforms, types.StringValue(p))
-	}
-
-	requires := make([]attr.Value, 0)
-	for _, raID := range ma.Requires {
-		requires = append(requires, types.StringValue(raID))
-	}
-
 	return mdmArtifact{
 		ID:                          types.StringValue(ma.ID),
 		Name:                        types.StringValue(ma.Name),
 		Type:                        types.StringValue(ma.Type),
 		Channel:                     types.StringValue(ma.Channel),
-		Platforms:                   types.SetValueMust(types.StringType, platforms),
+		Platforms:                   stringSetForState(ma.Platforms),
 		InstallDuringSetupAssistant: types.BoolValue(ma.InstallDuringSetupAssistant),
 		AutoUpdate:                  types.BoolValue(ma.AutoUpdate),
 		ReinstallInterval:           types.Int64Value(int64(ma.ReinstallInterval)),
 		ReinstallOnOSUpdate:         types.StringValue(ma.ReinstallOnOSUpdate),
-		Requires:                    types.SetValueMust(types.StringType, requires),
+		Requires:                    stringSetForState(ma.Requires),
 	}
 }
 
 func mdmArtifactRequestWithState(data mdmArtifact) *goztl.MDMArtifactRequest {
-	platforms := make([]string, 0)
-	for _, p := range data.Platforms.Elements() { // nil if null or unknown → no iterations
-		platforms = append(platforms, p.(types.String).ValueString())
-	}
-
-	requires := make([]string, 0)
-	for _, raID := range data.Requires.Elements() { // nil if null or unknown → no iterations
-		requires = append(requires, raID.(types.String).ValueString())
-	}
-
 	return &goztl.MDMArtifactRequest{
 		Name:                        data.Name.ValueString(),
 		Type:                        data.Type.ValueString(),
 		Channel:                     data.Channel.ValueString(),
-		Platforms:                   platforms,
+		Platforms:                   stringListWithStateSet(data.Platforms),
 		InstallDuringSetupAssistant: data.InstallDuringSetupAssistant.ValueBool(),
 		AutoUpdate:                  data.AutoUpdate.ValueBool(),
 		ReinstallInterval:           int(data.ReinstallInterval.ValueInt64()),
 		ReinstallOnOSUpdate:         data.ReinstallOnOSUpdate.ValueString(),
-		Requires:                    requires,
+		Requires:                    stringListWithStateSet(data.Requires),
 	}
 }
