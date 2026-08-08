@@ -30,6 +30,8 @@ func TestAccMDMRecoveryPasswordConfigResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "rotation_interval_days", "90"),
 					resource.TestCheckResourceAttr(
+						resourceName, "reveal_rotation_delay", "120"),
+					resource.TestCheckResourceAttr(
 						resourceName, "rotate_firmware_password", "true"),
 				),
 			},
@@ -51,6 +53,9 @@ func TestAccMDMRecoveryPasswordConfigResource(t *testing.T) {
 						resourceName, "static_password", "12345678"),
 					resource.TestCheckResourceAttr(
 						resourceName, "rotation_interval_days", "0"),
+					// a static password forbids a rotation after reveal: the 0 default keeps it valid
+					resource.TestCheckResourceAttr(
+						resourceName, "reveal_rotation_delay", "0"),
 					resource.TestCheckResourceAttr(
 						resourceName, "rotate_firmware_password", "false"),
 				),
@@ -70,6 +75,7 @@ func testAccMDMRecoveryPasswordConfigResourceConfigDynamic(name string) string {
 resource "zentral_mdm_recovery_password_config" "test" {
   name                     = %[1]q
   rotation_interval_days   = 90
+  reveal_rotation_delay    = 120
   rotate_firmware_password = true
 }
 `, name)

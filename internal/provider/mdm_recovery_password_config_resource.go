@@ -74,6 +74,25 @@ func (r *MDMRecoveryPasswordConfigResource) Schema(ctx context.Context, req reso
 					int64validator.Between(0, 365),
 				},
 			},
+			"reveal_rotation_delay": schema.Int64Attribute{
+				Description: "The delay in minutes after which a recovery password rotation is scheduled once the password " +
+					"has been revealed. Must be 0, or between 5 and 1440, and must be 0 with a static password. " +
+					"Defaults to 0 (no rotation after a reveal). " +
+					"Note that a configuration created outside of Terraform defaults to 60.",
+				MarkdownDescription: "The delay in minutes after which a recovery password rotation is scheduled once the password " +
+					"has been revealed. Must be `0`, or between `5` and `1440`, and must be `0` with a static password. " +
+					"Defaults to `0` (no rotation after a reveal). " +
+					"Note that a configuration created outside of Terraform defaults to `60`.",
+				Optional: true,
+				Computed: true,
+				Default:  int64default.StaticInt64(0),
+				Validators: []validator.Int64{
+					int64validator.Any(
+						int64validator.OneOf(0),
+						int64validator.Between(5, 1440),
+					),
+				},
+			},
 			"rotate_firmware_password": schema.BoolAttribute{
 				Description:         "Set to true to rotate the firmware passwords. Defaults to false.",
 				MarkdownDescription: "Set to `true` to rotate the firmware passwords. Defaults to `false`.",

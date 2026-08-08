@@ -56,6 +56,11 @@ func (d *MDMRecoveryPasswordConfigDataSource) Schema(ctx context.Context, req da
 				MarkdownDescription: "The automatic recovery password rotation interval in days. It has a maximum value of `365`. Defaults to `0` (no automatic rotation).",
 				Computed:            true,
 			},
+			"reveal_rotation_delay": schema.Int64Attribute{
+				Description:         "The delay in minutes after which a recovery password rotation is scheduled once the password has been revealed.",
+				MarkdownDescription: "The delay in minutes after which a recovery password rotation is scheduled once the password has been revealed.",
+				Computed:            true,
+			},
 			"rotate_firmware_password": schema.BoolAttribute{
 				Description:         "Set to true to rotate the firmware passwords. Defaults to false.",
 				MarkdownDescription: "Set to `true` to rotate the firmware passwords. Defaults to `false`.",

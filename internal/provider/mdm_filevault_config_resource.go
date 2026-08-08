@@ -98,6 +98,23 @@ func (r *MDMFileVaultConfigResource) Schema(ctx context.Context, req resource.Sc
 					int64validator.Between(0, 365),
 				},
 			},
+			"prk_reveal_rotation_delay": schema.Int64Attribute{
+				Description: "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed. " +
+					"Must be 0, or between 5 and 1440. Defaults to 0 (no rotation after a reveal). " +
+					"Note that a configuration created outside of Terraform defaults to 60.",
+				MarkdownDescription: "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed. " +
+					"Must be `0`, or between `5` and `1440`. Defaults to `0` (no rotation after a reveal). " +
+					"Note that a configuration created outside of Terraform defaults to `60`.",
+				Optional: true,
+				Computed: true,
+				Default:  int64default.StaticInt64(0),
+				Validators: []validator.Int64{
+					int64validator.Any(
+						int64validator.OneOf(0),
+						int64validator.Between(5, 1440),
+					),
+				},
+			},
 		},
 	}
 }

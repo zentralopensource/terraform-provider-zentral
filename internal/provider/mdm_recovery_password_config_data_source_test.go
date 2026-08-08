@@ -33,6 +33,8 @@ func TestAccMDMRecoveryPasswordConfigDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "rotation_interval_days", "90"),
 					resource.TestCheckResourceAttr(
+						ds1ResourceName, "reveal_rotation_delay", "120"),
+					resource.TestCheckResourceAttr(
 						ds1ResourceName, "rotate_firmware_password", "true"),
 					// Read by ID
 					resource.TestCheckResourceAttrPair(
@@ -43,6 +45,8 @@ func TestAccMDMRecoveryPasswordConfigDataSource(t *testing.T) {
 						ds2ResourceName, "static_password", "12345678"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "rotation_interval_days", "0"),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "reveal_rotation_delay", "0"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "rotate_firmware_password", "false"),
 				),
@@ -56,6 +60,7 @@ func testAccMDMRecoveryPasswordConfigDataSourceConfig(c1Name string, c2Name stri
 resource "zentral_mdm_recovery_password_config" "check1" {
   name                     = %[1]q
   rotation_interval_days   = 90
+  reveal_rotation_delay    = 120
   rotate_firmware_password = true
 }
 

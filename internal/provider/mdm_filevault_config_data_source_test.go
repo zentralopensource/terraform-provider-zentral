@@ -38,6 +38,8 @@ func TestAccMDMFileVaultConfigDataSource(t *testing.T) {
 						ds1ResourceName, "destroy_key_on_standby", "false"),
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "prk_rotation_interval_days", "0"),
+					resource.TestCheckResourceAttr(
+						ds1ResourceName, "prk_reveal_rotation_delay", "0"),
 					// Read by ID
 					resource.TestCheckResourceAttrPair(
 						ds2ResourceName, "id", c2ResourceName, "id"),
@@ -53,6 +55,8 @@ func TestAccMDMFileVaultConfigDataSource(t *testing.T) {
 						ds2ResourceName, "destroy_key_on_standby", "true"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "prk_rotation_interval_days", "90"),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "prk_reveal_rotation_delay", "120"),
 				),
 			},
 		},
@@ -74,6 +78,7 @@ resource "zentral_mdm_filevault_config" "check2" {
   show_recovery_key            = true
   destroy_key_on_standby       = true
   prk_rotation_interval_days   = 90
+  prk_reveal_rotation_delay    = 120
 }
 
 data "zentral_mdm_filevault_config" "check1_by_name" {
