@@ -55,9 +55,13 @@ Resource families mirror Zentral / goztl: `mdm_*`, `monolith_*`, `munki_*`, `osq
 
 **`tfsdk` tag MUST match the schema attribute key, character-for-character.** The framework matches by name. A mismatch silently produces an unrelated diff (zero value in state, plan churn) — there's no compile-time check. When renaming an attribute, change the schema key, the struct field, and the `tfsdk:"..."` tag together.
 
-**Optional/nullable fields go through the `common.go` helpers.** Use `optionalStringForState` / `optionalStringWithState` / `optionalInt64ForState` / `optionalIntWithState` rather than open-coding the null check. Sets/lists have their own helpers there too (`stringSetForState`, `intListWithState`, `nullableStringSetForState`).
+**The state ↔ goztl conversion goes through the `common.go` helpers.** `optionalStringForState` / `optionalStringWithState`, `optionalBoolForState` / `optionalBoolWithState`, `optionalInt64ForState` / `optionalIntWithState` for the nullable scalars; `stringSetForState`, `int64SetForState`, `intListWithState`, `stringListWithStateSet`, `nullableStringSetForState` for the collections. Don't open-code the loop or the null check, and add the helper to `common.go` when one is missing rather than inlining it. Mind the null-vs-empty behaviour when picking: `stringSetForState` yields an empty set, `nullableStringSetForState` yields null, and swapping them changes what lands in state.
 
 **`id` plan modifier.** Every resource's `id` attribute (Int64 or String) is `Computed: true` with `UseStateForUnknown()` so the value survives plans where it would otherwise be marked unknown.
+
+**`UseStateForUnknown()` is not only for `id`.** Any computed attribute other resources reference needs it too — `zentral_turbo_script.job_id` for instance. A computed attribute that is null in the config is marked unknown in the plan on *every* update, and an unknown value in a referencing attribute carrying `RequiresReplace` plans the replacement of a resource nothing changed about. Only pin what the API keeps stable across updates.
+
+**State has to match what the API echoes back.** A `Required` / `Optional` attribute is planned as the literal config value, so an API that normalises it fails the apply with *inconsistent result after apply*. Zentral trims the leading and trailing whitespace off every string (DRF `trim_whitespace`) and returns naive UTC datetimes (`USE_TZ = False`, no timezone suffix). Accept only the forms that survive the round trip and reject the rest with a validator — as for the API's other constraints, ranges and mutually exclusive fields included, which belong in the schema instead of surfacing as a 400.
 
 **Import: integer vs UUID keys.** Use `resourceImportStatePassthroughZentralID` for Int64-keyed resources and `resourceImportStatePassthroughZentralUUID` for String-keyed ones — most MDM artifact-related resources are UUID-keyed (see the list in `utils.go`).
 
@@ -83,7 +87,7 @@ Almost always preceded by a goztl release — the provider depends on a typed se
    - Both `Description` and `MarkdownDescription` on the schema and every attribute — `tfplugindocs` reads `MarkdownDescription` (backticked identifiers) into `docs/`.
 4. **Data source** `internal/provider/<resource>_data_source.go` — copy `tag_data_source.go`. Schema attributes are mostly `Optional` (the lookup keys) + `Computed` (everything else). Use `ValidateConfig` for "exactly one of these keys" rules.
 5. **Tests** `<resource>_resource_test.go` and `<resource>_data_source_test.go` — copy `tag_resource_test.go` / `tag_data_source_test.go`. Use `acctest.RandString` for unique names; cover Create/Read, ImportState (`ImportStateVerify: true`), Update/Read, and a final ImportState round-trip. Tests hit a real Zentral — see Acceptance tests below.
-6. **Examples** `examples/resources/zentral_<name>/resource.tf` (and `examples/data-sources/zentral_<name>/data-source.tf` if the data source is non-trivial). `tfplugindocs` embeds these in the generated docs.
+6. **Examples** `examples/resources/zentral_<name>/resource.tf` (and `examples/data-sources/zentral_<name>/data-source.tf` if the data source is non-trivial). `tfplugindocs` embeds these in the generated docs. Each one declares every resource it references, so it can be applied as it stands — which is also how it gets checked. Wrap a heredoc in `trimspace()`: the API strips the trailing newline.
 7. **Register** in `internal/provider/provider.go` — add `NewXxxResource` to the `Resources()` slice and/or `NewXxxDataSource` to `DataSources()`, keeping alphabetical-within-area order.
 8. **Regenerate docs** with `go generate ./...` (in Docker). Commit the new files under `docs/`.
 
@@ -92,7 +96,8 @@ Almost always preceded by a goztl release — the provider depends on a typed se
 - **goztl version coupling.** Bumping the provider almost always means bumping `github.com/zentralopensource/goztl` in `go.mod` to a tag that contains the new resource. Adding a resource without a matching goztl release leaves the provider uncompilable. When making changes that span both repos: cut goztl first, tag it, then point this repo's `go.mod` at the new tag.
 - **Doc generation is mandatory.** The `generate` CI job runs `go generate ./...` and fails if the working tree has any diff. Run it locally (in Docker) after touching any schema description, example, or template. Files under `docs/` are generated artifacts — never hand-edit; change the source (`MarkdownDescription`, `examples/`, `templates/index.md.tmpl`) and regenerate.
 - **`tfsdk` tag drift.** As above: schema key, struct field, and `tfsdk:"…"` tag must agree. The framework matches by string, silently, at runtime.
-- **Acceptance tests cost real resources.** Tests run against a live Zentral and create/destroy objects there. Don't aim them at production.
+- **Acceptance tests cost real resources.** Tests run against a live Zentral and create/destroy objects there. Don't aim them at production. The instance is shared with CI, so a sudden wave of failures may be the server rather than the provider — check that the API still exposes the fields the error mentions before digging into the provider.
+- **A new attribute on an existing resource defaults to whatever preserves the current behaviour**, which is not always the API default. Zentral tends to migrate the existing rows so they keep behaving as before while new objects take the model default; matching the model default here flips every managed resource on the next apply.
 
 ## Running things
 
