@@ -24,6 +24,7 @@ The data source `zentral_munki_script_check` allows details of a Munki script ch
 
 - `arch_amd64` (Boolean) If `true`, this Munki script check is scheduled on Intel machines.
 - `arch_arm64` (Boolean) If `true`, this Munki script check is scheduled on Apple Silicon machines.
+- `compliance_check_id` (Number) `ID` of the compliance check backing this script check.
 - `description` (String) Description of the Munki script check.
 - `excluded_tag_ids` (Set of Number) The IDs of the tags this Munki script check is not scoped to.
 - `expected_result` (String) Expected result of the Munki script check.

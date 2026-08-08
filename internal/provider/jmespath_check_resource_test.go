@@ -37,6 +37,8 @@ func TestAccJMESPathCheckResource(t *testing.T) {
 						resourceName, "tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
 						resourceName, "jmespath_expression", "ok"),
+					resource.TestCheckResourceAttrSet(
+						resourceName, "compliance_check_id"),
 				),
 			},
 			// ImportState
@@ -69,6 +71,8 @@ func TestAccJMESPathCheckResource(t *testing.T) {
 						resourceName, "tag_ids.*", t2Resource, "id"),
 					resource.TestCheckResourceAttr(
 						resourceName, "jmespath_expression", "ok"),
+					resource.TestCheckResourceAttrSet(
+						resourceName, "compliance_check_id"),
 				),
 			},
 			// ImportState

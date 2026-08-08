@@ -34,5 +34,6 @@ The resource `zentral_munki_script_check` manages Munki script checks.
 
 ### Read-Only
 
+- `compliance_check_id` (Number) `ID` of the compliance check backing this script check.
 - `id` (Number) `ID` of the Munki script check.
 - `version` (Number) Version of the Munki script check.

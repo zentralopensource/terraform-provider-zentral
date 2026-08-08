@@ -25,6 +25,7 @@ The data source `zentral_osquery_query` allows details of a Osquery query to be 
 ### Read-Only
 
 - `compliance_check_enabled` (Boolean) If `true`, the query will be used as compliance check. Defaults to `false`.
+- `compliance_check_id` (Number) `ID` of the compliance check backing this query, when `compliance_check_enabled` is `true`.
 - `description` (String) Description of the query.
 - `minimum_osquery_version` (String) Only run on Osquery versions greater than or equal-to this version string
 - `platforms` (Set of String) Restrict the query to some platforms, default is 'all' platforms

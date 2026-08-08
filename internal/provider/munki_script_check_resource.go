@@ -127,6 +127,11 @@ func (r *MunkiScriptCheckResource) Schema(ctx context.Context, req resource.Sche
 				MarkdownDescription: "Version of the Munki script check.",
 				Computed:            true,
 			},
+			"compliance_check_id": schema.Int64Attribute{
+				Description:         "ID of the compliance check backing this script check.",
+				MarkdownDescription: "`ID` of the compliance check backing this script check.",
+				Computed:            true,
+			},
 		},
 	}
 }

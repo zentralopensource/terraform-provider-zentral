@@ -47,6 +47,8 @@ func TestAccMunkiScriptCheckResource(t *testing.T) {
 						resourceName, "excluded_tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
 						resourceName, "version", "1"),
+					resource.TestCheckResourceAttrSet(
+						resourceName, "compliance_check_id"),
 				),
 			},
 			// ImportState
@@ -87,6 +89,8 @@ func TestAccMunkiScriptCheckResource(t *testing.T) {
 						resourceName, "excluded_tag_ids.*", excludedTagResourceName, "id"),
 					resource.TestCheckResourceAttr(
 						resourceName, "version", "2"),
+					resource.TestCheckResourceAttrSet(
+						resourceName, "compliance_check_id"),
 				),
 			},
 			// ImportState

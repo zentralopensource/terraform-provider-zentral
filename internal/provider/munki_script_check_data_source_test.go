@@ -52,6 +52,8 @@ func TestAccMunkiScriptCheckDataSource(t *testing.T) {
 						ds1ResourceName, "excluded_tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "version", "1"),
+					resource.TestCheckResourceAttrSet(
+						ds1ResourceName, "compliance_check_id"),
 					// Read by ID, no platforms, no tags
 					resource.TestCheckResourceAttrPair(
 						ds2ResourceName, "id", sc2ResourceName, "id"),
@@ -83,6 +85,8 @@ func TestAccMunkiScriptCheckDataSource(t *testing.T) {
 						ds2ResourceName, "excluded_tag_ids.*", excludedTagResourceName, "id"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "version", "1"),
+					resource.TestCheckResourceAttrSet(
+						ds2ResourceName, "compliance_check_id"),
 				),
 			},
 		},

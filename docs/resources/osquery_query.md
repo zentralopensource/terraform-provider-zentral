@@ -32,6 +32,7 @@ The resource `zentral_osquery_query` manages Osquery queries.
 
 ### Read-Only
 
+- `compliance_check_id` (Number) `ID` of the compliance check backing this query, when `compliance_check_enabled` is `true`.
 - `id` (Number) `ID` of the query.
 - `version` (Number) Version of the query.
 
