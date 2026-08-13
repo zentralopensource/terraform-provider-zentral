@@ -214,7 +214,7 @@ Optional:
 
 - `assume_role_arn` (String) `ARN` of the AWS role to assume.
 - `aws_access_key_id` (String) AWS access key ID.
-- `aws_secret_access_key` (String) AWS secret access key.
+- `aws_secret_access_key` (String, Sensitive) AWS secret access key.
 - `batch_size` (Number) Number of events sent in a single request. Defaults to `1`. Must be between `1` and `500`.
 
 

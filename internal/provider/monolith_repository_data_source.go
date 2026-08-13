@@ -83,6 +83,7 @@ func (d *MonolithRepositoryDataSource) Schema(ctx context.Context, req datasourc
 					"client_secret": schema.StringAttribute{
 						Description:         "Client secret of the Azure app registration.",
 						MarkdownDescription: "Client secret of the Azure app registration.",
+						Sensitive:           true,
 						Computed:            true,
 					},
 				},

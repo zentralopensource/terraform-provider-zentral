@@ -28,7 +28,7 @@ The data source `zentral_osquery_enrollment` allows details of a Osquery enrollm
 - `powershell_script_url` (String) Powershell script download URL.
 - `quota` (Number) The number of times the enrollment can be used.
 - `script_url` (String) Linux script download URL.
-- `secret` (String) Enrollment secret.
+- `secret` (String, Sensitive) Enrollment secret.
 - `serial_numbers` (Set of String) The serial numbers the enrollment is restricted to.
 - `tag_ids` (Set of Number) The `ID`s of the tags that the machine will get at enrollment.
 - `udids` (Set of String) The `UDID`s the enrollment is restricted to.

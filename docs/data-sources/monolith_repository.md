@@ -33,7 +33,7 @@ The data source `zentral_monolith_repository` allows details of a Monolith repos
 Read-Only:
 
 - `client_id` (String) Client ID of the Azure app registration.
-- `client_secret` (String) Client secret of the Azure app registration.
+- `client_secret` (String, Sensitive) Client secret of the Azure app registration.
 - `container` (String) Name of the blob container.
 - `prefix` (String) Prefix of the Munki repository in the container.
 - `storage_account` (String) Name of the storage account.

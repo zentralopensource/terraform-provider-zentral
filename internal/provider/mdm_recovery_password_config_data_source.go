@@ -50,6 +50,7 @@ func (d *MDMRecoveryPasswordConfigDataSource) Schema(ctx context.Context, req da
 				Description:         "The static password to set for all devices.",
 				MarkdownDescription: "The static password to set for all devices.",
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"rotation_interval_days": schema.Int64Attribute{
 				Description:         "The automatic recovery password rotation interval in days. It has a maximum value of 365. Defaults to 0 (no automatic rotation).",

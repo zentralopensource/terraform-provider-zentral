@@ -32,5 +32,5 @@ The resource `zentral_santa_enrollment` manages Santa enrollments.
 - `configuration_profile_url` (String) Configuration profile download URL.
 - `id` (Number) `ID` of the Santa enrollment.
 - `plist_url` (String) Plist download URL.
-- `secret` (String) Enrollment secret.
+- `secret` (String, Sensitive) Enrollment secret.
 - `version` (Number) Enrollment version.

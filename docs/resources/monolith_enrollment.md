@@ -32,5 +32,5 @@ The resource `zentral_monolith_enrollment` manages Monolith enrollments.
 - `configuration_profile_url` (String) Configuration profile download URL.
 - `id` (Number) `ID` of the Monolith enrollment.
 - `plist_url` (String) Plist download URL.
-- `secret` (String) Enrollment secret.
+- `secret` (String, Sensitive) Enrollment secret.
 - `version` (Number) Enrollment version.

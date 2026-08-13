@@ -34,5 +34,5 @@ The resource `zentral_osquery_enrollment` manages Osquery enrollments.
 - `package_url` (String) macOS package download URL.
 - `powershell_script_url` (String) Powershell script download URL.
 - `script_url` (String) Linux script download URL.
-- `secret` (String) Enrollment secret.
+- `secret` (String, Sensitive) Enrollment secret.
 - `version` (Number) Enrollment version.

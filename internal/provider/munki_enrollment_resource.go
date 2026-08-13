@@ -63,6 +63,7 @@ func (r *MunkiEnrollmentResource) Schema(ctx context.Context, req resource.Schem
 				Description:         "Enrollment secret.",
 				MarkdownDescription: "Enrollment secret.",
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"meta_business_unit_id": schema.Int64Attribute{
 				Description:         "The ID of the meta business unit the machine will be assigned to at enrollment.",

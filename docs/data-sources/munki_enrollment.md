@@ -25,7 +25,7 @@ The data source `zentral_munki_enrollment` allows details of a Munki enrollment 
 - `meta_business_unit_id` (Number) The `ID` of the meta business unit the machine will be assigned to at enrollment.
 - `package_url` (String) Package download URL.
 - `quota` (Number) The number of times the enrollment can be used.
-- `secret` (String) Enrollment secret.
+- `secret` (String, Sensitive) Enrollment secret.
 - `serial_numbers` (Set of String) The serial numbers the enrollment is restricted to.
 - `tag_ids` (Set of Number) The `ID`s of the tags that the machine will get at enrollment.
 - `udids` (Set of String) The `UDID`s the enrollment is restricted to.

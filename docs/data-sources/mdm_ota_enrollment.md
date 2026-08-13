@@ -30,7 +30,7 @@ The data source `zentral_mdm_ota_enrollment` allows details of a MDM OTA enrollm
 - `quota` (Number) The number of times the enrollment can be used.
 - `realm_uuid` (String) `UUID` of the identity realm linked to the OTA enrollment.
 - `scep_issuer_id` (String) `ID` of the MDM SCEP issuer linked to the OTA enrollment.
-- `secret` (String) Enrollment secret.
+- `secret` (String, Sensitive) Enrollment secret.
 - `serial_numbers` (Set of String) The serial numbers the enrollment is restricted to.
 - `tag_ids` (Set of Number) The `ID`s of the tags that the machine will get at enrollment.
 - `udids` (Set of String) The `UDID`s the enrollment is restricted to.

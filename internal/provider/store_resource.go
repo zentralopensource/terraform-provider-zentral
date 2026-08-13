@@ -165,6 +165,7 @@ var kinesisBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttri
 			Description:         "AWS secret access key.",
 			MarkdownDescription: "AWS secret access key.",
 			Optional:            true,
+			Sensitive:           true,
 		},
 		"assume_role_arn": schema.StringAttribute{
 			Description:         "ARN of the AWS role to assume.",

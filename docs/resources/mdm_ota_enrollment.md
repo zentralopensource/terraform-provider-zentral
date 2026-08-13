@@ -36,4 +36,4 @@ The resource `zentral_mdm_ota_enrollment` manages MDM OTA enrollments.
 ### Read-Only
 
 - `id` (Number) `ID` of the MDM OTA enrollment.
-- `secret` (String) Enrollment secret.
+- `secret` (String, Sensitive) Enrollment secret.
