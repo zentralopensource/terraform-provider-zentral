@@ -26,4 +26,4 @@ The data source `zentral_mdm_recovery_password_config` allows details of a MDM r
 - `reveal_rotation_delay` (Number) The delay in minutes after which a recovery password rotation is scheduled once the password has been revealed.
 - `rotate_firmware_password` (Boolean) Set to `true` to rotate the firmware passwords. Defaults to `false`.
 - `rotation_interval_days` (Number) The automatic recovery password rotation interval in days. It has a maximum value of `365`. Defaults to `0` (no automatic rotation).
-- `static_password` (String) The  static password to set for all devices.
+- `static_password` (String) The static password to set for all devices.

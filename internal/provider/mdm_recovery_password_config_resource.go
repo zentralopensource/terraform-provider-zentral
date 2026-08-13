@@ -61,7 +61,7 @@ func (r *MDMRecoveryPasswordConfigResource) Schema(ctx context.Context, req reso
 			},
 			"static_password": schema.StringAttribute{
 				Description:         "The static password to set for all devices.",
-				MarkdownDescription: "The  static password to set for all devices.",
+				MarkdownDescription: "The static password to set for all devices.",
 				Optional:            true,
 			},
 			"rotation_interval_days": schema.Int64Attribute{
