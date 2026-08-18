@@ -72,9 +72,11 @@ func (d *MDMFileVaultConfigDataSource) Schema(ctx context.Context, req datasourc
 				Computed:            true,
 			},
 			"prk_reveal_rotation_delay": schema.Int64Attribute{
-				Description:         "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed.",
-				MarkdownDescription: "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed.",
-				Computed:            true,
+				Description: "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed. " +
+					"Requires Zentral v2026.5 or later, older servers report 0.",
+				MarkdownDescription: "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed. " +
+					"Requires Zentral `v2026.5` or later, older servers report `0`.",
+				Computed: true,
 			},
 		},
 	}

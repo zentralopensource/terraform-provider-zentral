@@ -79,11 +79,13 @@ func (r *MDMRecoveryPasswordConfigResource) Schema(ctx context.Context, req reso
 				Description: "The delay in minutes after which a recovery password rotation is scheduled once the password " +
 					"has been revealed. Must be 0, or between 5 and 1440, and must be 0 with a static password. " +
 					"Defaults to 0 (no rotation after a reveal). " +
-					"Note that a configuration created outside of Terraform defaults to 60.",
+					"Note that a configuration created outside of Terraform defaults to 60. " +
+					"Requires Zentral v2026.5 or later.",
 				MarkdownDescription: "The delay in minutes after which a recovery password rotation is scheduled once the password " +
 					"has been revealed. Must be `0`, or between `5` and `1440`, and must be `0` with a static password. " +
 					"Defaults to `0` (no rotation after a reveal). " +
-					"Note that a configuration created outside of Terraform defaults to `60`.",
+					"Note that a configuration created outside of Terraform defaults to `60`. " +
+					"Requires Zentral `v2026.5` or later.",
 				Optional: true,
 				Computed: true,
 				Default:  int64default.StaticInt64(0),
@@ -148,6 +150,10 @@ func (r *MDMRecoveryPasswordConfigResource) Create(ctx context.Context, req reso
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, mdmRecoveryPasswordConfigForState(ztlMRPC))...)
+	checkInt64AttributeSupport(
+		&resp.Diagnostics, "reveal_rotation_delay", minZentralVersionRevealRotationDelay,
+		data.RevealRotationDelay, ztlMRPC.RevealRotationDelay,
+	)
 }
 
 func (r *MDMRecoveryPasswordConfigResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -198,6 +204,10 @@ func (r *MDMRecoveryPasswordConfigResource) Update(ctx context.Context, req reso
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, mdmRecoveryPasswordConfigForState(ztlMRPC))...)
+	checkInt64AttributeSupport(
+		&resp.Diagnostics, "reveal_rotation_delay", minZentralVersionRevealRotationDelay,
+		data.RevealRotationDelay, ztlMRPC.RevealRotationDelay,
+	)
 }
 
 func (r *MDMRecoveryPasswordConfigResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

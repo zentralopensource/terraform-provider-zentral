@@ -101,10 +101,12 @@ func (r *MDMFileVaultConfigResource) Schema(ctx context.Context, req resource.Sc
 			"prk_reveal_rotation_delay": schema.Int64Attribute{
 				Description: "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed. " +
 					"Must be 0, or between 5 and 1440. Defaults to 0 (no rotation after a reveal). " +
-					"Note that a configuration created outside of Terraform defaults to 60.",
+					"Note that a configuration created outside of Terraform defaults to 60. " +
+					"Requires Zentral v2026.5 or later.",
 				MarkdownDescription: "The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed. " +
 					"Must be `0`, or between `5` and `1440`. Defaults to `0` (no rotation after a reveal). " +
-					"Note that a configuration created outside of Terraform defaults to `60`.",
+					"Note that a configuration created outside of Terraform defaults to `60`. " +
+					"Requires Zentral `v2026.5` or later.",
 				Optional: true,
 				Computed: true,
 				Default:  int64default.StaticInt64(0),
@@ -162,6 +164,10 @@ func (r *MDMFileVaultConfigResource) Create(ctx context.Context, req resource.Cr
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, mdmFileVaultConfigForState(ztlMFC))...)
+	checkInt64AttributeSupport(
+		&resp.Diagnostics, "prk_reveal_rotation_delay", minZentralVersionPRKRevealRotationDelay,
+		data.PRKRevealRotationDelay, ztlMFC.PRKRevealRotationDelay,
+	)
 }
 
 func (r *MDMFileVaultConfigResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -212,6 +218,10 @@ func (r *MDMFileVaultConfigResource) Update(ctx context.Context, req resource.Up
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, mdmFileVaultConfigForState(ztlMFC))...)
+	checkInt64AttributeSupport(
+		&resp.Diagnostics, "prk_reveal_rotation_delay", minZentralVersionPRKRevealRotationDelay,
+		data.PRKRevealRotationDelay, ztlMFC.PRKRevealRotationDelay,
+	)
 }
 
 func (r *MDMFileVaultConfigResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

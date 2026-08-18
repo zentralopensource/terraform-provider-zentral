@@ -58,9 +58,11 @@ func (d *MDMRecoveryPasswordConfigDataSource) Schema(ctx context.Context, req da
 				Computed:            true,
 			},
 			"reveal_rotation_delay": schema.Int64Attribute{
-				Description:         "The delay in minutes after which a recovery password rotation is scheduled once the password has been revealed.",
-				MarkdownDescription: "The delay in minutes after which a recovery password rotation is scheduled once the password has been revealed.",
-				Computed:            true,
+				Description: "The delay in minutes after which a recovery password rotation is scheduled once the password has been revealed. " +
+					"Requires Zentral v2026.5 or later, older servers report 0.",
+				MarkdownDescription: "The delay in minutes after which a recovery password rotation is scheduled once the password has been revealed. " +
+					"Requires Zentral `v2026.5` or later, older servers report `0`.",
+				Computed: true,
 			},
 			"rotate_firmware_password": schema.BoolAttribute{
 				Description:         "Set to true to rotate the firmware passwords. Defaults to false.",

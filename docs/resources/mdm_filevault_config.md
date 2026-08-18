@@ -25,7 +25,7 @@ The resource `zentral_mdm_filevault_config` manages MDM FileVault configurations
 - `at_login_only` (Boolean) If `true`, prevents requests for enabling FileVault at user logout time. Defaults to `false`.
 - `bypass_attempts` (Number) The maximum number of times users can bypass enabling FileVault before being required to enable it to log in.
 - `destroy_key_on_standby` (Boolean) Set to `true` to prevent storing the FileVault key across restarts. Defaults to `false`.
-- `prk_reveal_rotation_delay` (Number) The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed. Must be `0`, or between `5` and `1440`. Defaults to `0` (no rotation after a reveal). Note that a configuration created outside of Terraform defaults to `60`.
+- `prk_reveal_rotation_delay` (Number) The delay in minutes after which a PRK rotation is scheduled once the PRK has been revealed. Must be `0`, or between `5` and `1440`. Defaults to `0` (no rotation after a reveal). Note that a configuration created outside of Terraform defaults to `60`. Requires Zentral `v2026.5` or later.
 - `prk_rotation_interval_days` (Number) The automatic PRK rotation interval in days. It has a maximum value of `365`. Defaults to `0` (no automatic rotation).
 - `show_recovery_key` (Boolean) If `false`, prevents display of the personal recovery key to the user after FileVault is enabled. Defaults to `false`.
 

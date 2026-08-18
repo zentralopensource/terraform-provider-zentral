@@ -1,13 +1,38 @@
 package provider
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
+
+// Server support
+
+// A Zentral that predates an attribute drops it from the requests, and leaves it out of the
+// responses, where goztl decodes it as a zero value. For an attribute whose zero value means what
+// the absent feature does, configurations that leave it alone keep working. Configurations that set
+// it get their value silently dropped, and the zero echoed back differs from the plan, which
+// Terraform reports as an inconsistent result — a provider bug, as far as the message goes. Naming
+// the cause is the point of this check. State has to be set before it runs, or the resource the
+// server did create is left out of the state.
+func checkInt64AttributeSupport(diags *diag.Diagnostics, attribute string, minVersion string, planned types.Int64, echoed int) {
+	if echoed != 0 || planned.IsNull() || planned.IsUnknown() || planned.ValueInt64() == 0 {
+		return
+	}
+	diags.AddError(
+		"Unsupported Zentral version",
+		fmt.Sprintf(
+			"The Zentral server ignored the %s attribute and returned 0 instead of %d. "+
+				"This attribute requires Zentral %s or later.",
+			attribute, planned.ValueInt64(), minVersion,
+		),
+	)
+}
 
 // Timestamps
 

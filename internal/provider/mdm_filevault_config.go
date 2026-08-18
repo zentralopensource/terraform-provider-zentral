@@ -5,6 +5,9 @@ import (
 	"github.com/zentralopensource/goztl"
 )
 
+// The Zentral release that added prk_reveal_rotation_delay.
+const minZentralVersionPRKRevealRotationDelay = "v2026.5"
+
 type mdmFileVaultConfig struct {
 	ID                        types.Int64  `tfsdk:"id"`
 	Name                      types.String `tfsdk:"name"`

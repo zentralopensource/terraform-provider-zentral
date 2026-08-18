@@ -5,6 +5,9 @@ import (
 	"github.com/zentralopensource/goztl"
 )
 
+// The Zentral release that added reveal_rotation_delay.
+const minZentralVersionRevealRotationDelay = "v2026.5"
+
 type mdmRecoveryPasswordConfig struct {
 	ID                     types.Int64  `tfsdk:"id"`
 	Name                   types.String `tfsdk:"name"`
