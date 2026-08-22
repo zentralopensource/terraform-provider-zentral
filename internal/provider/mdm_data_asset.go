@@ -5,10 +5,13 @@ import (
 	"github.com/zentralopensource/goztl"
 )
 
+const minZentralVersionDataAssetSource = "v2026.6"
+
 type mdmDataAsset struct {
 	ID               types.String `tfsdk:"id"`
 	Type             types.String `tfsdk:"type"`
 	FileURI          types.String `tfsdk:"file_uri"`
+	Source           types.String `tfsdk:"source"`
 	FileSHA256       types.String `tfsdk:"file_sha256"`
 	FileSize         types.Int64  `tfsdk:"file_size"`
 	Filename         types.String `tfsdk:"filename"`
@@ -32,11 +35,12 @@ type mdmDataAsset struct {
 	Version          types.Int64  `tfsdk:"version"`
 }
 
-func mdmDataAssetForState(mda *goztl.MDMDataAsset, fileURI types.String) mdmDataAsset {
+func mdmDataAssetForState(mda *goztl.MDMDataAsset, fileURI types.String, source types.String) mdmDataAsset {
 	return mdmDataAsset{
 		ID:               types.StringValue(mda.ID),
 		Type:             types.StringValue(mda.Type),
 		FileURI:          fileURI,
+		Source:           source,
 		FileSHA256:       types.StringValue(mda.FileSHA256),
 		FileSize:         types.Int64Value(mda.FileSize),
 		Filename:         types.StringValue(mda.Filename),
@@ -65,6 +69,7 @@ func mdmDataAssetRequestWithState(data mdmDataAsset) *goztl.MDMDataAssetRequest 
 	return &goztl.MDMDataAssetRequest{
 		Type:       data.Type.ValueString(),
 		FileURI:    data.FileURI.ValueString(),
+		Source:     data.Source.ValueString(),
 		FileSHA256: data.FileSHA256.ValueString(),
 		MDMArtifactVersionRequest: goztl.MDMArtifactVersionRequest{
 			ArtifactID:       data.ArtifactID.ValueString(),

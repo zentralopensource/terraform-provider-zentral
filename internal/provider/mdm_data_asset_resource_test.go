@@ -1,11 +1,24 @@
 package provider
 
 import (
+	"crypto/sha256"
+	_ "embed"
+	"encoding/base64"
 	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+)
+
+//go:embed mdm_data_asset_resource_test_data.plist
+var dummyDataAssetPlist string
+
+// Zentral computes the digest from the content, so the test computes it the same way rather than
+// carrying a constant that goes stale with the fixture.
+var (
+	dummyDataAssetSource     = base64.StdEncoding.EncodeToString([]byte(dummyDataAssetPlist))
+	dummyDataAssetFileSHA256 = fmt.Sprintf("%x", sha256.Sum256([]byte(dummyDataAssetPlist)))
 )
 
 func TestAccMDMDataAssetResource(t *testing.T) {
@@ -73,7 +86,7 @@ func TestAccMDMDataAssetResource(t *testing.T) {
 				ResourceName:            resourceName,
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"file_uri"},
+				ImportStateVerifyIgnore: []string{"file_uri", "source"},
 			},
 			// Update and Read
 			{
@@ -139,7 +152,33 @@ func TestAccMDMDataAssetResource(t *testing.T) {
 				ResourceName:            resourceName,
 				ImportState:             true,
 				ImportStateVerify:       true,
-				ImportStateVerifyIgnore: []string{"file_uri"},
+				ImportStateVerifyIgnore: []string{"file_uri", "source"},
+			},
+			// Update the scope only, with the same file
+			{
+				Config: testAccMDMDataAssetResourceConfigSameFile(name),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "file_sha256", "388e1a3ac8dcf2f8fa0bf269c4004c59221312d65d7e42ef93150e278542b6dc"),
+					resource.TestCheckResourceAttr(
+						resourceName, "macos_min_version", "14.0"),
+				),
+			},
+			// Replace the file URI with an inline source
+			{
+				Config: testAccMDMDataAssetResourceConfigSource(name),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "type", "PLIST"),
+					resource.TestCheckNoResourceAttr(
+						resourceName, "file_uri"),
+					// the sha256 of the decoded source, computed by the server
+					resource.TestCheckResourceAttr(
+						resourceName, "file_sha256", dummyDataAssetFileSHA256),
+					// a data asset built from a source has no file to name it after
+					resource.TestCheckResourceAttr(
+						resourceName, "filename", ""),
+				),
 			},
 		},
 	})
@@ -163,6 +202,46 @@ resource "zentral_mdm_data_asset" "test" {
   macos          = true
 }
 `, name)
+}
+
+func testAccMDMDataAssetResourceConfigSameFile(name string) string {
+	return fmt.Sprintf(`
+resource "zentral_mdm_artifact" "test" {
+  name      = %[1]q
+  type      = "Data Asset"
+  channel   = "Device"
+  platforms = ["macOS"]
+}
+
+resource "zentral_mdm_data_asset" "test" {
+  artifact_id       = zentral_mdm_artifact.test.id
+  type              = "ZIP"
+  file_uri          = "s3://zentral-pro-services-artifacts-eu-central-1/terraform-provider-zentral/testdata/pam.d.v2.zip"
+  file_sha256       = "388e1a3ac8dcf2f8fa0bf269c4004c59221312d65d7e42ef93150e278542b6dc"
+  version           = 2
+  macos             = true
+  macos_min_version = "14.0"
+}
+`, name)
+}
+
+func testAccMDMDataAssetResourceConfigSource(name string) string {
+	return fmt.Sprintf(`
+resource "zentral_mdm_artifact" "test" {
+  name      = %[1]q
+  type      = "Data Asset"
+  channel   = "Device"
+  platforms = ["macOS"]
+}
+
+resource "zentral_mdm_data_asset" "test" {
+  artifact_id = zentral_mdm_artifact.test.id
+  type        = "PLIST"
+  source      = %[2]q
+  version     = 3
+  macos       = true
+}
+`, name, dummyDataAssetSource)
 }
 
 func testAccMDMDataAssetResourceConfigFull(name string) string {

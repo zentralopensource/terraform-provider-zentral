@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -13,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
@@ -60,14 +63,30 @@ func (r *MDMDataAssetResource) Schema(ctx context.Context, req resource.SchemaRe
 				Required:            true,
 			},
 			"file_uri": schema.StringAttribute{
-				Description:         "The URI of the data asset file.",
-				MarkdownDescription: "The URI of the data asset file.",
-				Required:            true,
+				Description:         "The URI of the data asset file. Conflicts with source.",
+				MarkdownDescription: "The URI of the data asset file. Conflicts with `source`.",
+				Optional:            true,
+				Validators: []validator.String{
+					stringvalidator.AlsoRequires(path.MatchRoot("file_sha256")),
+				},
+			},
+			"source": schema.StringAttribute{
+				Description: "The content of the data asset file, base 64 encoded. " +
+					"Conflicts with file_uri. Requires Zentral v2026.6 or later.",
+				MarkdownDescription: "The content of the data asset file, base 64 encoded. " +
+					"Conflicts with `file_uri`. Requires Zentral `v2026.6` or later.",
+				Optional: true,
+				Validators: []validator.String{
+					stringvalidator.ExactlyOneOf(path.MatchRoot("file_uri"), path.MatchRoot("source")),
+				},
 			},
 			"file_sha256": schema.StringAttribute{
-				Description:         "The hexadecimal digest of the sha256 hash of the file.",
-				MarkdownDescription: "The hexadecimal digest of the sha256 hash of the file.",
-				Required:            true,
+				Description: "The hexadecimal digest of the sha256 hash of the file. " +
+					"Required with file_uri, computed from a source.",
+				MarkdownDescription: "The hexadecimal digest of the sha256 hash of the file. " +
+					"Required with `file_uri`, computed from a `source`.",
+				Optional: true,
+				Computed: true,
 			},
 			"file_size": schema.Int64Attribute{
 				Description:         "The size of the data asset file.",
@@ -251,13 +270,14 @@ func (r *MDMDataAssetResource) Create(ctx context.Context, req resource.CreateRe
 			"Client Error",
 			fmt.Sprintf("Unable to create MDM data asset, got error: %s", err),
 		)
+		addMDMDataAssetSourceSupportDiagnostic(ctx, r.client, &resp.Diagnostics, err, data.Source)
 		return
 	}
 
 	tflog.Trace(ctx, "created an MDM data asset")
 
 	// Save data into Terraform state
-	resp.Diagnostics.Append(resp.State.Set(ctx, mdmDataAssetForState(ztlMDA, data.FileURI))...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, mdmDataAssetForState(ztlMDA, data.FileURI, data.Source))...)
 }
 
 func (r *MDMDataAssetResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -282,7 +302,7 @@ func (r *MDMDataAssetResource) Read(ctx context.Context, req resource.ReadReques
 	tflog.Trace(ctx, "read an MDM data asset")
 
 	// Save updated data into Terraform state
-	resp.Diagnostics.Append(resp.State.Set(ctx, mdmDataAssetForState(ztlMDA, data.FileURI))...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, mdmDataAssetForState(ztlMDA, data.FileURI, data.Source))...)
 }
 
 func (r *MDMDataAssetResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -301,13 +321,14 @@ func (r *MDMDataAssetResource) Update(ctx context.Context, req resource.UpdateRe
 			"Client Error",
 			fmt.Sprintf("Unable to update MDM data asset %s, got error: %s", data.ID.ValueString(), err),
 		)
+		addMDMDataAssetSourceSupportDiagnostic(ctx, r.client, &resp.Diagnostics, err, data.Source)
 		return
 	}
 
 	tflog.Trace(ctx, "updated an MDM data asset")
 
 	// Save updated data into Terraform state
-	resp.Diagnostics.Append(resp.State.Set(ctx, mdmDataAssetForState(ztlMDA, data.FileURI))...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, mdmDataAssetForState(ztlMDA, data.FileURI, data.Source))...)
 }
 
 func (r *MDMDataAssetResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

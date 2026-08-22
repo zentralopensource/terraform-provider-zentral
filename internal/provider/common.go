@@ -1,7 +1,10 @@
 package provider
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"net/http"
 	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -30,6 +33,46 @@ func checkInt64AttributeSupport(diags *diag.Diagnostics, attribute string, minVe
 			"The Zentral server ignored the %s attribute and returned 0 instead of %d. "+
 				"This attribute requires Zentral %s or later.",
 			attribute, planned.ValueInt64(), minVersion,
+		),
+	)
+}
+
+// A Zentral that predates the data asset source attribute drops it from the request, and then
+// rejects the request for the file_uri and the file_sha256 it still requires. The 400 names two
+// attributes the configuration does not set, which reads as a provider bug. Ask the endpoint what
+// it accepts instead of guessing from the body of the error: DRF answers an OPTIONS request with
+// the fields of the serializer, for the methods the token is allowed to use.
+//
+// Say nothing when the probe cannot answer. A server that has no OPTIONS on the API, a token
+// without the view permission, and a network error all leave the support of the attribute unknown,
+// and the error from the API is a better answer than a wrong diagnosis.
+func addMDMDataAssetSourceSupportDiagnostic(
+	ctx context.Context, client *goztl.Client, diags *diag.Diagnostics, err error, source types.String,
+) {
+	if source.IsNull() || source.IsUnknown() {
+		return
+	}
+	var errorResponse *goztl.ErrorResponse
+	if !errors.As(err, &errorResponse) || errorResponse.Response == nil {
+		return
+	}
+	if status := errorResponse.Response.StatusCode; status < 400 || status > 499 {
+		return
+	}
+	endpointOptions, _, optionsErr := client.MDMDataAssets.Options(ctx)
+	if optionsErr != nil {
+		return
+	}
+	supported, known := endpointOptions.SupportsField(http.MethodPost, "source")
+	if !known || supported {
+		return
+	}
+	diags.AddError(
+		"Unsupported Zentral version",
+		fmt.Sprintf(
+			"The Zentral server does not accept the source attribute of a MDM data asset. "+
+				"This attribute requires Zentral %s or later.",
+			minZentralVersionDataAssetSource,
 		),
 	)
 }
