@@ -12,22 +12,40 @@ resource "zentral_mdm_artifact" "app-config" {
 resource "zentral_mdm_data_asset" "app-config-v1" {
   artifact_id = zentral_mdm_artifact.app-config.id
   type        = "PLIST"
-  source      = filebase64("${path.module}/plists/app-config.v1.plist")
-  ios         = true
-  ipados      = true
-  version     = 1
+  source = base64encode(<<-EOT
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>ApiURL</key>
+      <string>https://api.example.com</string>
+    </dict>
+    </plist>
+  EOT
+  )
+  ios     = true
+  ipados  = true
+  version = 1
 }
 
 # Or point at an object in an S3 bucket the server can read. `file_sha256` is
-# required with `file_uri`, and the server verifies the file against it.
-resource "zentral_mdm_data_asset" "app-config-legacy" {
-  artifact_id = zentral_mdm_artifact.app-config.id
+# required with `file_uri`, and the server downloads the file and verifies it
+# against the digest, so replace both with your own.
+resource "zentral_mdm_artifact" "app-resources" {
+  name      = "App Resources"
+  type      = "Data Asset"
+  channel   = "Device"
+  platforms = ["iOS", "iPadOS"]
+}
+
+resource "zentral_mdm_data_asset" "app-resources-v1" {
+  artifact_id = zentral_mdm_artifact.app-resources.id
   type        = "ZIP"
-  file_uri    = "s3://acme-mdm-assets/app-config.v0.zip"
-  file_sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  file_uri    = "s3://acme-mdm-assets/app-resources.v1.zip"
+  file_sha256 = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
   ios         = true
   ipados      = true
-  version     = 2
+  version     = 1
 }
 
 # The declaration that references the data asset by artifact ID.
