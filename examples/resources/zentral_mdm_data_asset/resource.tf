@@ -28,9 +28,7 @@ resource "zentral_mdm_data_asset" "app-config-v1" {
   version = 1
 }
 
-# Or point at an object in an S3 bucket the server can read. `file_sha256` is
-# required with `file_uri`, and the server downloads the file and verifies it
-# against the digest, so replace both with your own.
+# Or point at an object in an S3 bucket the server can read.
 resource "zentral_mdm_artifact" "app-resources" {
   name      = "App Resources"
   type      = "Data Asset"
@@ -38,6 +36,8 @@ resource "zentral_mdm_artifact" "app-resources" {
   platforms = ["iOS", "iPadOS"]
 }
 
+# `file_sha256` is required with `file_uri`, and the server downloads the file
+# and verifies it against the digest, so replace both with your own.
 resource "zentral_mdm_data_asset" "app-resources-v1" {
   artifact_id = zentral_mdm_artifact.app-resources.id
   type        = "ZIP"
