@@ -54,7 +54,7 @@ func TestAccMDMSoftwareUpdateEnforcementResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccMDMSoftwareUpdateEnforcementResourceConfigOneTime(secondName),
+				Config: testAccMDMSoftwareUpdateEnforcementResourceConfigOneTime(secondName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -88,6 +88,20 @@ func TestAccMDMSoftwareUpdateEnforcementResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Remove the tags from the config
+			{
+				Config: testAccMDMSoftwareUpdateEnforcementResourceConfigOneTime(secondName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "tag_ids.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -102,7 +116,11 @@ resource "zentral_mdm_software_update_enforcement" "test" {
 `, name)
 }
 
-func testAccMDMSoftwareUpdateEnforcementResourceConfigOneTime(name string) string {
+func testAccMDMSoftwareUpdateEnforcementResourceConfigOneTime(name string, withTagIDs bool) string {
+	tagIDs := ""
+	if withTagIDs {
+		tagIDs = "tag_ids        = [zentral_tag.test.id]"
+	}
 	return fmt.Sprintf(`
 resource "zentral_tag" "test" {
   name = %[1]q
@@ -112,10 +130,10 @@ resource "zentral_mdm_software_update_enforcement" "test" {
   name           = %[1]q
   details_url    = "https://www.example.com"
   platforms      = ["macOS"]
-  tag_ids        = [zentral_tag.test.id]
+  %[2]s
   os_version     = "14.1"
   build_version  = "23B74"
   local_datetime = "2023-11-05T09:30:00"
 }
-`, name)
+`, name, tagIDs)
 }
