@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -64,6 +66,7 @@ func (r *OsqueryFileCategoryResource) Schema(ctx context.Context, req resource.S
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"exclude_paths": schema.SetAttribute{
 				Description:         "Set of paths to exclude from the Osquery file category.",
@@ -71,6 +74,7 @@ func (r *OsqueryFileCategoryResource) Schema(ctx context.Context, req resource.S
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"file_paths_queries": schema.SetAttribute{
 				Description:         "Set of queries returning paths to monitor as path columns in the results.",
@@ -78,6 +82,7 @@ func (r *OsqueryFileCategoryResource) Schema(ctx context.Context, req resource.S
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"access_monitoring": schema.BoolAttribute{
 				Description:         "If true, FIM will include file access for this file category. Defaults to false.",

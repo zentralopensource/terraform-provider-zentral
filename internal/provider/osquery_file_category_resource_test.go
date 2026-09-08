@@ -43,7 +43,7 @@ func TestAccOsqueryFileCategoryResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccOsqueryFileCategoryResourceConfigFull(secondName),
+				Config: testAccOsqueryFileCategoryResourceConfigFull(secondName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -71,6 +71,24 @@ func TestAccOsqueryFileCategoryResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Remove the paths from the config
+			{
+				Config: testAccOsqueryFileCategoryResourceConfigFull(secondName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "file_paths.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "exclude_paths.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "file_paths_queries.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -83,15 +101,19 @@ resource "zentral_osquery_file_category" "test" {
 `, name)
 }
 
-func testAccOsqueryFileCategoryResourceConfigFull(name string) string {
+func testAccOsqueryFileCategoryResourceConfigFull(name string, withPaths bool) string {
+	paths := ""
+	if withPaths {
+		paths = `file_paths         = ["/root/.ssh/%%", "/home/%/.ssh/%%"]
+  exclude_paths      = ["/home/not_to_monitor/.ssh/%%"]
+  file_paths_queries = []`
+	}
 	return fmt.Sprintf(`
 resource "zentral_osquery_file_category" "test" {
   name               = %[1]q
   description        = "%[1]s description"
-  file_paths         = ["/root/.ssh/%%%%", "/home/%%/.ssh/%%%%"]
-  exclude_paths      = ["/home/not_to_monitor/.ssh/%%%%"]
-  file_paths_queries = []
+  %[2]s
   access_monitoring  = true
 }
-`, name)
+`, name, paths)
 }
