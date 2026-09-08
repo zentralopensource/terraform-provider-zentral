@@ -59,7 +59,7 @@ func TestAccMunkiScriptCheckResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccMunkiScriptCheckResourceConfigFull(secondName),
+				Config: testAccMunkiScriptCheckResourceConfigFull(secondName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -99,6 +99,22 @@ func TestAccMunkiScriptCheckResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Remove the tags and the excluded tags from the config
+			{
+				Config: testAccMunkiScriptCheckResourceConfigFull(secondName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "excluded_tag_ids.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -113,7 +129,12 @@ resource "zentral_munki_script_check" "test" {
 `, name)
 }
 
-func testAccMunkiScriptCheckResourceConfigFull(name string) string {
+func testAccMunkiScriptCheckResourceConfigFull(name string, withTags bool) string {
+	tags := ""
+	if withTags {
+		tags = `tag_ids          = [zentral_tag.test.id]
+  excluded_tag_ids = [zentral_tag.test-excluded.id]`
+	}
 	return fmt.Sprintf(`
 resource "zentral_tag" "test" {
   name = %[1]q
@@ -133,8 +154,7 @@ resource "zentral_munki_script_check" "test" {
   arch_arm64       = true
   min_os_version   = "14"
   max_os_version   = "15"
-  tag_ids          = [zentral_tag.test.id]
-  excluded_tag_ids = [zentral_tag.test-excluded.id]
+  %[2]s
 }
-`, name)
+`, name, tags)
 }
