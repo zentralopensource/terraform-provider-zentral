@@ -5,9 +5,11 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -76,6 +78,7 @@ func (r *TurboRecurringJobResource) Schema(ctx context.Context, req resource.Sch
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
 			"excluded_tag_ids": schema.SetAttribute{
 				Description:         "The IDs of the tags the job is excluded from.",
@@ -83,6 +86,7 @@ func (r *TurboRecurringJobResource) Schema(ctx context.Context, req resource.Sch
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
 			"serial_numbers": schema.SetAttribute{
 				Description:         "The serial numbers the job is scoped to.",
@@ -90,6 +94,7 @@ func (r *TurboRecurringJobResource) Schema(ctx context.Context, req resource.Sch
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"excluded_serial_numbers": schema.SetAttribute{
 				Description:         "The serial numbers the job is excluded from.",
@@ -97,6 +102,7 @@ func (r *TurboRecurringJobResource) Schema(ctx context.Context, req resource.Sch
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 		},
 	}

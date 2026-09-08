@@ -50,7 +50,7 @@ func TestAccTurboRecurringJobResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccTurboRecurringJobResourceConfigFull(name, tagName, excludedTagName),
+				Config: testAccTurboRecurringJobResourceConfigFull(name, tagName, excludedTagName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair(
 						resourceName, "configuration_id", cfgResourceName, "id"),
@@ -84,6 +84,26 @@ func TestAccTurboRecurringJobResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Remove the tags and the serial numbers from the config
+			{
+				Config: testAccTurboRecurringJobResourceConfigFull(name, tagName, excludedTagName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "excluded_tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "serial_numbers.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "excluded_serial_numbers.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -106,7 +126,14 @@ resource "zentral_turbo_recurring_job" "test" {
 `, name)
 }
 
-func testAccTurboRecurringJobResourceConfigFull(name string, tagName string, excludedTagName string) string {
+func testAccTurboRecurringJobResourceConfigFull(name string, tagName string, excludedTagName string, withSets bool) string {
+	sets := ""
+	if withSets {
+		sets = `tag_ids                 = [zentral_tag.test.id]
+  excluded_tag_ids        = [zentral_tag.excluded.id]
+  serial_numbers          = ["un", "deux"]
+  excluded_serial_numbers = ["trois"]`
+	}
 	return fmt.Sprintf(`
 resource "zentral_turbo_configuration" "test" {
   name = %[1]q
@@ -135,10 +162,7 @@ resource "zentral_turbo_recurring_job" "test" {
   configuration_id        = zentral_turbo_configuration.test.id
   job_id                  = zentral_turbo_script.test.job_id
   interval                = 3600
-  tag_ids                 = [zentral_tag.test.id]
-  excluded_tag_ids        = [zentral_tag.excluded.id]
-  serial_numbers          = ["un", "deux"]
-  excluded_serial_numbers = ["trois"]
+  %[4]s
 }
-`, name, tagName, excludedTagName)
+`, name, tagName, excludedTagName, sets)
 }
