@@ -163,6 +163,7 @@ func (r *ProbeResource) Schema(ctx context.Context, req resource.SchemaRequest, 
 				},
 				Computed: true,
 				Optional: true,
+				Default:  setdefault.StaticValue(types.SetValueMust(types.SetType{ElemType: types.ObjectType{AttrTypes: probePayloadFilterItemAttrTypes}}, []attr.Value{})),
 			},
 			"active": schema.BoolAttribute{
 				Description:         "If true, the probe is active.",

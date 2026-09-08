@@ -114,7 +114,7 @@ func TestAccProbeResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccProbeResourceFullUpdated(secondName),
+				Config: testAccProbeResourceFullUpdated(secondName, true, true, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -164,6 +164,60 @@ func TestAccProbeResource(t *testing.T) {
 						resourceName, "payload_filters.0.0.values.#", "1"),
 					resource.TestCheckResourceAttr(
 						resourceName, "payload_filters.0.0.values.0", "trois"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Remove the payload filters from the config
+			{
+				Config: testAccProbeResourceFullUpdated(secondName, true, true, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "inventory_filters.#", "1"),
+					resource.TestCheckResourceAttr(
+						resourceName, "metadata_filters.#", "1"),
+					resource.TestCheckResourceAttr(
+						resourceName, "payload_filters.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Remove the inventory filters from the config
+			{
+				Config: testAccProbeResourceFullUpdated(secondName, false, true, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "inventory_filters.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "metadata_filters.#", "1"),
+					resource.TestCheckResourceAttr(
+						resourceName, "payload_filters.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Remove the metadata filters from the config
+			{
+				Config: testAccProbeResourceFullUpdated(secondName, false, false, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "inventory_filters.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "metadata_filters.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "payload_filters.#", "0"),
 				),
 			},
 			// ImportState
@@ -234,7 +288,38 @@ resource "zentral_probe" "test" {
 `, name)
 }
 
-func testAccProbeResourceFullUpdated(name string) string {
+func testAccProbeResourceFullUpdated(name string, withInventoryFilters bool, withMetadataFilters bool, withPayloadFilters bool) string {
+	filters := ""
+	if withInventoryFilters {
+		filters += `
+  inventory_filters = [
+    {
+      meta_business_unit_ids = [zentral_meta_business_unit.test.id]
+      platforms              = ["MACOS"]
+      types                  = ["LAPTOP"]
+    }
+  ]`
+	}
+	if withMetadataFilters {
+		filters += `
+  metadata_filters = [
+    {
+      event_routing_keys = ["yolo"]
+    }
+  ]`
+	}
+	if withPayloadFilters {
+		filters += `
+  payload_filters = [
+    [
+      {
+        attribute = "fomo"
+        operator  = "NOT_IN"
+        values    = ["trois"]
+      }
+    ]
+  ]`
+	}
 	return fmt.Sprintf(`
 resource "zentral_meta_business_unit" "test" {
   name = %[1]q
@@ -251,28 +336,7 @@ resource "zentral_probe_action" "test" {
 resource "zentral_probe" "test" {
   name              = %[1]q
   description       = "Second description"
-  active            = true
-  inventory_filters = [
-    {
-      meta_business_unit_ids = [zentral_meta_business_unit.test.id]
-      platforms              = ["MACOS"]
-      types                  = ["LAPTOP"]
-    }
-  ]
-  metadata_filters = [
-    {
-      event_routing_keys = ["yolo"]
-    }
-  ]
-  payload_filters = [
-    [
-      {
-        attribute = "fomo"
-        operator  = "NOT_IN"
-        values    = ["trois"]
-      }
-    ]
-  ]
+  active            = true%[2]s
 }
-`, name)
+`, name, filters)
 }
