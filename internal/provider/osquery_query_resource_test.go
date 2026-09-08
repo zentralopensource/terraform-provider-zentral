@@ -102,7 +102,7 @@ func TestAccOsqueryQueryResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccOsqueryQueryResourceConfigTag(thirdName),
+				Config: testAccOsqueryQueryResourceConfigTag(thirdName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", thirdName),
@@ -138,6 +138,20 @@ func TestAccOsqueryQueryResource(t *testing.T) {
 						resourceName, "scheduling.shard", "10"),
 					resource.TestCheckResourceAttr(
 						resourceName, "scheduling.snapshot_mode", "true"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Remove the platforms from the config
+			{
+				Config: testAccOsqueryQueryResourceConfigTag(thirdName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "platforms.#", "0"),
 				),
 			},
 			// ImportState
@@ -185,7 +199,11 @@ resource "zentral_osquery_query" "test" {
 `, name)
 }
 
-func testAccOsqueryQueryResourceConfigTag(name string) string {
+func testAccOsqueryQueryResourceConfigTag(name string, withPlatforms bool) string {
+	platforms := ""
+	if withPlatforms {
+		platforms = `platforms                = ["darwin"]`
+	}
 	return fmt.Sprintf(`
 resource "zentral_tag" "test" {
   name = %[1]q
@@ -198,7 +216,7 @@ resource "zentral_osquery_pack" "test" {
 resource "zentral_osquery_query" "test" {
   name                     = %[1]q
   sql                      = "SELECT 1;"
-  platforms                = ["darwin"]
+  %[2]s
   minimum_osquery_version  = "0.1.0"
   description              = "A query that always adds a tag"
   value                    = "Not much"
@@ -212,5 +230,5 @@ resource "zentral_osquery_query" "test" {
     snapshot_mode       = true
   }
 }
-`, name)
+`, name, platforms)
 }
