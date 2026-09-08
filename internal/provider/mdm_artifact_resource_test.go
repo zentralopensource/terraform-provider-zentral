@@ -53,7 +53,7 @@ func TestAccMDMArtifactResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccMDMArtifactResourceConfigFull(secondName, raName),
+				Config: testAccMDMArtifactResourceConfigFull(secondName, raName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -85,6 +85,20 @@ func TestAccMDMArtifactResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Remove the required artifacts from the config
+			{
+				Config: testAccMDMArtifactResourceConfigFull(secondName, raName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "requires.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -100,7 +114,11 @@ resource "zentral_mdm_artifact" "test" {
 `, name)
 }
 
-func testAccMDMArtifactResourceConfigFull(name string, raName string) string {
+func testAccMDMArtifactResourceConfigFull(name string, raName string, withRequires bool) string {
+	requires := ""
+	if withRequires {
+		requires = "requires                       = [zentral_mdm_artifact.required.id]"
+	}
 	return fmt.Sprintf(`
 resource "zentral_mdm_artifact" "required" {
   name      = %[2]q
@@ -118,7 +136,7 @@ resource "zentral_mdm_artifact" "test" {
   auto_update                    = false
   reinstall_interval             = 1
   reinstall_on_os_update         = "Minor"
-  requires                       = [zentral_mdm_artifact.required.id]
+  %[3]s
 }
-`, name, raName)
+`, name, raName, requires)
 }
