@@ -14,16 +14,16 @@ Three repos in play, all checked out side-by-side:
 Same constraint as goztl: this machine runs a binary blocker, so **do not invoke a local `go` toolchain**. Every Go command — build, test, format, `mod tidy`, `generate` — runs in a container.
 
 ```
-docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.25 go build ./...
-docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.25 go test ./...
-docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.25 gofmt -s -l .
-docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.25 go generate ./...
-docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.25 go mod tidy
+docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.26 go build ./...
+docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.26 go test ./...
+docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.26 gofmt -s -l .
+docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.26 go generate ./...
+docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.26 go mod tidy
 ```
 
 **The mount path has to keep the repository name.** `tfplugindocs` derives the provider name from the working directory, so mounting at `/src` makes it look for a `src_zentral_…` provider, fail — and, because it wipes `docs/` before rendering, leave the whole directory deleted. Recover with `git checkout -- docs/`. The other commands don't care, but they use the same path so there is one invocation to remember.
 
-A devcontainer (`mcr.microsoft.com/devcontainers/go:1.24`) is also configured for an interactive shell inside the container.
+A devcontainer (`mcr.microsoft.com/devcontainers/go:1.26`) is also configured for an interactive shell inside the container.
 
 If a command would shell out to `go` or `gofmt` directly on the host, rewrite it as a `docker run …` invocation first.
 
@@ -103,7 +103,7 @@ Almost always preceded by a goztl release — the provider depends on a typed se
 
 ## Running things
 
-**Build / install locally:** `docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.25 go install` drops the binary in the container's `$GOPATH/bin`. For driving Terraform against a local build, the standard `~/.terraformrc` `dev_overrides` mechanism is the way.
+**Build / install locally:** `docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zentral golang:1.26 go install` drops the binary in the container's `$GOPATH/bin`. For driving Terraform against a local build, the standard `~/.terraformrc` `dev_overrides` mechanism is the way.
 
 **Acceptance tests** require `TF_ACC=1` and a reachable Zentral:
 
@@ -112,7 +112,7 @@ docker run --rm -v "$PWD":/terraform-provider-zentral -w /terraform-provider-zen
   -e TF_ACC=1 \
   -e ZTL_API_BASE_URL="$ZTL_API_BASE_URL" \
   -e ZTL_API_TOKEN="$ZTL_API_TOKEN" \
-  golang:1.25 go test ./internal/provider/ -v -timeout 120m
+  golang:1.26 go test ./internal/provider/ -v -timeout 120m
 ```
 
 Local workflow: run `../zentral` (the Django app) on this machine and point `ZTL_API_BASE_URL` at it (typically `http://host.docker.internal:<port>/api/` from inside the container; check the Zentral repo for the exact mount path). `ZTL_API_TOKEN` comes from a service account / user token created in that local Zentral instance.
