@@ -55,7 +55,7 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccMDMBlueprintResourceConfigFull(secondName),
+				Config: testAccMDMBlueprintResourceConfigFull(secondName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -87,6 +87,20 @@ func TestAccMDMBlueprintResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Remove the software update enforcement IDs from the config
+			{
+				Config: testAccMDMBlueprintResourceConfigFull(secondName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "software_update_enforcement_ids.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -99,7 +113,11 @@ resource "zentral_mdm_blueprint" "test" {
 `, name)
 }
 
-func testAccMDMBlueprintResourceConfigFull(name string) string {
+func testAccMDMBlueprintResourceConfigFull(name string, withSUE bool) string {
+	sueIDs := ""
+	if withSUE {
+		sueIDs = "software_update_enforcement_ids = [zentral_mdm_software_update_enforcement.test.id]"
+	}
 	return fmt.Sprintf(`
 data "zentral_mdm_location" "test" {
   name = "Terraform Provider CI/CD"
@@ -130,7 +148,7 @@ resource "zentral_mdm_blueprint" "test" {
   default_location_id             = data.zentral_mdm_location.test.id
   filevault_config_id             = zentral_mdm_filevault_config.test.id
   recovery_password_config_id     = zentral_mdm_recovery_password_config.test.id
-  software_update_enforcement_ids = [zentral_mdm_software_update_enforcement.test.id]
+  %[2]s
 }
-`, name)
+`, name, sueIDs)
 }
