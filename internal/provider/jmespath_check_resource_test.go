@@ -49,7 +49,7 @@ func TestAccJMESPathCheckResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccJMESPathCheckResourceConfigFull(secondName, t1Name, t2Name),
+				Config: testAccJMESPathCheckResourceConfigFull(secondName, t1Name, t2Name, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "name", secondName),
@@ -81,6 +81,22 @@ func TestAccJMESPathCheckResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Remove the platforms and the tags from the config
+			{
+				Config: testAccJMESPathCheckResourceConfigFull(secondName, t1Name, t2Name, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "platforms.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "tag_ids.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -95,7 +111,12 @@ resource "zentral_jmespath_check" "test" {
 `, name)
 }
 
-func testAccJMESPathCheckResourceConfigFull(name string, t1Name string, t2Name string) string {
+func testAccJMESPathCheckResourceConfigFull(name string, t1Name string, t2Name string, withSets bool) string {
+	sets := ""
+	if withSets {
+		sets = `platforms = ["MACOS", "LINUX"]
+  tag_ids = [zentral_tag.test1.id, zentral_tag.test2.id]`
+	}
 	return fmt.Sprintf(`
 resource "zentral_tag" "test1" {
   name = %[2]q
@@ -109,9 +130,8 @@ resource "zentral_jmespath_check" "test" {
   name = %[1]q
   description = "desc"
   source_name = "osquery"
-  platforms = ["MACOS", "LINUX"]
-  tag_ids = [zentral_tag.test1.id, zentral_tag.test2.id]
+  %[4]s
   jmespath_expression = "ok"
 }
-`, name, t1Name, t2Name)
+`, name, t1Name, t2Name, sets)
 }
