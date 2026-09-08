@@ -101,10 +101,29 @@ func TestAccTurboEnrollmentResource(t *testing.T) {
 			},
 			// Move to another configuration and Read
 			{
-				Config: testAccTurboEnrollmentResourceConfigOtherConfiguration(name, tagName),
+				Config: testAccTurboEnrollmentResourceConfigOtherConfiguration(name, tagName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair(
 						resourceName, "configuration_id", otherCfgResourceName, "id"),
+					checkNotReplaced,
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Remove the tags, serial numbers and UDIDs from the config
+			{
+				Config: testAccTurboEnrollmentResourceConfigOtherConfiguration(name, tagName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "serial_numbers.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "udids.#", "0"),
 					checkNotReplaced,
 				),
 			},
@@ -165,7 +184,13 @@ resource "zentral_turbo_enrollment" "test" {
 `, name, tagName)
 }
 
-func testAccTurboEnrollmentResourceConfigOtherConfiguration(name string, tagName string) string {
+func testAccTurboEnrollmentResourceConfigOtherConfiguration(name string, tagName string, withSets bool) string {
+	sets := ""
+	if withSets {
+		sets = `tag_ids        = [zentral_tag.test.id]
+  serial_numbers = ["un", "deux"]
+  udids          = ["trois", "quatre"]`
+	}
 	return fmt.Sprintf(`
 resource "zentral_meta_business_unit" "test" {
   name = %[1]q
@@ -191,10 +216,8 @@ resource "zentral_tag" "test" {
 resource "zentral_turbo_enrollment" "test" {
   configuration_id      = zentral_turbo_configuration.other.id
   meta_business_unit_id = zentral_meta_business_unit.test.id
-  tag_ids               = [zentral_tag.test.id]
-  serial_numbers        = ["un", "deux"]
-  udids                 = ["trois", "quatre"]
+  %[3]s
   quota                 = 5
 }
-`, name, tagName)
+`, name, tagName, sets)
 }

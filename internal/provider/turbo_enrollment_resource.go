@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/zentralopensource/goztl"
@@ -81,6 +83,7 @@ func (r *TurboEnrollmentResource) Schema(ctx context.Context, req resource.Schem
 				ElementType:         types.Int64Type,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
 			"serial_numbers": schema.SetAttribute{
 				Description:         "The serial numbers the enrollment is restricted to.",
@@ -88,6 +91,7 @@ func (r *TurboEnrollmentResource) Schema(ctx context.Context, req resource.Schem
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"udids": schema.SetAttribute{
 				Description:         "The UDIDs the enrollment is restricted to.",
@@ -95,6 +99,7 @@ func (r *TurboEnrollmentResource) Schema(ctx context.Context, req resource.Schem
 				ElementType:         types.StringType,
 				Optional:            true,
 				Computed:            true,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"quota": schema.Int64Attribute{
 				Description:         "The number of times the enrollment can be used.",
