@@ -52,7 +52,7 @@ func TestAccTurboOneTimeJobResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccTurboOneTimeJobResourceConfigFull(name, tagName, excludedTagName),
+				Config: testAccTurboOneTimeJobResourceConfigFull(name, tagName, excludedTagName, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair(
 						resourceName, "configuration_id", cfgResourceName, "id"),
@@ -88,6 +88,26 @@ func TestAccTurboOneTimeJobResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			// Remove the tags and the serial numbers from the config
+			{
+				Config: testAccTurboOneTimeJobResourceConfigFull(name, tagName, excludedTagName, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "excluded_tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "serial_numbers.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "excluded_serial_numbers.#", "0"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -110,7 +130,14 @@ resource "zentral_turbo_one_time_job" "test" {
 `, name)
 }
 
-func testAccTurboOneTimeJobResourceConfigFull(name string, tagName string, excludedTagName string) string {
+func testAccTurboOneTimeJobResourceConfigFull(name string, tagName string, excludedTagName string, withSets bool) string {
+	sets := ""
+	if withSets {
+		sets = `tag_ids                 = [zentral_tag.test.id]
+  excluded_tag_ids        = [zentral_tag.excluded.id]
+  serial_numbers          = ["un", "deux"]
+  excluded_serial_numbers = ["trois"]`
+	}
 	return fmt.Sprintf(`
 resource "zentral_turbo_configuration" "test" {
   name = %[1]q
@@ -140,10 +167,7 @@ resource "zentral_turbo_one_time_job" "test" {
   job_id                  = zentral_turbo_script.test.job_id
   not_before              = "2026-08-01T09:00:00"
   not_after               = "2026-08-31T09:00:00"
-  tag_ids                 = [zentral_tag.test.id]
-  excluded_tag_ids        = [zentral_tag.excluded.id]
-  serial_numbers          = ["un", "deux"]
-  excluded_serial_numbers = ["trois"]
+  %[4]s
 }
-`, name, tagName, excludedTagName)
+`, name, tagName, excludedTagName, sets)
 }
