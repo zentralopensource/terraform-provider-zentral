@@ -39,7 +39,7 @@ func TestAccMonolithManifestSubManifestResource(t *testing.T) {
 			},
 			// Update and Read
 			{
-				Config: testAccMonolithManifestSubManifestResourceConfigFull(name),
+				Config: testAccMonolithManifestSubManifestResourceConfigFull(name, true),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrPair(
 						resourceName, "manifest_id", mResourceName, "id"),
@@ -49,6 +49,20 @@ func TestAccMonolithManifestSubManifestResource(t *testing.T) {
 						resourceName, "tag_ids.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
 						resourceName, "tag_ids.*", tResourceName, "id"),
+				),
+			},
+			// ImportState
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Remove the tags from the config
+			{
+				Config: testAccMonolithManifestSubManifestResourceConfigFull(name, false),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "tag_ids.#", "0"),
 				),
 			},
 			// ImportState
@@ -83,7 +97,11 @@ resource "zentral_monolith_manifest_sub_manifest" "test" {
 `, name)
 }
 
-func testAccMonolithManifestSubManifestResourceConfigFull(name string) string {
+func testAccMonolithManifestSubManifestResourceConfigFull(name string, withTagIDs bool) string {
+	tagIDs := ""
+	if withTagIDs {
+		tagIDs = "tag_ids          = [zentral_tag.test.id]"
+	}
 	return fmt.Sprintf(`
 resource "zentral_meta_business_unit" "test" {
   name = %[1]q
@@ -105,7 +123,7 @@ resource "zentral_tag" "test" {
 resource "zentral_monolith_manifest_sub_manifest" "test" {
   manifest_id      = zentral_monolith_manifest.test.id
   sub_manifest_id  = zentral_monolith_sub_manifest.test.id
-  tag_ids          = [zentral_tag.test.id]
+  %[2]s
 }
-`, name)
+`, name, tagIDs)
 }
