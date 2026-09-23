@@ -64,6 +64,14 @@ resource "zentral_santa_scoped_client_mode" "test" {
   serial_numbers   = [" 012345678 "]
 }
 `, `must\s+not\s+start\s+or\s+end\s+with\s+whitespace`),
+			step(`
+resource "zentral_santa_scoped_path_regex" "test" {
+  configuration_id = 1
+  name             = "test"
+  policy           = "BLOCK"
+  regex            = "^/Users/.+"
+}
+`, `must\s+not\s+start\s+with\s+\^`),
 		},
 	})
 }

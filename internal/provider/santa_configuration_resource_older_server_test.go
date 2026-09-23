@@ -196,6 +196,21 @@ resource "zentral_santa_scoped_client_mode" "test" {
 `,
 				ExpectError: regexp.MustCompile(`no\s+Santa\s+scoped\s+client\s+mode\s+endpoint[\s\S]*requires\s+Zentral\s+v2026\.6`),
 			},
+			{
+				Config: testOlderZentralProviderConfig(server) + `
+resource "zentral_santa_configuration" "test" {
+  name = "older"
+}
+
+resource "zentral_santa_scoped_path_regex" "test" {
+  configuration_id = zentral_santa_configuration.test.id
+  name             = "applications"
+  policy           = "ALLOW"
+  regex            = "/Applications/.+"
+}
+`,
+				ExpectError: regexp.MustCompile(`no\s+Santa\s+scoped\s+path\s+regex\s+endpoint[\s\S]*requires\s+Zentral\s+v2026\.6`),
+			},
 		},
 	})
 }
