@@ -127,6 +127,6 @@ To run a single test: `... go test ./internal/provider/ -v -run TestAccTagResour
 
 - `go build -v .` (build job).
 - `go generate ./...` — must produce a zero diff (`generate` job).
-- `go test -v -cover ./internal/provider/` with `TF_ACC=1` against a CI-managed Zentral (`test` job, currently pinned to Terraform `1.14.*`).
+- `go test -v -cover ./internal/provider/` with `TF_ACC=1` against a CI-managed Zentral (`test` job, currently pinned to Terraform `1.16.*`).
 
 Releases are tag-driven (`v*`) via GoReleaser — `.goreleaser.yaml` produces a signed multi-arch release that the Terraform Registry consumes.
