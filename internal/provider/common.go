@@ -37,6 +37,23 @@ func checkInt64AttributeSupport(diags *diag.Diagnostics, attribute string, minVe
 	)
 }
 
+// The string counterpart of checkInt64AttributeSupport, for an attribute the older server does not
+// behave as its zero value: absent is the value that means what the older server does, and that a
+// configuration can keep without being told anything.
+func checkStringAttributeSupport(diags *diag.Diagnostics, attribute string, minVersion string, planned types.String, echoed string, absent string) {
+	if echoed != "" || planned.IsNull() || planned.IsUnknown() || planned.ValueString() == absent {
+		return
+	}
+	diags.AddError(
+		"Unsupported Zentral version",
+		fmt.Sprintf(
+			"The Zentral server ignored the %s attribute and returned no value instead of %q. "+
+				"This attribute requires Zentral %s or later.",
+			attribute, planned.ValueString(), minVersion,
+		),
+	)
+}
+
 // A Zentral that predates the data asset source attribute drops it from the request, and then
 // rejects the request for the file_uri and the file_sha256 it still requires. The 400 names two
 // attributes the configuration does not set, which reads as a provider bug. Ask the endpoint what
@@ -88,6 +105,15 @@ var naiveTimestampRe = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$
 var naiveTimestampValidator = stringvalidator.RegexMatches(
 	naiveTimestampRe,
 	"must be a UTC timestamp without a timezone suffix, e.g. 2026-09-01T09:00:00",
+)
+
+// Strings
+
+// The API trims the leading and trailing whitespace off every string, and the trimmed echo would
+// fail the apply.
+var trimmedStringValidator = stringvalidator.RegexMatches(
+	regexp.MustCompile(`(?s)^(?:\S(?:.*\S)?)?$`),
+	"must not start or end with whitespace",
 )
 
 // Bool (optional)

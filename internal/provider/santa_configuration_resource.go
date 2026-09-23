@@ -23,6 +23,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces
 var _ resource.Resource = &SantaConfigurationResource{}
 var _ resource.ResourceWithImportState = &SantaConfigurationResource{}
+var _ resource.ResourceWithValidateConfig = &SantaConfigurationResource{}
 
 func NewSantaConfigurationResource() resource.Resource {
 	return &SantaConfigurationResource{}
@@ -115,6 +116,47 @@ func (r *SantaConfigurationResource) Schema(ctx context.Context, req resource.Sc
 				Computed:            true,
 				Default:             stringdefault.StaticString(""),
 			},
+			"event_detail_source": schema.StringAttribute{
+				Description: "Where the block notification button comes from. Valid values are LOCAL, VOTING_PORTAL, CUSTOM and NONE. " +
+					"LOCAL sends nothing and leaves the button to the configuration profile, VOTING_PORTAL sends a link to the user portal " +
+					"of the voting realm, CUSTOM sends event_detail_url and event_detail_text, and NONE removes the button. Defaults to LOCAL.",
+				MarkdownDescription: "Where the block notification button comes from. Valid values are `LOCAL`, `VOTING_PORTAL`, `CUSTOM` and `NONE`. " +
+					"`LOCAL` sends nothing and leaves the button to the configuration profile, `VOTING_PORTAL` sends a link to the user portal " +
+					"of the voting realm, `CUSTOM` sends `event_detail_url` and `event_detail_text`, and `NONE` removes the button. Defaults to `LOCAL`.",
+				Optional: true,
+				Computed: true,
+				Default:  stringdefault.StaticString(tfSantaEventDetailLocal),
+				Validators: []validator.String{
+					stringvalidator.OneOf(
+						tfSantaEventDetailLocal, tfSantaEventDetailVotingPortal, tfSantaEventDetailCustom, tfSantaEventDetailNone,
+					),
+				},
+			},
+			"event_detail_url": schema.StringAttribute{
+				Description: "URL of the block notification button. Required when event_detail_source is CUSTOM, and only allowed then. " +
+					"The following sequences are replaced: %file_identifier%, %bundle_or_file_identifier%, %file_bundle_id%, %team_id%, " +
+					"%signing_id%, %cdhash%, %username%, %machine_id%, %hostname%, %uuid%, %serial%.",
+				MarkdownDescription: "URL of the block notification button. Required when `event_detail_source` is `CUSTOM`, and only allowed then. " +
+					"The following sequences are replaced: `%file_identifier%`, `%bundle_or_file_identifier%`, `%file_bundle_id%`, `%team_id%`, " +
+					"`%signing_id%`, `%cdhash%`, `%username%`, `%machine_id%`, `%hostname%`, `%uuid%`, `%serial%`.",
+				Optional: true,
+				Computed: true,
+				Default:  stringdefault.StaticString(""),
+				Validators: []validator.String{
+					stringvalidator.LengthAtMost(1024),
+					trimmedStringValidator,
+				},
+			},
+			"event_detail_text": schema.StringAttribute{
+				Description:         "Label of the block notification button. Only allowed when event_detail_source is CUSTOM or VOTING_PORTAL.",
+				MarkdownDescription: "Label of the block notification button. Only allowed when `event_detail_source` is `CUSTOM` or `VOTING_PORTAL`.",
+				Optional:            true,
+				Computed:            true,
+				Default:             stringdefault.StaticString(""),
+				Validators: []validator.String{
+					trimmedStringValidator,
+				},
+			},
 			"block_usb_mount": schema.BoolAttribute{
 				Description:         "If set to true blocking USB Mass storage feature is enabled.",
 				MarkdownDescription: "If set to `true` blocking USB Mass storage feature is enabled.",
@@ -153,6 +195,17 @@ func (r *SantaConfigurationResource) Schema(ctx context.Context, req resource.Sc
 			},
 		},
 	}
+}
+
+func (r *SantaConfigurationResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var data santaConfiguration
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	validateSantaEventDetail(&resp.Diagnostics, data.EventDetailSource, data.EventDetailURL, data.EventDetailText, tfSantaEventDetailLocal)
 }
 
 func (r *SantaConfigurationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -198,6 +251,7 @@ func (r *SantaConfigurationResource) Create(ctx context.Context, req resource.Cr
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, santaConfigurationForState(ztlSC))...)
+	checkSantaConfigurationEventDetailSupport(&resp.Diagnostics, data, ztlSC)
 }
 
 func (r *SantaConfigurationResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -248,6 +302,7 @@ func (r *SantaConfigurationResource) Update(ctx context.Context, req resource.Up
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, santaConfigurationForState(ztlSC))...)
+	checkSantaConfigurationEventDetailSupport(&resp.Diagnostics, data, ztlSC)
 }
 
 func (r *SantaConfigurationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

@@ -45,6 +45,12 @@ func TestAccSantaConfigurationDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "blocked_path_regex", ""),
 					resource.TestCheckResourceAttr(
+						ds1ResourceName, "event_detail_source", "LOCAL"),
+					resource.TestCheckResourceAttr(
+						ds1ResourceName, "event_detail_url", ""),
+					resource.TestCheckResourceAttr(
+						ds1ResourceName, "event_detail_text", ""),
+					resource.TestCheckResourceAttr(
 						ds1ResourceName, "block_usb_mount", "false"),
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "remount_usb_mode.#", "0"),
@@ -76,6 +82,12 @@ func TestAccSantaConfigurationDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "blocked_path_regex", ""),
 					resource.TestCheckResourceAttr(
+						ds2ResourceName, "event_detail_source", "CUSTOM"),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "event_detail_url", "https://www.example.com/blocked/"),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "event_detail_text", "Request an exception"),
+					resource.TestCheckResourceAttr(
 						ds2ResourceName, "block_usb_mount", "true"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "remount_usb_mode.#", "2"),
@@ -102,10 +114,13 @@ resource "zentral_santa_configuration" "check1" {
 }
 
 resource "zentral_santa_configuration" "check2" {
-  name             = %q
-  client_mode      = "LOCKDOWN"
-  block_usb_mount  = true
-  remount_usb_mode = ["noexec", "rdonly"]
+  name                = %q
+  client_mode         = "LOCKDOWN"
+  event_detail_source = "CUSTOM"
+  event_detail_url    = "https://www.example.com/blocked/"
+  event_detail_text   = "Request an exception"
+  block_usb_mount     = true
+  remount_usb_mode    = ["noexec", "rdonly"]
 }
 
 data "zentral_santa_configuration" "check1_by_name" {

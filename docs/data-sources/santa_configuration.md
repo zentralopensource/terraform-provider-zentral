@@ -32,6 +32,9 @@ The data source `zentral_santa_configuration` allows details of a Santa configur
 - `enable_all_event_upload_shard` (Number) Restrict the upload of all execution events to Zentral, including those that were explicitly allowed, to a percentage (0-100) of hosts
 - `enable_bundles` (Boolean) If set to `true` the bundle scanning feature is enabled.
 - `enable_transitive_rules` (Boolean) If set to `true` the transitive rule feature is enabled.
+- `event_detail_source` (String) Where the block notification button comes from: `LOCAL`, `VOTING_PORTAL`, `CUSTOM` or `NONE`.
+- `event_detail_text` (String) Label of the block notification button, when `event_detail_source` is `CUSTOM` or `VOTING_PORTAL`.
+- `event_detail_url` (String) URL of the block notification button, when `event_detail_source` is `CUSTOM`.
 - `full_sync_interval` (Number) The max time to wait before performing a full sync with the server.
 - `remount_usb_mode` (Set of String) Array of strings for arguments to pass to `mount -o`.
 - `sync_incident_severity` (Number) If 100, 200, 300, incidents will be automatically opened and closed when the santa agent rules are out of sync.

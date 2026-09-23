@@ -40,6 +40,12 @@ func TestAccSantaConfigurationResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "blocked_path_regex", ""),
 					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_source", "LOCAL"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_url", ""),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_text", ""),
+					resource.TestCheckResourceAttr(
 						resourceName, "block_usb_mount", "false"),
 					resource.TestCheckResourceAttr(
 						resourceName, "remount_usb_mode.#", "0"),
@@ -80,6 +86,12 @@ func TestAccSantaConfigurationResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "blocked_path_regex", "deux"),
 					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_source", "CUSTOM"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_url", "https://www.example.com/blocked/%serial%"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_text", "Request an exception"),
+					resource.TestCheckResourceAttr(
 						resourceName, "block_usb_mount", "true"),
 					resource.TestCheckResourceAttr(
 						resourceName, "remount_usb_mode.#", "2"),
@@ -100,6 +112,18 @@ func TestAccSantaConfigurationResource(t *testing.T) {
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
+			},
+			// Back to the defaults, the button cleared
+			{
+				Config: testAccSantaConfigurationResourceConfigBare(secondName),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_source", "LOCAL"),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_url", ""),
+					resource.TestCheckResourceAttr(
+						resourceName, "event_detail_text", ""),
+				),
 			},
 		},
 	})
@@ -125,6 +149,9 @@ resource "zentral_santa_configuration" "test" {
   enable_transitive_rules       = true
   allowed_path_regex            = "un"
   blocked_path_regex            = "deux"
+  event_detail_source           = "CUSTOM"
+  event_detail_url              = "https://www.example.com/blocked/%%serial%%"
+  event_detail_text             = "Request an exception"
   block_usb_mount               = true
   remount_usb_mode              = ["noexec", "rdonly"]
   allow_unknown_shard           = 99

@@ -82,6 +82,21 @@ func (d *SantaConfigurationDataSource) Schema(ctx context.Context, req datasourc
 				MarkdownDescription: "A regex to block if the binary, certificate, or Team ID scopes did not allow/block an execution.",
 				Computed:            true,
 			},
+			"event_detail_source": schema.StringAttribute{
+				Description:         "Where the block notification button comes from: LOCAL, VOTING_PORTAL, CUSTOM or NONE.",
+				MarkdownDescription: "Where the block notification button comes from: `LOCAL`, `VOTING_PORTAL`, `CUSTOM` or `NONE`.",
+				Computed:            true,
+			},
+			"event_detail_url": schema.StringAttribute{
+				Description:         "URL of the block notification button, when event_detail_source is CUSTOM.",
+				MarkdownDescription: "URL of the block notification button, when `event_detail_source` is `CUSTOM`.",
+				Computed:            true,
+			},
+			"event_detail_text": schema.StringAttribute{
+				Description:         "Label of the block notification button, when event_detail_source is CUSTOM or VOTING_PORTAL.",
+				MarkdownDescription: "Label of the block notification button, when `event_detail_source` is `CUSTOM` or `VOTING_PORTAL`.",
+				Computed:            true,
+			},
 			"block_usb_mount": schema.BoolAttribute{
 				Description:         "If set to true blocking USB Mass storage feature is enabled.",
 				MarkdownDescription: "If set to `true` blocking USB Mass storage feature is enabled.",
