@@ -54,6 +54,20 @@ func checkStringAttributeSupport(diags *diag.Diagnostics, attribute string, minV
 	)
 }
 
+// A Zentral that predates an endpoint answers 404 to the create, which reads as a missing parent
+// object rather than as a server that is too old.
+func addEndpointSupportDiagnostic(diags *diag.Diagnostics, err error, name string, minVersion string) {
+	var errorResponse *goztl.ErrorResponse
+	if !errors.As(err, &errorResponse) || errorResponse.Response == nil ||
+		errorResponse.Response.StatusCode != http.StatusNotFound {
+		return
+	}
+	diags.AddError(
+		"Unsupported Zentral version",
+		fmt.Sprintf("The Zentral server has no %s endpoint. It requires Zentral %s or later.", name, minVersion),
+	)
+}
+
 // A Zentral that predates the data asset source attribute drops it from the request, and then
 // rejects the request for the file_uri and the file_sha256 it still requires. The 400 names two
 // attributes the configuration does not set, which reads as a provider bug. Ask the endpoint what

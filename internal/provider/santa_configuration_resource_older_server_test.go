@@ -175,3 +175,27 @@ resource "zentral_santa_configuration" "test" {
 		},
 	})
 }
+
+func TestSantaScopedConfigurationItemsOlderZentral(t *testing.T) {
+	server := newOlderZentralServer(t)
+
+	resource.UnitTest(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testOlderZentralProviderConfig(server) + `
+resource "zentral_santa_configuration" "test" {
+  name = "older"
+}
+
+resource "zentral_santa_scoped_client_mode" "test" {
+  configuration_id = zentral_santa_configuration.test.id
+  name             = "lockdown"
+  client_mode      = "LOCKDOWN"
+}
+`,
+				ExpectError: regexp.MustCompile(`no\s+Santa\s+scoped\s+client\s+mode\s+endpoint[\s\S]*requires\s+Zentral\s+v2026\.6`),
+			},
+		},
+	})
+}

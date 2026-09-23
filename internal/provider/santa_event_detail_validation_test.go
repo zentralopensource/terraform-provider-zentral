@@ -48,6 +48,22 @@ resource "zentral_santa_configuration" "test" {
   event_detail_text   = "More info "
 }
 `, `must\s+not\s+start\s+or\s+end\s+with\s+whitespace`),
+			step(`
+resource "zentral_santa_scoped_client_mode" "test" {
+  configuration_id  = 1
+  name              = "test"
+  client_mode       = "LOCKDOWN"
+  event_detail_text = "More info"
+}
+`, `event_detail_text\s+can\s+only\s+be\s+set\s+when\s+event_detail_source\s+is\s+CUSTOM\s+or\s+VOTING_PORTAL`),
+			step(`
+resource "zentral_santa_scoped_client_mode" "test" {
+  configuration_id = 1
+  name             = "test"
+  client_mode      = "LOCKDOWN"
+  serial_numbers   = [" 012345678 "]
+}
+`, `must\s+not\s+start\s+or\s+end\s+with\s+whitespace`),
 		},
 	})
 }

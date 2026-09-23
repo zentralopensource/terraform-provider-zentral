@@ -174,6 +174,7 @@ func (p *ZentralProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewSantaConfigurationResource,
 		NewSantaEnrollmentResource,
 		NewSantaRuleResource,
+		NewSantaScopedClientModeResource,
 		NewStoreResource,
 		NewTagResource,
 		NewTaxonomyResource,
