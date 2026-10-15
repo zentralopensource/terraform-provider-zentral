@@ -48,8 +48,8 @@ func (d *MDMSoftwareUpdateEnforcementDataSource) Schema(ctx context.Context, req
 				Computed:            true,
 			},
 			"platforms": schema.SetAttribute{
-				Description:         "The platforms this software update enforcement is scoped to.",
-				MarkdownDescription: "The platforms this software update enforcement is scoped to.",
+				Description:         "The platforms this software update enforcement is scoped to. Valid values are macOS, iOS, iPadOS and tvOS.",
+				MarkdownDescription: "The platforms this software update enforcement is scoped to. Valid values are `macOS`, `iOS`, `iPadOS` and `tvOS`.",
 				ElementType:         types.StringType,
 				Computed:            true,
 			},

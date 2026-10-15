@@ -59,8 +59,8 @@ func (r *MDMArtifactResource) Schema(ctx context.Context, req resource.SchemaReq
 				Required:            true,
 			},
 			"type": schema.StringAttribute{
-				Description:         "Type of the artifact.",
-				MarkdownDescription: "Type of the artifact.",
+				Description:         "Type of the artifact. Valid values are Activation, Asset, Certificate Asset, Configuration, Configuration (manual), Data Asset, Enterprise App, Profile, Provisioning Profile and Store App.",
+				MarkdownDescription: "Type of the artifact. Valid values are `Activation`, `Asset`, `Certificate Asset`, `Configuration`, `Configuration (manual)`, `Data Asset`, `Enterprise App`, `Profile`, `Provisioning Profile` and `Store App`.",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{
@@ -78,16 +78,16 @@ func (r *MDMArtifactResource) Schema(ctx context.Context, req resource.SchemaReq
 				},
 			},
 			"channel": schema.StringAttribute{
-				Description:         "Channel of the artifact.",
-				MarkdownDescription: "Channel of the artifact.",
+				Description:         "Channel of the artifact. Valid values are Device and User.",
+				MarkdownDescription: "Channel of the artifact. Valid values are `Device` and `User`.",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"Device", "User"}...),
 				},
 			},
 			"platforms": schema.SetAttribute{
-				Description:         "Platforms of the artifact.",
-				MarkdownDescription: "Platforms of the artifact.",
+				Description:         "Platforms of the artifact. Valid values are macOS, iOS, iPadOS and tvOS.",
+				MarkdownDescription: "Platforms of the artifact. Valid values are `macOS`, `iOS`, `iPadOS` and `tvOS`.",
 				ElementType:         types.StringType,
 				Required:            true,
 				Validators: []validator.Set{

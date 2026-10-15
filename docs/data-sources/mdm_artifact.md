@@ -23,10 +23,10 @@ The data source `zentral_mdm_artifact` allows details of a MDM artifact to be re
 ### Read-Only
 
 - `auto_update` (Boolean) If `true`, new version of this artifact will be automatically installed.
-- `channel` (String) Channel of the artifact.
+- `channel` (String) Channel of the artifact. Valid values are `Device` and `User`.
 - `install_during_setup_assistant` (Boolean) If `true`, this artifact will be installed during the setup assistant.
-- `platforms` (Set of String) Platforms of the artifact.
+- `platforms` (Set of String) Platforms of the artifact. Valid values are `macOS`, `iOS`, `iPadOS` and `tvOS`.
 - `reinstall_interval` (Number) In days, the time interval after which the artifact will be reinstalled. If `0`, the artifact will not be reinstalled.
 - `reinstall_on_os_update` (String) Possible values: `No`, `Major`, `Minor`, `Patch`. Defaults to `No`.
 - `requires` (Set of String) `ID`s of the artifacts required by this artifact.
-- `type` (String) Type of the artifact.
+- `type` (String) Type of the artifact. Valid values are `Activation`, `Asset`, `Certificate Asset`, `Configuration`, `Configuration (manual)`, `Data Asset`, `Enterprise App`, `Profile`, `Provisioning Profile` and `Store App`.

@@ -17,10 +17,10 @@ The resource `zentral_mdm_artifact` manages MDM artifacts.
 
 ### Required
 
-- `channel` (String) Channel of the artifact.
+- `channel` (String) Channel of the artifact. Valid values are `Device` and `User`.
 - `name` (String) Name of the artifact.
-- `platforms` (Set of String) Platforms of the artifact.
-- `type` (String) Type of the artifact.
+- `platforms` (Set of String) Platforms of the artifact. Valid values are `macOS`, `iOS`, `iPadOS` and `tvOS`.
+- `type` (String) Type of the artifact. Valid values are `Activation`, `Asset`, `Certificate Asset`, `Configuration`, `Configuration (manual)`, `Data Asset`, `Enterprise App`, `Profile`, `Provisioning Profile` and `Store App`.
 
 ### Optional
 

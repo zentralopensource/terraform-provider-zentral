@@ -64,8 +64,8 @@ func (r *MDMSoftwareUpdateEnforcementResource) Schema(ctx context.Context, req r
 				Default:             stringdefault.StaticString(""),
 			},
 			"platforms": schema.SetAttribute{
-				Description:         "Restrict the software update enforcement to some platforms.",
-				MarkdownDescription: "Restrict the software update enforcement to some platforms.",
+				Description:         "Restrict the software update enforcement to some platforms. Valid values are macOS, iOS, iPadOS and tvOS.",
+				MarkdownDescription: "Restrict the software update enforcement to some platforms. Valid values are `macOS`, `iOS`, `iPadOS` and `tvOS`.",
 				ElementType:         types.StringType,
 				Required:            true,
 				Validators: []validator.Set{
