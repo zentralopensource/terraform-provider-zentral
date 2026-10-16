@@ -2,7 +2,7 @@
 
 Terraform provider for [Zentral](https://github.com/zentralopensource/zentral/) — the Django platform that orchestrates MDM, Munki, Osquery, Santa, etc. on Apple fleets. This repo is a thin shell: Terraform schemas in front of the [goztl](https://github.com/zentralopensource/goztl) Go client, which itself wraps Zentral's REST API.
 
-Built on the modern [Terraform Plugin Framework](https://developer.hashicorp.com/terraform/plugin/framework) (not the legacy SDKv2). Registry address: `registry.terraform.io/zentral/zentral`.
+Built on the modern [Terraform Plugin Framework](https://developer.hashicorp.com/terraform/plugin/framework) (not the legacy SDKv2). Registry address: `registry.terraform.io/zentralopensource/zentral`.
 
 Three repos in play, all checked out side-by-side:
 - `.` — this repo, the provider.
