@@ -129,4 +129,8 @@ To run a single test: `... go test ./internal/provider/ -v -run TestAccTagResour
 - `go generate ./...` — must produce a zero diff (`generate` job).
 - `go test -v -cover ./internal/provider/` with `TF_ACC=1` against a CI-managed Zentral (`test` job, currently pinned to Terraform `1.16.*`).
 
+[.github/workflows/govulncheck.yml](.github/workflows/govulncheck.yml) runs `govulncheck ./...` on the same events and daily, because new advisories show up without any commit.
+
+**The `toolchain` line in `go.mod` is the Go that ships.** Every job, the release one included, installs Go with setup-go's `go-version-file: 'go.mod'`, which takes `toolchain` over `go` and then pins `GOTOOLCHAIN=local`. Without a `toolchain` line, releases are built with the exact `go` version, never with a later patch release. When govulncheck flags the standard library, bump `toolchain` to the fixed patch release — Dependabot never touches it. The `go` line is the minimum and only moves on purpose.
+
 Releases are tag-driven (`v*`) via GoReleaser — `.goreleaser.yaml` produces a signed multi-arch release that the Terraform Registry consumes.
