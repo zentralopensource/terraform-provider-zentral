@@ -33,6 +33,10 @@ func TestAccMDMSoftwareUpdateEnforcementResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
+						resourceName, "min_device_os_version", ""),
+					resource.TestCheckResourceAttr(
+						resourceName, "max_device_os_version", ""),
+					resource.TestCheckResourceAttr(
 						resourceName, "os_version", ""),
 					resource.TestCheckResourceAttr(
 						resourceName, "build_version", ""),
@@ -69,6 +73,10 @@ func TestAccMDMSoftwareUpdateEnforcementResource(t *testing.T) {
 					resource.TestCheckTypeSetElemAttrPair(
 						resourceName, "tag_ids.*", tResourceName, "id"),
 					resource.TestCheckResourceAttr(
+						resourceName, "min_device_os_version", "26"),
+					resource.TestCheckResourceAttr(
+						resourceName, "max_device_os_version", "27"),
+					resource.TestCheckResourceAttr(
 						resourceName, "os_version", "14.1"),
 					resource.TestCheckResourceAttr(
 						resourceName, "build_version", "23B74"),
@@ -88,12 +96,16 @@ func TestAccMDMSoftwareUpdateEnforcementResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
-			// Remove the tags from the config
+			// Remove the tags and the device OS version range from the config
 			{
 				Config: testAccMDMSoftwareUpdateEnforcementResourceConfigOneTime(secondName, false),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						resourceName, "tag_ids.#", "0"),
+					resource.TestCheckResourceAttr(
+						resourceName, "min_device_os_version", ""),
+					resource.TestCheckResourceAttr(
+						resourceName, "max_device_os_version", ""),
 				),
 			},
 			// ImportState
@@ -119,7 +131,9 @@ resource "zentral_mdm_software_update_enforcement" "test" {
 func testAccMDMSoftwareUpdateEnforcementResourceConfigOneTime(name string, withTagIDs bool) string {
 	tagIDs := ""
 	if withTagIDs {
-		tagIDs = "tag_ids        = [zentral_tag.test.id]"
+		tagIDs = `tag_ids        = [zentral_tag.test.id]
+  min_device_os_version = "26"
+  max_device_os_version = "27"`
 	}
 	return fmt.Sprintf(`
 resource "zentral_tag" "test" {

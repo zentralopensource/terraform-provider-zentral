@@ -1,37 +1,44 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/zentralopensource/goztl"
 )
 
+const minZentralVersionSUEDeviceOSVersion = "v2026.6"
+
 type mdmSoftwareUpdateEnforcement struct {
-	ID            types.Int64  `tfsdk:"id"`
-	Name          types.String `tfsdk:"name"`
-	DetailsURL    types.String `tfsdk:"details_url"`
-	Platforms     types.Set    `tfsdk:"platforms"`
-	TagIDs        types.Set    `tfsdk:"tag_ids"`
-	OSVersion     types.String `tfsdk:"os_version"`
-	BuildVersion  types.String `tfsdk:"build_version"`
-	LocalDateTime types.String `tfsdk:"local_datetime"`
-	MaxOSVersion  types.String `tfsdk:"max_os_version"`
-	DelayDays     types.Int64  `tfsdk:"delay_days"`
-	LocalTime     types.String `tfsdk:"local_time"`
+	ID                 types.Int64  `tfsdk:"id"`
+	Name               types.String `tfsdk:"name"`
+	DetailsURL         types.String `tfsdk:"details_url"`
+	Platforms          types.Set    `tfsdk:"platforms"`
+	TagIDs             types.Set    `tfsdk:"tag_ids"`
+	MinDeviceOSVersion types.String `tfsdk:"min_device_os_version"`
+	MaxDeviceOSVersion types.String `tfsdk:"max_device_os_version"`
+	OSVersion          types.String `tfsdk:"os_version"`
+	BuildVersion       types.String `tfsdk:"build_version"`
+	LocalDateTime      types.String `tfsdk:"local_datetime"`
+	MaxOSVersion       types.String `tfsdk:"max_os_version"`
+	DelayDays          types.Int64  `tfsdk:"delay_days"`
+	LocalTime          types.String `tfsdk:"local_time"`
 }
 
 func mdmSoftwareUpdateEnforcementForState(msue *goztl.MDMSoftwareUpdateEnforcement) mdmSoftwareUpdateEnforcement {
 	return mdmSoftwareUpdateEnforcement{
-		ID:            types.Int64Value(int64(msue.ID)),
-		Name:          types.StringValue(msue.Name),
-		DetailsURL:    types.StringValue(msue.DetailsURL),
-		Platforms:     stringSetForState(msue.Platforms),
-		TagIDs:        int64SetForState(msue.TagIDs),
-		OSVersion:     types.StringValue(msue.OSVersion),
-		BuildVersion:  types.StringValue(msue.BuildVersion),
-		LocalDateTime: optionalStringForState(msue.LocalDateTime),
-		MaxOSVersion:  types.StringValue(msue.MaxOSVersion),
-		DelayDays:     optionalInt64ForState(msue.DelayDays),
-		LocalTime:     optionalStringForState(msue.LocalTime),
+		ID:                 types.Int64Value(int64(msue.ID)),
+		Name:               types.StringValue(msue.Name),
+		DetailsURL:         types.StringValue(msue.DetailsURL),
+		Platforms:          stringSetForState(msue.Platforms),
+		TagIDs:             int64SetForState(msue.TagIDs),
+		MinDeviceOSVersion: types.StringValue(msue.MinDeviceOSVersion),
+		MaxDeviceOSVersion: types.StringValue(msue.MaxDeviceOSVersion),
+		OSVersion:          types.StringValue(msue.OSVersion),
+		BuildVersion:       types.StringValue(msue.BuildVersion),
+		LocalDateTime:      optionalStringForState(msue.LocalDateTime),
+		MaxOSVersion:       types.StringValue(msue.MaxOSVersion),
+		DelayDays:          optionalInt64ForState(msue.DelayDays),
+		LocalTime:          optionalStringForState(msue.LocalTime),
 	}
 }
 
@@ -55,15 +62,28 @@ func mdmSoftwareUpdateEnforcementRequestWithState(data mdmSoftwareUpdateEnforcem
 	}
 
 	return &goztl.MDMSoftwareUpdateEnforcementRequest{
-		Name:          data.Name.ValueString(),
-		DetailsURL:    data.DetailsURL.ValueString(),
-		Platforms:     stringListWithStateSet(data.Platforms),
-		TagIDs:        intListWithState(data.TagIDs),
-		OSVersion:     data.OSVersion.ValueString(),
-		BuildVersion:  data.BuildVersion.ValueString(),
-		LocalDateTime: optionalStringWithState(data.LocalDateTime),
-		MaxOSVersion:  data.MaxOSVersion.ValueString(),
-		DelayDays:     dd,
-		LocalTime:     lt,
+		Name:               data.Name.ValueString(),
+		DetailsURL:         data.DetailsURL.ValueString(),
+		Platforms:          stringListWithStateSet(data.Platforms),
+		TagIDs:             intListWithState(data.TagIDs),
+		MinDeviceOSVersion: data.MinDeviceOSVersion.ValueString(),
+		MaxDeviceOSVersion: data.MaxDeviceOSVersion.ValueString(),
+		OSVersion:          data.OSVersion.ValueString(),
+		BuildVersion:       data.BuildVersion.ValueString(),
+		LocalDateTime:      optionalStringWithState(data.LocalDateTime),
+		MaxOSVersion:       data.MaxOSVersion.ValueString(),
+		DelayDays:          dd,
+		LocalTime:          lt,
 	}
+}
+
+func checkMDMSoftwareUpdateEnforcementDeviceOSVersionSupport(diags *diag.Diagnostics, planned mdmSoftwareUpdateEnforcement, echoed *goztl.MDMSoftwareUpdateEnforcement) {
+	checkStringAttributeSupport(
+		diags, "min_device_os_version", minZentralVersionSUEDeviceOSVersion,
+		planned.MinDeviceOSVersion, echoed.MinDeviceOSVersion, "",
+	)
+	checkStringAttributeSupport(
+		diags, "max_device_os_version", minZentralVersionSUEDeviceOSVersion,
+		planned.MaxDeviceOSVersion, echoed.MaxDeviceOSVersion, "",
+	)
 }

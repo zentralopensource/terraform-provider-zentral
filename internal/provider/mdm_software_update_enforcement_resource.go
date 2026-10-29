@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
@@ -22,6 +23,8 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces
 var _ resource.Resource = &MDMSoftwareUpdateEnforcementResource{}
+
+var deviceOSVersionBoundRegexp = regexp.MustCompile(`^(\d+(\.\d+){0,2})?$`)
 var _ resource.ResourceWithImportState = &MDMSoftwareUpdateEnforcementResource{}
 
 func NewMDMSoftwareUpdateEnforcementResource() resource.Resource {
@@ -80,6 +83,30 @@ func (r *MDMSoftwareUpdateEnforcementResource) Schema(ctx context.Context, req r
 				Optional:            true,
 				Computed:            true,
 				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
+			},
+			"min_device_os_version": schema.StringAttribute{
+				Description: "Only the devices with an OS version greater than or equal to this version are enforced. " +
+					"A version with at most three components, such as 26 or 26.3.1. Requires Zentral v2026.6 or later.",
+				MarkdownDescription: "Only the devices with an OS version greater than or equal to this version are enforced. " +
+					"A version with at most three components, such as `26` or `26.3.1`. Requires Zentral `v2026.6` or later.",
+				Optional: true,
+				Computed: true,
+				Default:  stringdefault.StaticString(""),
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(deviceOSVersionBoundRegexp, "must be a version with at most three components"),
+				},
+			},
+			"max_device_os_version": schema.StringAttribute{
+				Description: "Only the devices with an OS version lower than this version are enforced. " +
+					"A version with at most three components, such as 27 or 27.1. Requires Zentral v2026.6 or later.",
+				MarkdownDescription: "Only the devices with an OS version lower than this version are enforced. " +
+					"A version with at most three components, such as `27` or `27.1`. Requires Zentral `v2026.6` or later.",
+				Optional: true,
+				Computed: true,
+				Default:  stringdefault.StaticString(""),
+				Validators: []validator.String{
+					stringvalidator.RegexMatches(deviceOSVersionBoundRegexp, "must be a version with at most three components"),
+				},
 			},
 			"os_version": schema.StringAttribute{
 				Description:         "The target OS version to update the device to by the appropriate time.",
@@ -169,6 +196,7 @@ func (r *MDMSoftwareUpdateEnforcementResource) Create(ctx context.Context, req r
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, mdmSoftwareUpdateEnforcementForState(ztlMSUE))...)
+	checkMDMSoftwareUpdateEnforcementDeviceOSVersionSupport(&resp.Diagnostics, data, ztlMSUE)
 }
 
 func (r *MDMSoftwareUpdateEnforcementResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -219,6 +247,7 @@ func (r *MDMSoftwareUpdateEnforcementResource) Update(ctx context.Context, req r
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, mdmSoftwareUpdateEnforcementForState(ztlMSUE))...)
+	checkMDMSoftwareUpdateEnforcementDeviceOSVersionSupport(&resp.Diagnostics, data, ztlMSUE)
 }
 
 func (r *MDMSoftwareUpdateEnforcementResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
