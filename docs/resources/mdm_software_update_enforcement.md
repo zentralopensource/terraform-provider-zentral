@@ -38,7 +38,8 @@ resource "zentral_tag" "upgrade_27" {
 
 # The tagged devices are upgraded to the latest macOS 27 update, whatever their OS version.
 # The tags rank before the device OS version range, so this enforcement wins over "macOS 26"
-# for a tagged macOS 26 device. After the upgrade, "macOS 27" takes over with the same target.
+# for a tagged macOS 26 device, and keeps winning for as long as the device has the tag.
+# Remove the tag after the upgrade: the device falls under "macOS 27".
 resource "zentral_mdm_software_update_enforcement" "upgrade_27" {
   name           = "Upgrade to macOS 27"
   platforms      = ["macOS"]

@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"regexp"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/setvalidator"
@@ -23,9 +22,8 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces
 var _ resource.Resource = &MDMSoftwareUpdateEnforcementResource{}
-
-var deviceOSVersionBoundRegexp = regexp.MustCompile(`^(\d+(\.\d+){0,2})?$`)
 var _ resource.ResourceWithImportState = &MDMSoftwareUpdateEnforcementResource{}
+var _ resource.ResourceWithValidateConfig = &MDMSoftwareUpdateEnforcementResource{}
 
 func NewMDMSoftwareUpdateEnforcementResource() resource.Resource {
 	return &MDMSoftwareUpdateEnforcementResource{}
@@ -93,7 +91,7 @@ func (r *MDMSoftwareUpdateEnforcementResource) Schema(ctx context.Context, req r
 				Computed: true,
 				Default:  stringdefault.StaticString(""),
 				Validators: []validator.String{
-					stringvalidator.RegexMatches(deviceOSVersionBoundRegexp, "must be a version with at most three components"),
+					deviceOSVersionBoundValidator{},
 				},
 			},
 			"max_device_os_version": schema.StringAttribute{
@@ -105,7 +103,7 @@ func (r *MDMSoftwareUpdateEnforcementResource) Schema(ctx context.Context, req r
 				Computed: true,
 				Default:  stringdefault.StaticString(""),
 				Validators: []validator.String{
-					stringvalidator.RegexMatches(deviceOSVersionBoundRegexp, "must be a version with at most three components"),
+					deviceOSVersionBoundValidator{},
 				},
 			},
 			"os_version": schema.StringAttribute{
@@ -151,6 +149,17 @@ func (r *MDMSoftwareUpdateEnforcementResource) Schema(ctx context.Context, req r
 			},
 		},
 	}
+}
+
+func (r *MDMSoftwareUpdateEnforcementResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var data mdmSoftwareUpdateEnforcement
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	validateDeviceOSVersionRange(&resp.Diagnostics, data.MinDeviceOSVersion, data.MaxDeviceOSVersion)
 }
 
 func (r *MDMSoftwareUpdateEnforcementResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
