@@ -38,6 +38,10 @@ func TestAccMDMSoftwareUpdateEnforcementDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "tag_ids.#", "0"),
 					resource.TestCheckResourceAttr(
+						ds1ResourceName, "min_device_os_version", ""),
+					resource.TestCheckResourceAttr(
+						ds1ResourceName, "max_device_os_version", ""),
+					resource.TestCheckResourceAttr(
 						ds1ResourceName, "os_version", ""),
 					resource.TestCheckResourceAttr(
 						ds1ResourceName, "build_version", ""),
@@ -62,6 +66,10 @@ func TestAccMDMSoftwareUpdateEnforcementDataSource(t *testing.T) {
 						ds2ResourceName, "tag_ids.#", "1"),
 					resource.TestCheckTypeSetElemAttrPair(
 						ds2ResourceName, "tag_ids.*", tResourceName, "id"),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "min_device_os_version", ""),
+					resource.TestCheckResourceAttr(
+						ds2ResourceName, "max_device_os_version", ""),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "os_version", "14.1"),
 					resource.TestCheckResourceAttr(

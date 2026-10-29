@@ -27,7 +27,9 @@ The data source `zentral_mdm_software_update_enforcement` allows details of a MD
 - `details_url` (String) The URL of a web page that shows details that the organization provides about the enforced update.
 - `local_datetime` (String) The local date time value that specifies when to force install the software update.
 - `local_time` (String) The local time value that specifies when to force install the software update.
+- `max_device_os_version` (String) Only the devices with an OS version lower than this version are enforced. Requires Zentral `v2026.6` or later, older servers report an empty string.
 - `max_os_version` (String) The maximum (excluded) target OS version to update the device to by the appropriate time.
+- `min_device_os_version` (String) Only the devices with an OS version greater than or equal to this version are enforced. Requires Zentral `v2026.6` or later, older servers report an empty string.
 - `os_version` (String) The target OS version to update the device to by the appropriate time.
 - `platforms` (Set of String) The platforms this software update enforcement is scoped to. Valid values are `macOS`, `iOS`, `iPadOS` and `tvOS`.
 - `tag_ids` (Set of Number) The `ID`s of the tags used to scope the software update enforcement.

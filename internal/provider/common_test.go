@@ -235,3 +235,34 @@ resource "zentral_mdm_recovery_password_config" "test" {
 		},
 	})
 }
+
+func TestAccMDMSoftwareUpdateEnforcementResourceUnsupportedDeviceOSVersion(t *testing.T) {
+	server := testAccOldZentralServer(
+		t, "mdm/software_update_enforcements/", "min_device_os_version", "max_device_os_version",
+	)
+	name := acctest.RandString(12)
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: fmt.Sprintf(`
+provider "zentral" {
+  base_url = %[1]q
+  token    = "stub"
+}
+
+resource "zentral_mdm_software_update_enforcement" "test" {
+  name                  = %[2]q
+  platforms             = ["macOS"]
+  min_device_os_version = "26"
+  max_device_os_version = "27"
+  max_os_version        = "27"
+}
+`, server.URL+"/", name),
+				ExpectError: regexpUnsupportedZentralVersion("min_device_os_version", minZentralVersionSUEDeviceOSVersion),
+			},
+		},
+	})
+}

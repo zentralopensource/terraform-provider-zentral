@@ -23,6 +23,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces
 var _ resource.Resource = &MDMSoftwareUpdateEnforcementResource{}
 var _ resource.ResourceWithImportState = &MDMSoftwareUpdateEnforcementResource{}
+var _ resource.ResourceWithValidateConfig = &MDMSoftwareUpdateEnforcementResource{}
 
 func NewMDMSoftwareUpdateEnforcementResource() resource.Resource {
 	return &MDMSoftwareUpdateEnforcementResource{}
@@ -81,6 +82,30 @@ func (r *MDMSoftwareUpdateEnforcementResource) Schema(ctx context.Context, req r
 				Computed:            true,
 				Default:             setdefault.StaticValue(types.SetValueMust(types.Int64Type, []attr.Value{})),
 			},
+			"min_device_os_version": schema.StringAttribute{
+				Description: "Only the devices with an OS version greater than or equal to this version are enforced. " +
+					"A version with at most three components, such as 26 or 26.3.1. Requires Zentral v2026.6 or later.",
+				MarkdownDescription: "Only the devices with an OS version greater than or equal to this version are enforced. " +
+					"A version with at most three components, such as `26` or `26.3.1`. Requires Zentral `v2026.6` or later.",
+				Optional: true,
+				Computed: true,
+				Default:  stringdefault.StaticString(""),
+				Validators: []validator.String{
+					deviceOSVersionBoundValidator{},
+				},
+			},
+			"max_device_os_version": schema.StringAttribute{
+				Description: "Only the devices with an OS version lower than this version are enforced. " +
+					"A version with at most three components, such as 27 or 27.1. Requires Zentral v2026.6 or later.",
+				MarkdownDescription: "Only the devices with an OS version lower than this version are enforced. " +
+					"A version with at most three components, such as `27` or `27.1`. Requires Zentral `v2026.6` or later.",
+				Optional: true,
+				Computed: true,
+				Default:  stringdefault.StaticString(""),
+				Validators: []validator.String{
+					deviceOSVersionBoundValidator{},
+				},
+			},
 			"os_version": schema.StringAttribute{
 				Description:         "The target OS version to update the device to by the appropriate time.",
 				MarkdownDescription: "The target OS version to update the device to by the appropriate time.",
@@ -126,6 +151,17 @@ func (r *MDMSoftwareUpdateEnforcementResource) Schema(ctx context.Context, req r
 	}
 }
 
+func (r *MDMSoftwareUpdateEnforcementResource) ValidateConfig(ctx context.Context, req resource.ValidateConfigRequest, resp *resource.ValidateConfigResponse) {
+	var data mdmSoftwareUpdateEnforcement
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	validateDeviceOSVersionRange(&resp.Diagnostics, data.MinDeviceOSVersion, data.MaxDeviceOSVersion)
+}
+
 func (r *MDMSoftwareUpdateEnforcementResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
@@ -169,6 +205,7 @@ func (r *MDMSoftwareUpdateEnforcementResource) Create(ctx context.Context, req r
 
 	// Save data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, mdmSoftwareUpdateEnforcementForState(ztlMSUE))...)
+	checkMDMSoftwareUpdateEnforcementDeviceOSVersionSupport(&resp.Diagnostics, data, ztlMSUE)
 }
 
 func (r *MDMSoftwareUpdateEnforcementResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
@@ -219,6 +256,7 @@ func (r *MDMSoftwareUpdateEnforcementResource) Update(ctx context.Context, req r
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, mdmSoftwareUpdateEnforcementForState(ztlMSUE))...)
+	checkMDMSoftwareUpdateEnforcementDeviceOSVersionSupport(&resp.Diagnostics, data, ztlMSUE)
 }
 
 func (r *MDMSoftwareUpdateEnforcementResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {

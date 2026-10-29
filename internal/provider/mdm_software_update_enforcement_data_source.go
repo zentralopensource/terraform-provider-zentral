@@ -59,6 +59,20 @@ func (d *MDMSoftwareUpdateEnforcementDataSource) Schema(ctx context.Context, req
 				ElementType:         types.Int64Type,
 				Computed:            true,
 			},
+			"min_device_os_version": schema.StringAttribute{
+				Description: "Only the devices with an OS version greater than or equal to this version are enforced. " +
+					"Requires Zentral v2026.6 or later, older servers report an empty string.",
+				MarkdownDescription: "Only the devices with an OS version greater than or equal to this version are enforced. " +
+					"Requires Zentral `v2026.6` or later, older servers report an empty string.",
+				Computed: true,
+			},
+			"max_device_os_version": schema.StringAttribute{
+				Description: "Only the devices with an OS version lower than this version are enforced. " +
+					"Requires Zentral v2026.6 or later, older servers report an empty string.",
+				MarkdownDescription: "Only the devices with an OS version lower than this version are enforced. " +
+					"Requires Zentral `v2026.6` or later, older servers report an empty string.",
+				Computed: true,
+			},
 			"os_version": schema.StringAttribute{
 				Description:         "The target OS version to update the device to by the appropriate time.",
 				MarkdownDescription: "The target OS version to update the device to by the appropriate time.",
