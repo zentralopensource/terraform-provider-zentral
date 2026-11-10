@@ -90,7 +90,7 @@ func TestAccMDMACMEIssuerDataSource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "ident.bearer_token", "YoloFomo"),
 					resource.TestCheckResourceAttr(
-						ds2ResourceName, "ident.request_timeout", "30"),
+						ds2ResourceName, "ident.request_timeout", "15"),
 					resource.TestCheckResourceAttr(
 						ds2ResourceName, "ident.max_retries", "3"),
 					resource.TestCheckNoResourceAttr(

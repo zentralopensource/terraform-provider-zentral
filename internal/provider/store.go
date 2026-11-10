@@ -17,7 +17,7 @@ const (
 	tfStoreHTTPBackendMinRequestTimeout                = 1
 	tfStoreHTTPBackendMaxRequestTimeout                = 600
 	tfStoreHTTPBackendDefaultMaxRetries                = 3
-	tfStoreHTTPBackendMinMaxRetries                    = 1
+	tfStoreHTTPBackendMinMaxRetries                    = 0
 	tfStoreHTTPBackendMaxMaxRetries                    = 5
 	tfStoreKinesisBackendDefaultBatchSize              = 1
 	tfStoreKinesisBackendMinBatchSize                  = 1
@@ -31,6 +31,11 @@ const (
 	tfStoreSplunkBackendDefaultBatchSize               = 1
 	tfStoreSplunkBackendMinBatchSize                   = 1
 	tfStoreSplunkBackendMaxBatchSize                   = 100
+)
+
+var tfStoreHTTPBackendMaxRetriesDesc, tfStoreHTTPBackendMaxRetriesMDDesc = int64RangeDescriptions(
+	"Number of retries after a failed request.",
+	tfStoreHTTPBackendMinMaxRetries, tfStoreHTTPBackendMaxMaxRetries, tfStoreHTTPBackendDefaultMaxRetries,
 )
 
 type store struct {

@@ -185,7 +185,7 @@ Optional:
 
 - `concurrency` (Number) Number of threads used to post to the endpoints. Defaults to `1`.
 - `headers` (Attributes Set) A set of additional HTTP headers to add to the POST requests. (see [below for nested schema](#nestedatt--http--headers))
-- `max_retries` (Number) Number of retries after a failed request. Defaults to `3`.
+- `max_retries` (Number) Number of retries after a failed request. Between `0` and `5`. Defaults to `3`.
 - `password` (String, Sensitive) Password for basic authentication.
 - `request_timeout` (Number) Request timeout in seconds. Defaults to `120` seconds.
 - `username` (String) Username for basic authentication.

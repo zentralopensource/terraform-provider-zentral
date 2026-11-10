@@ -134,9 +134,9 @@ func TestAccMDMACMEIssuerResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "ident.bearer_token", "YoloFomo"),
 					resource.TestCheckResourceAttr(
-						resourceName, "ident.request_timeout", "123"),
+						resourceName, "ident.request_timeout", "30"),
 					resource.TestCheckResourceAttr(
-						resourceName, "ident.max_retries", "5"),
+						resourceName, "ident.max_retries", "3"),
 					resource.TestCheckNoResourceAttr(
 						resourceName, "microsoft_ca"),
 					resource.TestCheckNoResourceAttr(
@@ -208,8 +208,8 @@ resource  "zentral_mdm_acme_issuer" "test" {
   ident              = {
       url             = "https://www.example.com/ident"
       bearer_token    = "YoloFomo"
-      request_timeout = 123
-      max_retries     = 5
+      request_timeout = 30
+      max_retries     = 3
   }
 }
 `, name)

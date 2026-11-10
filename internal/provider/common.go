@@ -130,6 +130,13 @@ var trimmedStringValidator = stringvalidator.RegexMatches(
 	"must not start or end with whitespace",
 )
 
+// Descriptions
+
+func int64RangeDescriptions(subject string, lower, upper, defaultValue int64) (string, string) {
+	return fmt.Sprintf("%s Between %d and %d. Defaults to %d.", subject, lower, upper, defaultValue),
+		fmt.Sprintf("%s Between `%d` and `%d`. Defaults to `%d`.", subject, lower, upper, defaultValue)
+}
+
 // Bool (optional)
 
 func optionalBoolForState(b *bool) types.Bool {

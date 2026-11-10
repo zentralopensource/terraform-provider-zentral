@@ -49,8 +49,8 @@ Required:
 
 Optional:
 
-- `max_retries` (Number) Max number of retries.
-- `request_timeout` (Number) Request timeout.
+- `max_retries` (Number) Number of retries after a failed request. Between `0` and `3`. Defaults to `3`.
+- `request_timeout` (Number) Request timeout, in seconds. Between `1` and `30`. Defaults to `15`.
 
 
 <a id="nestedatt--microsoft_ca"></a>

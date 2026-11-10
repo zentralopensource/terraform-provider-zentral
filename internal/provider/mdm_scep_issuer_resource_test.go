@@ -115,7 +115,7 @@ func TestAccMDMSCEPIssuerResource(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						resourceName, "ident.bearer_token", "YoloFomo"),
 					resource.TestCheckResourceAttr(
-						resourceName, "ident.request_timeout", "30"),
+						resourceName, "ident.request_timeout", "15"),
 					resource.TestCheckResourceAttr(
 						resourceName, "ident.max_retries", "3"),
 					resource.TestCheckNoResourceAttr(

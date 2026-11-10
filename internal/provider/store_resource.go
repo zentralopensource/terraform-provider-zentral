@@ -121,17 +121,11 @@ var httpBackendSchema schema.SingleNestedAttribute = schema.SingleNestedAttribut
 			},
 		},
 		"max_retries": schema.Int64Attribute{
-			Description: fmt.Sprintf(
-				"Number of retries after a failed request. Defaults to %d.",
-				tfStoreHTTPBackendDefaultMaxRetries,
-			),
-			MarkdownDescription: fmt.Sprintf(
-				"Number of retries after a failed request. Defaults to `%d`.",
-				tfStoreHTTPBackendDefaultMaxRetries,
-			),
-			Optional: true,
-			Computed: true,
-			Default:  int64default.StaticInt64(tfStoreHTTPBackendDefaultMaxRetries),
+			Description:         tfStoreHTTPBackendMaxRetriesDesc,
+			MarkdownDescription: tfStoreHTTPBackendMaxRetriesMDDesc,
+			Optional:            true,
+			Computed:            true,
+			Default:             int64default.StaticInt64(tfStoreHTTPBackendDefaultMaxRetries),
 			Validators: []validator.Int64{
 				int64validator.Between(tfStoreHTTPBackendMinMaxRetries, tfStoreHTTPBackendMaxMaxRetries),
 			},

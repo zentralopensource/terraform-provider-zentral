@@ -3,6 +3,7 @@ package provider
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	dataschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
@@ -32,8 +33,20 @@ const (
 	tfDigicertRFC882Name                      = "rfc822Name"
 	tfDigicertDNSName                         = "dNSName"
 	tfDigicertUserSeatType                    = "USER_SEAT"
-	tfIDentDefaultRequestTimeout       int64  = 30
+	tfIDentDefaultRequestTimeout       int64  = 15
+	tfIDentMinRequestTimeout                  = 1
+	tfIDentMaxRequestTimeout                  = 30
 	tfIDentDefaultMaxRetries                  = 3
+	tfIDentMinMaxRetries                      = 0
+	tfIDentMaxMaxRetries                      = 3
+)
+
+var tfIDentRequestTimeoutDesc, tfIDentRequestTimeoutMDDesc = int64RangeDescriptions(
+	"Request timeout, in seconds.", tfIDentMinRequestTimeout, tfIDentMaxRequestTimeout, tfIDentDefaultRequestTimeout,
+)
+
+var tfIDentMaxRetriesDesc, tfIDentMaxRetriesMDDesc = int64RangeDescriptions(
+	"Number of retries after a failed request.", tfIDentMinMaxRetries, tfIDentMaxMaxRetries, tfIDentDefaultMaxRetries,
 )
 
 // Digicert
@@ -261,13 +274,13 @@ func makeIDentBackendDataSourceAttribute() dataschema.SingleNestedAttribute {
 				Computed:            true,
 			},
 			"request_timeout": dataschema.Int64Attribute{
-				Description:         "Request timeout.",
-				MarkdownDescription: "Request timeout.",
+				Description:         tfIDentRequestTimeoutDesc,
+				MarkdownDescription: tfIDentRequestTimeoutMDDesc,
 				Computed:            true,
 			},
 			"max_retries": dataschema.Int64Attribute{
-				Description:         "Max number of retries.",
-				MarkdownDescription: "Max number of retries.",
+				Description:         tfIDentMaxRetriesDesc,
+				MarkdownDescription: tfIDentMaxRetriesMDDesc,
 				Computed:            true,
 			},
 		},
@@ -293,18 +306,24 @@ func makeIDentBackendResourceAttribute() schema.SingleNestedAttribute {
 				Required:            true,
 			},
 			"request_timeout": schema.Int64Attribute{
-				Description:         "Request timeout.",
-				MarkdownDescription: "Request timeout.",
+				Description:         tfIDentRequestTimeoutDesc,
+				MarkdownDescription: tfIDentRequestTimeoutMDDesc,
 				Optional:            true,
 				Computed:            true,
 				Default:             int64default.StaticInt64(tfIDentDefaultRequestTimeout),
+				Validators: []validator.Int64{
+					int64validator.Between(tfIDentMinRequestTimeout, tfIDentMaxRequestTimeout),
+				},
 			},
 			"max_retries": schema.Int64Attribute{
-				Description:         "Max number of retries.",
-				MarkdownDescription: "Max number of retries.",
+				Description:         tfIDentMaxRetriesDesc,
+				MarkdownDescription: tfIDentMaxRetriesMDDesc,
 				Optional:            true,
 				Computed:            true,
 				Default:             int64default.StaticInt64(tfIDentDefaultMaxRetries),
+				Validators: []validator.Int64{
+					int64validator.Between(tfIDentMinMaxRetries, tfIDentMaxMaxRetries),
+				},
 			},
 		},
 		Optional: true,
