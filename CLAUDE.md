@@ -127,7 +127,7 @@ To run a single test: `... go test ./internal/provider/ -v -run TestAccTagResour
 
 - `go build -v .` (build job).
 - `go generate ./...` — must produce a zero diff (`generate` job).
-- `go test -v -cover ./internal/provider/` with `TF_ACC=1` against a CI-managed Zentral (`test` job, currently pinned to Terraform `1.16.*`).
+- `go test -v -cover ./internal/provider/` with `TF_ACC=1` against a CI-managed Zentral (`test` job, currently on Terraform `1.16.*` and `1.17.*`).
 
 [.github/workflows/govulncheck.yml](.github/workflows/govulncheck.yml) runs `govulncheck ./...` on the same events and daily, because new advisories show up without any commit.
 
