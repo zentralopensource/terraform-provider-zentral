@@ -1,6 +1,6 @@
 module github.com/zentralopensource/terraform-provider-zentral
 
-go 1.26.10
+go 1.26.11
 
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.25.0
